@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as $ from 'jquery';
 import * as PIXI from 'pixi.js';
+import { LunnEngineComponent } from '../LunnEngine/LunnEngineComponent';
 
 @Component({
   moduleId: module.id,
@@ -8,17 +9,16 @@ import * as PIXI from 'pixi.js';
   templateUrl: './first.component.html',
   styleUrls: ['./first.component.css']
 })
-export class FirstComponent implements OnInit, OnDestroy {
-
-  private app: PIXI.Application;
+export class FirstComponent extends LunnEngineComponent implements OnInit, OnDestroy {
 
   constructor() {
+    super();
   }
 
   ngOnInit() {
-    this.app = new PIXI.Application(800, 600, { backgroundColor: 0x1099bb, view: $('#firstGameCanvas').get(0) as HTMLCanvasElement });
+    this.init(800, 600, { backgroundColor: 0x1099bb, view: $('#firstGameCanvas').get(0) as HTMLCanvasElement });
 
-    PIXI.loader.add('bunny', 'assets/bunny.png').load((loader, resources) => {
+    PIXI.loader.add('bunny', 'assets/bunny.png').load((loader: any, resources: any) => {
 
       // This creates a texture from a 'bunny.png' image.
       const bunny = new PIXI.Sprite(resources.bunny.texture);
@@ -41,26 +41,18 @@ export class FirstComponent implements OnInit, OnDestroy {
       });
     });
 
-    $(document).keydown(this.keydown);
-    $(document).keyup(this.keyup);
+
   }
 
   ngOnDestroy() {
-    PIXI.loader.reset();
-    this.app.destroy();
-    this.unsubscribeEvents();
+    this.destroy();
   }
 
-  private unsubscribeEvents() {
-    $(document).off('keydown', this.keydown);
-    $(document).off('keyup', this.keyup);
-  }
-
-  private keydown = (e: JQueryMouseEventObject) => {
+  protected keydown = (e: JQueryMouseEventObject) => {
     console.log('keydown: ' + e.which);
   }
 
-  private keyup = (e: JQueryMouseEventObject) => {
+  protected keyup = (e: JQueryMouseEventObject) => {
     console.log('keyup: ' + e.which);
   }
 

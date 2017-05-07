@@ -11,12 +11,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.post('/api/users', function (req, res) {
-    var user_id = 'req.body.id';
-    var token = 'req.body.token';
-    var geo = 'req.body.geo';
+app.get('/api/users', function (req, res) {
+    res.send('GET');
+});
 
-    res.send(user_id + ' ' + token + ' ' + geo);
+app.post('/api/users', function (req, res) {
+    res.send('POST');
 });
 
 app.use(express.static(__dirname + "/dist"));
