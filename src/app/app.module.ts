@@ -1,20 +1,30 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
+import { PairingComponent } from './pairing.component';
+import { AboutComponent } from './about.component';
+import { FirstComponent } from './games/first/first.component';
+
+const routes: Routes = [
+  { path: '', redirectTo: '/first', pathMatch: 'full' },
+  { path: 'pairing', component: PairingComponent },
+  { path: 'about', component: AboutComponent },
+  { path: 'first', component: FirstComponent }
+];
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
-    FormsModule,
-    HttpModule
+    RouterModule.forRoot(routes)
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  declarations: [
+    AppComponent,
+    PairingComponent,
+    AboutComponent,
+    FirstComponent
+  ]
 })
 export class AppModule { }

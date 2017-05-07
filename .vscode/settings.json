@@ -1,0 +1,27 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "node_modules": true,
+        "wwwroot": true,
+        "bin": true,
+        "obj": true,
+        ".gitattributes": true,
+        "dist": true,
+        "**/*.js": {
+            "when": "$(basename).ts"
+        },
+        "**/*.js.map": true,
+        "publish": true,
+        "*.log": true,
+        "npm-debug.log*": true
+    },
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "vsicons.presets.angular": true,
+    "tslint.autoFixOnSave": true,
+    "extensions.autoUpdate": true,
+    "typescript.tsdk": "./node_modules/typescript/lib"
+}
