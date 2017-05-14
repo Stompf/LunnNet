@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as $ from 'jquery';
 import * as PIXI from 'pixi.js';
 import { LunnEngineComponent } from '../LunnEngine/LunnEngineComponent';
+import * as KeyMapping from './States/KeyMapping';
 
 @Component({
   moduleId: module.id,
@@ -35,9 +36,20 @@ export class FirstComponent extends LunnEngineComponent implements OnInit, OnDes
       this.app.stage.addChild(bunny);
 
       // Listen for frame updates
-      this.app.ticker.add(function () {
-        // each frame we spin the bunny around a bit
-        bunny.rotation += 0.1;
+      this.app.ticker.add(() => {
+
+        if (this.isKeyPressed(KeyMapping.KeyMapping.Mapping.walk_forward)) {
+          bunny.y -= 5;
+        }
+        if (this.isKeyPressed(KeyMapping.KeyMapping.Mapping.walk_back)) {
+          bunny.y += 5;
+        }
+        if (this.isKeyPressed(KeyMapping.KeyMapping.Mapping.walk_left)) {
+          bunny.x -= 5;
+        }
+        if (this.isKeyPressed(KeyMapping.KeyMapping.Mapping.walk_right)) {
+          bunny.x += 5;
+        }
       });
     });
 
@@ -46,14 +58,6 @@ export class FirstComponent extends LunnEngineComponent implements OnInit, OnDes
 
   ngOnDestroy() {
     this.destroy();
-  }
-
-  protected keydown = (e: JQueryMouseEventObject) => {
-    console.log('keydown: ' + e.which);
-  }
-
-  protected keyup = (e: JQueryMouseEventObject) => {
-    console.log('keyup: ' + e.which);
   }
 
 }

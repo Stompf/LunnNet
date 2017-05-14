@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as $ from 'jquery';
+import { KeyboardStates } from './utils/KeyboardStates';
 
 export class LunnEngineComponent {
     protected app: PIXI.Application;
@@ -22,6 +23,10 @@ export class LunnEngineComponent {
         this.unsubscribeEvents();
     }
 
+    isKeyPressed(which: number) {
+        return KeyboardStates.isKeyPressed(which);
+    }
+
     private unsubscribeEvents() {
         $(document).off('keydown', this.keydown);
         $(document).off('keyup', this.keyup);
@@ -29,14 +34,14 @@ export class LunnEngineComponent {
     }
 
     protected keydown = (e: JQueryMouseEventObject) => {
-        console.log('LunnEngineComponent - keydown: ' + e.which);
+        KeyboardStates.keyPressed(e.which);
     }
 
     protected keyup = (e: JQueryMouseEventObject) => {
-        console.log('LunnEngineComponent - keyup: ' + e.which);
+        KeyboardStates.keyReleased(e.which);
     }
 
     protected onBlur = (e: JQueryMouseEventObject) => {
-        console.log('LunnEngineComponent - onBlur: ' + e.which);
+        KeyboardStates.keyReleased(e.which);
     }
 }

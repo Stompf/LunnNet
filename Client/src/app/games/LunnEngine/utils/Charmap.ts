@@ -1,4 +1,4 @@
-export module Charmap {
+export namespace CharMap {
     export function getKeyNumber(name: string) {
         return keys.indexOf(name);
     }

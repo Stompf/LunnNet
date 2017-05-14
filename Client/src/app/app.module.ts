@@ -6,12 +6,16 @@ import { AppComponent } from './app.component';
 import { PairingComponent } from './pairing.component';
 import { AboutComponent } from './about.component';
 import { FirstComponent } from './games/first/first.component';
+import { CarComponent } from './games/car/car.component';
+import { AsteroidsComponent } from './games/asteroids/asteroids.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/first', pathMatch: 'full' },
+  { path: '', redirectTo: '/car', pathMatch: 'full' },
   { path: 'pairing', component: PairingComponent },
   { path: 'about', component: AboutComponent },
-  { path: 'first', component: FirstComponent }
+  { path: 'first', component: FirstComponent },
+  { path: 'car', component: CarComponent },
+  { path: 'asteroids', component: AsteroidsComponent }
 ];
 
 @NgModule({
@@ -24,7 +28,9 @@ const routes: Routes = [
     AppComponent,
     PairingComponent,
     AboutComponent,
-    FirstComponent
+    FirstComponent,
+    CarComponent,
+    AsteroidsComponent
   ]
 })
 export class AppModule { }
