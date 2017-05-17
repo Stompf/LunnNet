@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 })
 
 export class PairingComponent {
-    food = 'Katarina';
+    food = 'Banana';
 
     foodInput(event: Event) {
         const target = event.target as HTMLInputElement;

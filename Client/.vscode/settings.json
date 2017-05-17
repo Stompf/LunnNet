@@ -19,12 +19,11 @@
         "npm-debug.log*": true
     },
     "editor.formatOnSave": true,
-    "editor.formatOnType": true,
     "vsicons.presets.angular": true,
     "tslint.autoFixOnSave": true,
     "extensions.autoUpdate": true,
     "typescript.tsdk": "./node_modules/typescript/lib",
     "path-intellisense.mappings": {
-        "lunnNet": "${workspaceRoot}/src/app/games/LunnEngine"
+        "lunnEngine": "${workspaceRoot}/src/app/games/lunnEngine"
     }
 }

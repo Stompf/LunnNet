@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as $ from 'jquery';
 import * as PIXI from 'pixi.js';
-import { LunnEngineComponent } from '../LunnEngine/LunnEngineComponent';
+import { LunnEngineComponent } from 'lunnEngine/LunnEngineComponent';
 import * as KeyMapping from './States/KeyMapping';
 
 @Component({
