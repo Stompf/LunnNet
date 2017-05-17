@@ -9,6 +9,7 @@ import * as PIXI from 'pixi.js';
   templateUrl: './car.component.html',
   styleUrls: ['./car.component.css']
 })
+
 export class CarComponent extends LunnEngineComponent implements OnInit, OnDestroy {
 
   private container: PIXI.Container;

@@ -21,6 +21,7 @@
     "editor.formatOnSave": true,
     "vsicons.presets.angular": true,
     "tslint.autoFixOnSave": true,
+    "tslint.alwaysShowRuleFailuresAsWarnings": true,
     "extensions.autoUpdate": true,
     "typescript.tsdk": "./node_modules/typescript/lib",
     "path-intellisense.mappings": {
