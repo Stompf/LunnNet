@@ -9,8 +9,6 @@ import * as _ from 'lodash';
   styleUrls: ['./asteroids.component.css']
 })
 
-
-
 export class AsteroidsComponent implements OnInit {
 
   canvas: HTMLCanvasElement;
