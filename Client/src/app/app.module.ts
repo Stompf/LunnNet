@@ -10,7 +10,7 @@ import { CarComponent } from './games/car/car.component';
 import { AsteroidsComponent } from './games/asteroids/asteroids.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/car', pathMatch: 'full' },
+  { path: '', redirectTo: '/asteroids', pathMatch: 'full' },
   { path: 'pairing', component: PairingComponent },
   { path: 'about', component: AboutComponent },
   { path: 'first', component: FirstComponent },

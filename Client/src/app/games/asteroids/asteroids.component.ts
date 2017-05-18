@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import * as PIXI from 'pixi.js';
 import * as p2 from 'p2';
 import * as _ from 'lodash';
+import { Player } from './scripts/Player';
 
 @Component({
   selector: 'app-asteroids',
@@ -11,37 +12,23 @@ import * as _ from 'lodash';
 
 export class AsteroidsComponent implements OnInit {
 
-  canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  w: number;
-  h: number;
   zoom: number;
-  shipSize = 0.3;
+  player: Player;
   spaceWidth = 16;
   spaceHeight = 9;
-  hideShip = false;
-  allowShipCollision = true;
   world: p2.World;
-  shipShape: p2.Circle;
-  shipBody: p2.Body;
-  shipReloadTime = 0.1;
-  shipTurnSpeed = 4;
-  bulletBodies: Bullet[] = [];
-  bulletShape: p2.Circle;
-  bulletRadius = 0.03;
-  bulletLifeTime = 2;
+
   numAsteroidLevels = 4;
   asteroidRadius = 0.9;
   maxAsteroidSpeed = 2;
-  asteroids: Asteroid[] = [];
+  asteroids: Asteroids.Asteroid[] = [];
   numAsteroidVerts = 10;
   SHIP = Math.pow(2, 1);
   BULLET = Math.pow(2, 2);
   ASTEROID = Math.pow(2, 3);
   initSpace = this.asteroidRadius * 2;
   level = 1;
-  lives = 3;
-  lastShootTime = 0;
   removeBodies: p2.Body[] = [];
   addBodies: p2.Body[] = [];
 
@@ -54,10 +41,7 @@ export class AsteroidsComponent implements OnInit {
   maxSubSteps = 5; // Max physics ticks per render frame
   fixedDeltaTime = 1 / 30; // Physics "tick" delta time
 
-
   constructor() { }
-
-
 
   ngOnInit() {
     // Catch key down events
@@ -76,19 +60,17 @@ export class AsteroidsComponent implements OnInit {
 
   private init() {
     // Init canvas
-    this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
-    this.canvas.width = 800;
-    this.canvas.height = 600;
-    this.w = this.canvas.width;
-    this.h = this.canvas.height;
+    canvas.width = 800;
+    canvas.height = 600;
 
-    this.zoom = this.h / this.spaceHeight;
-    if (this.w / this.spaceWidth < this.zoom) {
-      this.zoom = this.w / this.spaceWidth;
+    this.zoom = canvas.height / this.spaceHeight;
+    if (canvas.width / this.spaceWidth < this.zoom) {
+      this.zoom = canvas.width / this.spaceWidth;
     }
 
-    this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+    this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     this.ctx.lineWidth = 2 / this.zoom;
     this.ctx.strokeStyle = this.ctx.fillStyle = 'white';
 
@@ -100,26 +82,16 @@ export class AsteroidsComponent implements OnInit {
     // Turn off friction, we don't need it.
     this.world.defaultContactMaterial.friction = 0;
 
-    // Add ship physics
-    this.shipShape = new p2.Circle({
-      radius: this.shipSize,
-      collisionGroup: this.SHIP, // Belongs to the SHIP group
-      collisionMask: this.ASTEROID // Only collide with the ASTEROID group
-    });
-    this.shipBody = new p2.Body({
-      mass: 1,
-      // damping: 0,
-      // angularDamping: 0
-    });
-    this.shipBody.addShape(this.shipShape);
-    this.world.addBody(this.shipBody);
+    this.player = new Player();
+    this.player.init(this.world, this.SHIP, this.ASTEROID);
 
+    // Add ship physics
     this.world.on('postStep', () => {
       // Thrust: add some force in the ship direction
-      this.shipBody.applyForceLocal([0, this.keyUp * 2]);
+      this.player.body.applyForceLocal([0, this.keyUp * 2]);
 
       // Set turn velocity of ship
-      this.shipBody.angularVelocity = (this.keyLeft - this.keyRight) * this.shipTurnSpeed;
+      this.player.body.angularVelocity = (this.keyLeft - this.keyRight) * this.player.turnSpeed;
     }, this);
 
     // Catch impacts in the world
@@ -127,58 +99,55 @@ export class AsteroidsComponent implements OnInit {
     this.world.on('beginContact', (evt: any) => {
       const bodyA = evt.bodyA as p2.Body;
       const bodyB = evt.bodyB as p2.Body;
-      const foundBulletA = _.find(this.bulletBodies, bullet => { return bullet.body === bodyA; });
-      const foundBulletB = _.find(this.bulletBodies, bullet => { return bullet.body === bodyB; });
+      const foundBulletA = _.find(this.player.bulletBodies, bullet => { return bullet.body === bodyA; });
+      const foundBulletB = _.find(this.player.bulletBodies, bullet => { return bullet.body === bodyB; });
 
-      if (!this.hideShip && this.allowShipCollision && (bodyA === this.shipBody || bodyB === this.shipBody)) {
+      if (this.player.visible && this.player.allowCollision && (bodyA === this.player.body || bodyB === this.player.body)) {
 
         // Ship collided with something
-        this.allowShipCollision = false;
+        this.player.allowCollision = false;
 
-        const otherBody = (bodyA === this.shipBody ? bodyB : bodyA);
+        const otherBody = (bodyA === this.player.body ? bodyB : bodyA);
         const foundAsteroid = _.find(this.asteroids, asteroid => { return asteroid.body === otherBody; });
 
 
         if (foundAsteroid != null) {
-          this.lives--;
+          this.player.lives--;
           this.updateLives();
 
           // Remove the ship body for a while
-          this.removeBodies.push(this.shipBody);
-          this.hideShip = true;
+          this.removeBodies.push(this.player.body);
+          this.player.visible = false;
 
-          if (this.lives > 0) {
+          if (this.player.lives > 0) {
             const interval = setInterval(() => {
               // Check if the ship position is free from asteroids
               let free = true;
               for (let i = 0; i < this.asteroids.length; i++) {
                 const a = this.asteroids[i];
                 if (Math.pow(a.body.position[0] -
-                  this.shipBody.position[0], 2) +
+                  this.player.body.position[0], 2) +
                   Math.pow(a.body.position[1] -
-                    this.shipBody.position[1], 2) < this.initSpace) {
+                    this.player.body.position[1], 2) < this.initSpace) {
 
                   free = false;
                 }
               }
               if (free) {
                 // Add ship again
-                this.shipBody.force[0] =
-                  this.shipBody.force[1] =
-                  this.shipBody.velocity[0] =
-                  this.shipBody.velocity[1] =
-                  this.shipBody.angularVelocity =
-                  this.shipBody.angle = 0;
-                this.hideShip = false;
-                this.world.addBody(this.shipBody);
+                this.player.body.force[0] = 0;
+                this.player.body.force[1] = 0;
+                this.player.body.velocity[0] = 0;
+                this.player.body.velocity[1] = 0;
+                this.player.body.angularVelocity = 0;
+                this.player.body.angle = 0;
+                this.player.visible = true;
+                this.world.addBody(this.player.body);
                 clearInterval(interval);
               }
             }, 100);
           } else {
-            const gameover = document.getElementById('gameover');
-            if (gameover) {
-              gameover.classList.remove('hidden');
-            }
+            alert('Game Over!');
           }
         }
       } else if (foundBulletA != null || foundBulletB != null) {
@@ -189,7 +158,7 @@ export class AsteroidsComponent implements OnInit {
 
         const found = _.find(this.asteroids, asteroid => { return asteroid.body === body; })
         if (found != null) {
-          this.explode(found, bulletBody as Bullet);
+          this.explode(found, bulletBody as Asteroids.Bullet);
         }
       }
 
@@ -208,22 +177,22 @@ export class AsteroidsComponent implements OnInit {
     requestAnimationFrame(this.animate);
 
     this.updatePhysics(time);
-    this.render();
+    this.render(this.ctx);
   }
 
   private updatePhysics(time: number) {
-    this.allowShipCollision = true;
+    this.player.allowCollision = true;
 
-    if (this.keyShoot && !this.hideShip && this.world.time - this.lastShootTime > this.shipReloadTime) {
+    if (this.keyShoot && this.player.visible && this.world.time - this.player.lastShootTime > this.player.reloadTime) {
       this.shoot();
     }
 
-    for (let i = 0; i < this.bulletBodies.length; i++) {
-      const b = this.bulletBodies[i];
+    for (let i = 0; i < this.player.bulletBodies.length; i++) {
+      const b = this.player.bulletBodies[i];
 
       // If the bullet is old, delete it
       if (b.dieTime <= this.world.time) {
-        this.bulletBodies.splice(i, 1);
+        this.player.bulletBodies.splice(i, 1);
         this.world.removeBody(b.body);
         i--;
         continue;
@@ -259,36 +228,36 @@ export class AsteroidsComponent implements OnInit {
   }
 
   private shoot() {
-    const angle = this.shipBody.angle + Math.PI / 2;
+    const angle = this.player.body.angle + Math.PI / 2;
 
     // Create a bullet body
     const bulletBody = new p2.Body({
       mass: 0.05,
       position: [
-        this.shipShape.radius * Math.cos(angle) + this.shipBody.position[0],
-        this.shipShape.radius * Math.sin(angle) + this.shipBody.position[1]
+        this.player.shape.radius * Math.cos(angle) + this.player.body.position[0],
+        this.player.shape.radius * Math.sin(angle) + this.player.body.position[1]
       ],
       // damping: 0,
       velocity: [ // initial velocity in ship direction
-        2 * Math.cos(angle) + this.shipBody.velocity[0],
-        2 * Math.sin(angle) + this.shipBody.velocity[1]
+        2 * Math.cos(angle) + this.player.body.velocity[0],
+        2 * Math.sin(angle) + this.player.body.velocity[1]
       ],
     });
     bulletBody.damping = 0;
 
     // Create bullet shape
-    this.bulletShape = new p2.Circle({
-      radius: this.bulletRadius,
+    this.player.bulletShape = new p2.Circle({
+      radius: this.player.bulletRadius,
       collisionGroup: this.BULLET, // Belongs to the BULLET group
       collisionMask: this.ASTEROID // Can only collide with the ASTEROID group
     });
-    bulletBody.addShape(this.bulletShape);
-    this.bulletBodies.push({ body: bulletBody, dieTime: this.world.time + this.bulletLifeTime });
+    bulletBody.addShape(this.player.bulletShape);
+    this.player.bulletBodies.push({ body: bulletBody, dieTime: this.world.time + this.player.bulletLifeTime });
 
     this.world.addBody(bulletBody);
 
     // Keep track of the last time we shot
-    this.lastShootTime = this.world.time;
+    this.player.lastShootTime = this.world.time;
   }
 
   // If the body is out of space bounds, warp it to the other side
@@ -305,22 +274,22 @@ export class AsteroidsComponent implements OnInit {
   }
 
 
-  private render() {
+  private render(ctx: CanvasRenderingContext2D) {
     // Clear the canvas
 
-    this.ctx.clearRect(0, 0, this.w, this.h);
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    this.ctx.fillStyle = '#000000';
-    this.ctx.fillRect(0, 0, this.w, this.h);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
 
-    this.ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = '#FFFFFF';
     // Transform the canvas
     // Note that we need to flip the y axis since Canvas pixel coordinates
     // goes from top to bottom, while physics does the opposite.
-    this.ctx.save();
-    this.ctx.translate(this.w / 2, this.h / 2); // Translate to the center
-    this.ctx.scale(this.zoom, -this.zoom);  // Zoom in and flip y axis
+    ctx.save();
+    ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2); // Translate to the center
+    ctx.scale(this.zoom, -this.zoom);  // Zoom in and flip y axis
 
     // Draw all things
     this.drawShip();
@@ -333,13 +302,13 @@ export class AsteroidsComponent implements OnInit {
   }
 
   private drawShip() {
-    if (!this.hideShip) {
-      const x = this.shipBody.interpolatedPosition[0];
-      const y = this.shipBody.interpolatedPosition[1];
-      const radius = this.shipShape.radius;
+    if (this.player.visible) {
+      const x = this.player.body.interpolatedPosition[0];
+      const y = this.player.body.interpolatedPosition[1];
+      const radius = this.player.shape.radius;
       this.ctx.save();
       this.ctx.translate(x, y);         // Translate to the ship center
-      this.ctx.rotate(this.shipBody.interpolatedAngle); // Rotate to ship orientation
+      this.ctx.rotate(this.player.body.interpolatedAngle); // Rotate to ship orientation
       this.ctx.beginPath();
       this.ctx.moveTo(-radius * 0.6, -radius);
       this.ctx.lineTo(0, radius);
@@ -380,12 +349,12 @@ export class AsteroidsComponent implements OnInit {
   }
 
   private drawBullets() {
-    for (let i = 0; i < this.bulletBodies.length; i++) {
-      const bulletBody = this.bulletBodies[i];
+    for (let i = 0; i < this.player.bulletBodies.length; i++) {
+      const bulletBody = this.player.bulletBodies[i];
       const x = bulletBody.body.interpolatedPosition[0];
       const y = bulletBody.body.interpolatedPosition[1];
       this.ctx.beginPath();
-      this.ctx.arc(x, y, this.bulletRadius, 0, 2 * Math.PI);
+      this.ctx.arc(x, y, this.player.bulletRadius, 0, 2 * Math.PI);
       this.ctx.fill();
       this.ctx.closePath();
     }
@@ -412,7 +381,7 @@ export class AsteroidsComponent implements OnInit {
   private updateLives() {
     const el = document.getElementById('lives');
     if (el) {
-      el.innerHTML = 'Lives ' + this.lives;
+      el.innerHTML = 'Lives ' + this.player.lives;
     }
   }
 
@@ -430,9 +399,9 @@ export class AsteroidsComponent implements OnInit {
       const vy = this.rand() * this.maxAsteroidSpeed;
       const va = this.rand() * this.maxAsteroidSpeed;
 
-      // Aviod the ship!
-      if (Math.abs(x - this.shipBody.position[0]) < this.initSpace) {
-        if (y - this.shipBody.position[1] > 0) {
+      // Avoid the ship!
+      if (Math.abs(x - this.player.body.position[0]) < this.initSpace) {
+        if (y - this.player.body.position[1] > 0) {
           y += this.initSpace;
         } else {
           y -= this.initSpace;
@@ -450,7 +419,7 @@ export class AsteroidsComponent implements OnInit {
       asteroidBody.angularDamping = 0;
 
       asteroidBody.addShape(this.createAsteroidShape(0));
-      const asteroid = { body: asteroidBody, level: 1, verts: [] } as Asteroid;
+      const asteroid = { body: asteroidBody, level: 1, verts: [] } as Asteroids.Asteroid;
       this.asteroids.push(asteroid);
       this.addBodies.push(asteroid.body);
       this.addAsteroidVerts(asteroid);
@@ -467,7 +436,7 @@ export class AsteroidsComponent implements OnInit {
   }
 
   // Adds random .verts to an asteroid body
-  private addAsteroidVerts(asteroidBody: Asteroid) {
+  private addAsteroidVerts(asteroidBody: Asteroids.Asteroid) {
     asteroidBody.verts = [];
     const radius = (asteroidBody.body.shapes[0] as p2.Circle).radius;
     for (let j = 0; j < this.numAsteroidVerts; j++) {
@@ -494,18 +463,18 @@ export class AsteroidsComponent implements OnInit {
     }
   }
 
-  private explode(asteroidBody: Asteroid, bulletBody: Bullet) {
-    const aidx = this.asteroids.indexOf(asteroidBody);
-    const idx = this.bulletBodies.indexOf(bulletBody);
-    if (aidx !== -1 && idx !== -1) {
+  private explode(asteroidBody: Asteroids.Asteroid, bulletBody: Asteroids.Bullet) {
+    const asteroidIndex = this.asteroids.indexOf(asteroidBody);
+    const idx = this.player.bulletBodies.indexOf(bulletBody);
+    if (asteroidIndex !== -1 && idx !== -1) {
       // Remove asteroid
       this.removeBodies.push(asteroidBody.body);
-      this.asteroids.splice(aidx, 1);
+      this.asteroids.splice(asteroidIndex, 1);
 
       // Remove bullet
       this.removeBodies.push(bulletBody.body);
 
-      this.bulletBodies.splice(idx, 1);
+      this.player.bulletBodies.splice(idx, 1);
 
       // Add new sub-asteroids
       const x = asteroidBody.body.position[0];
@@ -530,9 +499,9 @@ export class AsteroidsComponent implements OnInit {
 
           subAsteroidBody.addShape(shape);
           this.addBodies.push(subAsteroidBody);
-          const astreiod = { body: subAsteroidBody, level: asteroidBody.level + 1 } as Asteroid;
-          this.addAsteroidVerts(astreiod);
-          this.asteroids.push(astreiod);
+          const asteroid = { body: subAsteroidBody, level: asteroidBody.level + 1 } as Asteroids.Asteroid;
+          this.addAsteroidVerts(asteroid);
+          this.asteroids.push(asteroid);
         }
       }
     }
@@ -543,15 +512,4 @@ export class AsteroidsComponent implements OnInit {
       this.addAsteroids();
     }
   }
-}
-
-interface Bullet {
-  body: p2.Body;
-  dieTime: number;
-}
-
-interface Asteroid {
-  body: p2.Body;
-  level: number;
-  verts: number[][];
 }
