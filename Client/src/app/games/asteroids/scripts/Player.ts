@@ -1,5 +1,5 @@
 import * as p2 from 'p2';
-import * as PIXI from 'pixi.js';
+// import * as PIXI from 'pixi.js';
 
 export class Player {
     size = 0.3

@@ -19,7 +19,7 @@ export class FirstComponent extends LunnEngineComponent implements OnInit, OnDes
   ngOnInit() {
     this.init(800, 600, { backgroundColor: 0x1099bb, view: $('#firstGameCanvas').get(0) as HTMLCanvasElement });
 
-    PIXI.loader.add('bunny', 'assets/bunny.png').load((loader: any, resources: any) => {
+    PIXI.loader.add('bunny', 'assets/bunny.png').load((_loader: any, resources: any) => {
 
       // This creates a texture from a 'bunny.png' image.
       const bunny = new PIXI.Sprite(resources.bunny.texture);

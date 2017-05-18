@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as PIXI from 'pixi.js';
+// import * as PIXI from 'pixi.js';
 import * as p2 from 'p2';
 import * as _ from 'lodash';
 import { Player } from './scripts/Player';
@@ -326,7 +326,7 @@ export class AsteroidsComponent implements OnInit {
       const a = this.asteroids[i];
       const x = a.body.interpolatedPosition[0];
       const y = a.body.interpolatedPosition[1];
-      const radius = (a.body.shapes[0] as p2.Circle).radius;
+
       this.ctx.save();
       this.ctx.translate(x, y);  // Translate to the center
       this.ctx.rotate(a.body.interpolatedAngle);

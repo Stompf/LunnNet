@@ -95,7 +95,7 @@ export class CarComponent extends LunnEngineComponent implements OnInit, OnDestr
     this.animate();
   }
 
-  private addPlanes(world: p2.World, height: number, width: number) {
+  private addPlanes(world: p2.World, _height: number, _width: number) {
 
     // Top plane
     const planeTop = new p2.Body({
@@ -106,11 +106,11 @@ export class CarComponent extends LunnEngineComponent implements OnInit, OnDestr
     world.addBody(planeTop);
 
     // Bottom plane
-    const planeButtom = new p2.Body({
+    const planeBottom = new p2.Body({
       position: [0, -3],
     });
-    planeButtom.addShape(new p2.Plane());
-    world.addBody(planeButtom);
+    planeBottom.addShape(new p2.Plane());
+    world.addBody(planeBottom);
 
     // Left plane
     const planeLeft = new p2.Body({
