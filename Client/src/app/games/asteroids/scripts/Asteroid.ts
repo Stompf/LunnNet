@@ -27,6 +27,7 @@ export class Asteroid {
         });
         asteroidBody.damping = 0;
         asteroidBody.angularDamping = 0;
+        asteroidBody.previousPosition = asteroidBody.position;
 
         asteroidBody.addShape(this.createAsteroidShape());
         this.body = asteroidBody;
@@ -39,10 +40,9 @@ export class Asteroid {
         const y = this.body.position[1];
         const subAsteroids: Asteroid[] = [];
 
-        console.log('explode level: ' + this.level);
         if (this.level < 3) {
             const angleDisturb = Math.PI / 2 * (Math.random() - 0.5);
-            for (let i = 0; i < 1; i++) {
+            for (let i = 0; i < 4; i++) {
                 const angle = Math.PI / 2 * i + angleDisturb;
                 const subAsteroid = this.createSubAsteroid(x, y, angle, playerPosition);
                 subAsteroids.push(subAsteroid);
@@ -117,7 +117,7 @@ export class Asteroid {
         const shape = new p2.Circle({
             radius: Asteroid.AsteroidRadius * (Asteroid.NumAsteroidLevels - this.level) / Asteroid.NumAsteroidLevels,
             collisionGroup: Asteroid.ASTEROID, // Belongs to the ASTEROID group
-            collisionMask: Bullet.BULLET | Player.SHIP // Can collide with the BULLET or SHIP group
+            collisionMask: Asteroid.ASTEROID | Bullet.BULLET | Player.SHIP // Can collide with the BULLET or SHIP group
         });
         return shape;
     }

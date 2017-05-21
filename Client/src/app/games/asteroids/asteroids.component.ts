@@ -24,6 +24,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
   bullets: Bullet[] = [];
 
   asteroids: Asteroid[] = [];
+  asteroidsToAdd: Asteroid[] = [];
+  asteroidsToRemove: Asteroid[] = [];
+
   currentLevel = 1;
 
   keyLeft = 0;
@@ -171,7 +174,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
           if (this.asteroids.length === 0) {
             this.currentLevel++;
             this.updateLevel();
-            // this.addAsteroids();
+            this.addAsteroids();
           }
         }
       }
@@ -226,7 +229,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
     deltaTime = Math.min(1 / 10, deltaTime);
 
     // Move physics bodies forward in time
-    this.world.step(this.fixedDeltaTime, deltaTime);
+    this.world.step(this.fixedDeltaTime, deltaTime, this.maxSubSteps);
   }
 
   private shoot() {
