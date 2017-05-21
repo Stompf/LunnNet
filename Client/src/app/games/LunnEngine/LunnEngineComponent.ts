@@ -6,6 +6,8 @@ import { Utils } from './utils/Utils';
 export class LunnEngineComponent {
     protected app: PIXI.Application;
 
+    private loader: PIXI.loaders.Loader;
+
     constructor() {
 
     }
@@ -16,6 +18,12 @@ export class LunnEngineComponent {
 
     init(width: number, height: number, options: PIXI.IApplicationOptions) {
         this.app = new PIXI.Application(width, height, options);
+        this.loader = new PIXI.loaders.Loader();
+        // Not tested
+        this.loader.onError.detachAll();
+        this.loader.onError.add(() => {
+            alert('error');
+        });
 
         $(document).keydown(this.keydown);
         $(document).keyup(this.keyup);
@@ -30,6 +38,15 @@ export class LunnEngineComponent {
 
     isKeyPressed(which: number) {
         return KeyboardStates.isKeyPressed(which);
+    }
+
+    loadTexture(name: string, path: string) {
+        const deferred = $.Deferred<PIXI.Sprite>();
+        this.loader.add(name, path).load((_loader: PIXI.loaders.Loader, resource: any) => {
+            const sprite = new PIXI.Sprite((resource[name] as PIXI.loaders.Resource).texture);
+            deferred.resolve(sprite);
+        });
+        return deferred.promise();
     }
 
     private unsubscribeEvents() {

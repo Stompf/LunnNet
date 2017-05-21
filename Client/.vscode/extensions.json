@@ -10,6 +10,8 @@
 		"msjsdiag.debugger-for-chrome",
 		"christian-kohler.path-intellisense",
 		"eg2.tslint",
-		"robertohuertasm.vscode-icons"
+		"robertohuertasm.vscode-icons",
+		"pprice.better-merge",
+		"kisstkondoros.vscode-codemetrics"
 	]
 }

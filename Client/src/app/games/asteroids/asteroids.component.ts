@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-// import * as PIXI from 'pixi.js';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import * as PIXI from 'pixi.js';
 import * as p2 from 'p2';
 import * as _ from 'lodash';
 import { Player } from './scripts/Player';
 import { Asteroid } from './scripts/Asteroid';
 import { Bullet } from './scripts/Bullet';
 import { LunnEngineComponent } from 'lunnEngine/LunnEngineComponent';
+import { MultiDictionary } from 'typescript-collections';
 
 @Component({
   selector: 'app-asteroids',
@@ -13,9 +14,8 @@ import { LunnEngineComponent } from 'lunnEngine/LunnEngineComponent';
   styleUrls: ['./asteroids.component.css']
 })
 
-export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
+export class AsteroidsComponent extends LunnEngineComponent implements OnInit, OnDestroy {
 
-  ctx: CanvasRenderingContext2D;
   zoom: number;
   player: Player;
   spaceWidth = 16;
@@ -38,6 +38,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
   maxSubSteps = 5; // Max physics ticks per render frame
   fixedDeltaTime = 1 / 30; // Physics "tick" delta time
 
+  playerSprite: PIXI.Sprite;
+  meteoroidSprites: MultiDictionary<number, PIXI.Sprite>;
+
   constructor() {
     super();
   }
@@ -53,25 +56,92 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
       this.handleKey(evt.keyCode, 0);
     }
 
-    this.initAsteroids();
-    this.animate(0);
+    this.loadTextures().done(() => {
+      this.initAsteroids();
+      this.animate(0);
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy();
+  }
+
+  private loadTextures() {
+    this.meteoroidSprites = new MultiDictionary<number, PIXI.Sprite>();
+
+    const deferred = $.Deferred();
+
+    const playerTexture = this.loadTexture('player', 'assets/games/asteroids/PNG/playerShip1_blue.png').done(sprite => {
+      if (sprite != null) {
+        this.playerSprite = sprite;
+      }
+    });
+
+    const meteorLevel0_0 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_big1.png').done(sprite => {
+      if (sprite != null) {
+        this.meteoroidSprites.setValue(0, sprite);
+      }
+    });
+
+    const meteorLevel0_1 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_big2.png').done(sprite => {
+      if (sprite != null) {
+        this.meteoroidSprites.setValue(0, sprite);
+      }
+    });
+
+    const meteorLevel1_0 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_med1.png').done(sprite => {
+      if (sprite != null) {
+        this.meteoroidSprites.setValue(1, sprite);
+      }
+    });
+
+    const meteorLevel1_1 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_med3.png').done(sprite => {
+      if (sprite != null) {
+        this.meteoroidSprites.setValue(1, sprite);
+      }
+    });
+
+    const meteorLevel2_0 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_small1.png').done(sprite => {
+      if (sprite != null) {
+        this.meteoroidSprites.setValue(2, sprite);
+      }
+    });
+
+    const meteorLevel2_1 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_small2.png').done(sprite => {
+      if (sprite != null) {
+        this.meteoroidSprites.setValue(2, sprite);
+      }
+    });
+
+    const meteorLevel3_0 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_small1.png').done(sprite => {
+      if (sprite != null) {
+        this.meteoroidSprites.setValue(3, sprite);
+      }
+    });
+
+    const meteorLevel3_1 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_small2.png').done(sprite => {
+      if (sprite != null) {
+        this.meteoroidSprites.setValue(3, sprite);
+      }
+    });
+
+    $.when(playerTexture,
+      meteorLevel0_0, meteorLevel0_1, meteorLevel1_0, meteorLevel1_1,
+      meteorLevel2_0, meteorLevel2_1, meteorLevel3_0, meteorLevel3_1).done(() => {
+        deferred.resolve();
+      });
+
+    return deferred.promise();
   }
 
   private initAsteroids() {
-    // Init canvas
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
-    canvas.width = 800;
-    canvas.height = 600;
+    this.init(800, 600, { view: document.getElementById('canvas') as HTMLCanvasElement, backgroundColor: 0x000000 });
 
-    this.zoom = canvas.height / this.spaceHeight;
-    if (canvas.width / this.spaceWidth < this.zoom) {
-      this.zoom = canvas.width / this.spaceWidth;
+    this.zoom = this.app.view.height / this.spaceHeight;
+    if (this.app.view.width / this.spaceWidth < this.zoom) {
+      this.zoom = this.app.view.width / this.spaceWidth;
     }
-
-    this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    this.ctx.lineWidth = 2 / this.zoom;
-    this.ctx.strokeStyle = this.ctx.fillStyle = 'white';
 
     // Init physics world
     this.world = new p2.World({
@@ -277,9 +347,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
     this.drawBullets();
     this.drawBounds();
     this.drawAsteroids();
-
-    // Restore transform
-    this.ctx.restore();
   }
 
   private drawShip() {
