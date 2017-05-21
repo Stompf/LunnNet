@@ -2,6 +2,8 @@ import * as p2 from 'p2';
 // import * as PIXI from 'pixi.js';
 
 export class Player {
+    static SHIP = Math.pow(2, 1);
+
     size = 0.3
     visible: boolean;
     allowCollision: boolean;
@@ -12,14 +14,7 @@ export class Player {
     lives = 3;
     lastShootTime = 0;
 
-    bulletBodies: Asteroids.Bullet[] = [];
-    bulletShape: p2.Circle;
-    bulletRadius = 0.03;
-    bulletLifeTime = 2;
-
     constructor() {
-
-
     }
 
     init(world: p2.World, shipMask: number, asteroidMask: number) {
@@ -39,6 +34,26 @@ export class Player {
         this.body.addShape(this.shape);
 
         world.addBody(this.body);
+    }
+
+    draw(ctx: CanvasRenderingContext2D) {
+        if (this.visible) {
+            const x = this.body.interpolatedPosition[0];
+            const y = this.body.interpolatedPosition[1];
+            const radius = this.shape.radius;
+            ctx.save();
+            ctx.translate(x, y);         // Translate to the ship center
+            ctx.rotate(this.body.interpolatedAngle); // Rotate to ship orientation
+            ctx.beginPath();
+            ctx.moveTo(-radius * 0.6, -radius);
+            ctx.lineTo(0, radius);
+            ctx.lineTo(radius * 0.6, -radius);
+            ctx.moveTo(-radius * 0.5, -radius * 0.5);
+            ctx.lineTo(radius * 0.5, -radius * 0.5);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
+        }
     }
 
 }

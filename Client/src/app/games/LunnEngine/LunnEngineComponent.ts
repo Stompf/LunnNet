@@ -1,12 +1,17 @@
 import * as PIXI from 'pixi.js';
 import * as $ from 'jquery';
 import { KeyboardStates } from './utils/KeyboardStates';
+import { Utils } from './utils/Utils';
 
 export class LunnEngineComponent {
     protected app: PIXI.Application;
 
     constructor() {
 
+    }
+
+    get UtilsHelper() {
+        return Utils;
     }
 
     init(width: number, height: number, options: PIXI.IApplicationOptions) {
