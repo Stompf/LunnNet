@@ -42,7 +42,7 @@ export class Asteroid {
         console.log('explode level: ' + this.level);
         if (this.level < 3) {
             const angleDisturb = Math.PI / 2 * (Math.random() - 0.5);
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 1; i++) {
                 const angle = Math.PI / 2 * i + angleDisturb;
                 const subAsteroid = this.createSubAsteroid(x, y, angle, playerPosition);
                 subAsteroids.push(subAsteroid);

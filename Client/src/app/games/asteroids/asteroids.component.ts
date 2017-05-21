@@ -25,8 +25,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
 
   asteroids: Asteroid[] = [];
   currentLevel = 1;
-  removeBodies: p2.Body[] = [];
-  addBodies: p2.Body[] = [];
 
   keyLeft = 0;
   keyRight = 0;
@@ -114,7 +112,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
           this.updateLives();
 
           // Remove the ship body for a while
-          this.removeBodies.push(this.player.body);
+          this.world.removeBody(this.player.body);
           this.player.visible = false;
 
           if (this.player.lives > 0) {
@@ -157,17 +155,17 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
         const collidedAsteroid = _.find(this.asteroids, asteroid => { return asteroid.body === body; })
         if (collidedAsteroid != null && bullet != null) {
           // Remove asteroid
-          this.removeBodies.push(collidedAsteroid.body);
+          this.world.removeBody(collidedAsteroid.body);
           this.asteroids.splice(this.asteroids.indexOf(collidedAsteroid), 1);
 
           // Remove bullet
-          this.removeBodies.push(bullet.body);
+          this.world.removeBody(bullet.body);
 
           this.bullets.splice(this.bullets.indexOf(bullet), 1);
 
           collidedAsteroid.explode(this.player.body.position).forEach(subAsteroid => {
             this.asteroids.push(subAsteroid);
-            this.addBodies.push(subAsteroid.body);
+            this.world.addBody(subAsteroid.body);
           });
 
           if (this.asteroids.length === 0) {
@@ -214,18 +212,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
         continue;
       }
     }
-
-    // Remove bodies scheduled to be removed
-    for (let i = 0; i < this.removeBodies.length; i++) {
-      this.world.removeBody(this.removeBodies[i]);
-    }
-    this.removeBodies = [];
-
-    // Add bodies scheduled to be added
-    for (let i = 0; i < this.addBodies.length; i++) {
-      this.world.addBody(this.addBodies[i]);
-    }
-    this.addBodies = [];
 
     // Warp all bodies
     for (let i = 0; i < this.world.bodies.length; i++) {
@@ -354,7 +340,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit {
 
       const asteroid = new Asteroid([x, y], [vx, vy], va, 0);
       this.asteroids.push(asteroid);
-      this.addBodies.push(asteroid.body);
+      this.world.addBody(asteroid.body);
     }
   }
 
