@@ -1,7 +1,7 @@
 import * as p2 from 'p2';
 import { Player } from './Player';
 import { Bullet } from './Bullet';
-
+import { Sprites } from './Sprites';
 export class Asteroid {
 
     static ASTEROID = Math.pow(2, 3);
@@ -10,17 +10,22 @@ export class Asteroid {
     static NumAsteroidVerticals = 10;
     static AsteroidRadius = 0.9;
     static InitSpace = Asteroid.AsteroidRadius * 2;
+    static MaxLevel = 3;
+    static Splits = 4;
 
     body: p2.Body;
     verticals: number[][] = [];
     level: number;
+    sprite: PIXI.Sprite;
+
+    bodyGraphics: PIXI.Graphics;
 
     constructor(position: number[], velocity: number[], angularVelocity: number, level: number) {
         this.level = level;
 
         // Create asteroid body
         const asteroidBody = new p2.Body({
-            mass: 10,
+            mass: 10 / (level + 1),
             position: position,
             velocity: velocity,
             angularVelocity: angularVelocity
@@ -32,6 +37,7 @@ export class Asteroid {
         asteroidBody.addShape(this.createAsteroidShape());
         this.body = asteroidBody;
         this.addAsteroidVerticals();
+        this.getRandomSpriteForLevel();
     }
 
     explode(playerPosition: number[]) {
@@ -40,9 +46,9 @@ export class Asteroid {
         const y = this.body.position[1];
         const subAsteroids: Asteroid[] = [];
 
-        if (this.level < 3) {
+        if (this.level < Asteroid.MaxLevel) {
             const angleDisturb = Math.PI / 2 * (Math.random() - 0.5);
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < Asteroid.Splits; i++) {
                 const angle = Math.PI / 2 * i + angleDisturb;
                 const subAsteroid = this.createSubAsteroid(x, y, angle, playerPosition);
                 subAsteroids.push(subAsteroid);
@@ -74,6 +80,42 @@ export class Asteroid {
 
         ctx.stroke();
         ctx.restore();
+    }
+
+    update() {
+        this.sprite.x = this.body.interpolatedPosition[0];
+        this.sprite.y = this.body.interpolatedPosition[1];
+        this.sprite.rotation = this.body.interpolatedAngle;
+
+        if (this.bodyGraphics) {
+            this.bodyGraphics.x = this.body.interpolatedPosition[0];
+            this.bodyGraphics.y = this.body.interpolatedPosition[1];
+            this.bodyGraphics.rotation = this.body.interpolatedAngle;
+        }
+    }
+
+    createBodyGraphics() {
+        this.bodyGraphics = new PIXI.Graphics();
+        this.bodyGraphics.beginFill(0xffffff);
+        this.bodyGraphics.alpha = 0.75;
+        for (let j = 0; j < Asteroid.NumAsteroidVerticals; j++) {
+            const xv = this.verticals[j][0];
+            const yv = this.verticals[j][1];
+            if (j === 0) {
+                this.bodyGraphics.moveTo(xv, yv);
+            } else {
+                this.bodyGraphics.lineTo(xv, yv);
+            }
+        }
+        return this.bodyGraphics;
+    }
+
+    private getRandomSpriteForLevel() {
+        const sprite = Sprites.MeteoroidSprites.getValue(this.level)[0]
+
+        this.sprite = new PIXI.Sprite(sprite.texture.clone());
+        this.sprite.scale = sprite.scale;
+        this.sprite.anchor = sprite.anchor;
     }
 
     private createSubAsteroid(x: number, y: number, angle: number, playerPosition: number[]) {
