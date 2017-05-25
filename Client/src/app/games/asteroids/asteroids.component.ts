@@ -109,12 +109,10 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.container.scale.x = zoom;
     this.container.scale.y = -zoom;
 
-    const playerWidth = 45;
-    this.playerSprite.width = playerWidth * (1 / this.container.scale.x);
-    this.playerSprite.height = (playerWidth / 1.5) * (1 / this.container.scale.y);
-
-    if (this.player != null) {
-      this.player.updateShape(this.playerSprite);
+    if (this.player == null) {
+      const playerWidth = this.app.renderer.width / 30;
+      this.playerSprite.width = playerWidth / zoom;
+      this.playerSprite.height = ((playerWidth / 1.5) / -zoom);
     }
   }
 

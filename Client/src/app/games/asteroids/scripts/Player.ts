@@ -31,26 +31,21 @@ export class Player {
         this.body.damping = 0;
         this.body.angularDamping = 0;
 
-        this.updateShape(this.sprite);
-        world.addBody(this.body);
-    }
-
-    updateShape(sprite: PIXI.Sprite) {
         if (this.body.shapes.length > 0) {
             this.body.removeShape(this.body.shapes[0]);
         }
 
-        this.sprite = sprite;
-
         const shape = new p2.Box({
-            height: sprite.height,
-            width: sprite.width
+            height: this.sprite.height,
+            width: this.sprite.width
         });
         shape.collisionGroup = Player.SHIP;
         shape.collisionMask = Asteroid.ASTEROID;
         this.body.addShape(shape);
 
         this.createBodyGraphics();
+
+        world.addBody(this.body);
     }
 
     update() {
