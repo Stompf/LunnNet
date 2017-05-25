@@ -1,7 +1,7 @@
 import * as p2 from 'p2';
 import { Player } from './Player';
 import { Bullet } from './Bullet';
-import { Sprites } from './Sprites';
+
 export class Asteroid {
 
     static ASTEROID = Math.pow(2, 3);
@@ -16,7 +16,6 @@ export class Asteroid {
     body: p2.Body;
     verticals: number[][] = [];
     level: number;
-    sprite: PIXI.Sprite;
 
     bodyGraphics: PIXI.Graphics;
 
@@ -33,11 +32,17 @@ export class Asteroid {
         asteroidBody.damping = 0;
         asteroidBody.angularDamping = 0;
         asteroidBody.previousPosition = asteroidBody.position;
-
-        asteroidBody.addShape(this.createAsteroidShape());
-        this.body = asteroidBody;
         this.addAsteroidVerticals();
-        this.getRandomSpriteForLevel();
+
+        asteroidBody.fromPolygon(this.verticals);
+        asteroidBody.shapes.forEach(shp => {
+            shp.collisionGroup = Asteroid.ASTEROID;
+            shp.collisionMask = Asteroid.ASTEROID | Bullet.BULLET | Player.SHIP;
+        });
+
+        // asteroidBody.addShape(this.createAsteroidShape());
+        this.body = asteroidBody;
+
     }
 
     explode(playerPosition: number[]) {
@@ -58,71 +63,32 @@ export class Asteroid {
         return subAsteroids;
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
-        const x = this.body.interpolatedPosition[0];
-        const y = this.body.interpolatedPosition[1];
-
-        ctx.save();
-        ctx.translate(x, y);  // Translate to the center
-        ctx.rotate(this.body.interpolatedAngle);
-
-        ctx.beginPath();
-        for (let j = 0; j < Asteroid.NumAsteroidVerticals; j++) {
-            const xv = this.verticals[j][0];
-            const yv = this.verticals[j][1];
-            if (j === 0) {
-                ctx.moveTo(xv, yv);
-            } else {
-                ctx.lineTo(xv, yv);
-            }
-        }
-        ctx.closePath();
-
-        ctx.stroke();
-        ctx.restore();
-    }
-
     update() {
-        this.sprite.x = this.body.interpolatedPosition[0];
-        this.sprite.y = this.body.interpolatedPosition[1];
-        this.sprite.rotation = this.body.interpolatedAngle;
-
-        if (this.bodyGraphics) {
-            this.bodyGraphics.x = this.body.interpolatedPosition[0];
-            this.bodyGraphics.y = this.body.interpolatedPosition[1];
-            this.bodyGraphics.rotation = this.body.interpolatedAngle;
-        }
+        this.bodyGraphics.x = this.body.interpolatedPosition[0];
+        this.bodyGraphics.y = this.body.interpolatedPosition[1];
+        this.bodyGraphics.rotation = this.body.interpolatedAngle;
     }
 
     createBodyGraphics() {
+        const concavePath = this.body.concavePath;
         this.bodyGraphics = new PIXI.Graphics();
-        this.bodyGraphics.beginFill(0xffffff);
-        this.bodyGraphics.alpha = 0.75;
-        for (let j = 0; j < Asteroid.NumAsteroidVerticals; j++) {
-            const xv = this.verticals[j][0];
-            const yv = this.verticals[j][1];
+        this.bodyGraphics.beginFill(0x7A5230);
+        for (let j = 0; j < concavePath.length; j++) {
+            const xv = concavePath[j][0];
+            const yv = concavePath[j][1];
             if (j === 0) {
                 this.bodyGraphics.moveTo(xv, yv);
             } else {
                 this.bodyGraphics.lineTo(xv, yv);
             }
         }
+        this.bodyGraphics.endFill();
+
         return this.bodyGraphics;
     }
 
-    private getRandomSpriteForLevel() {
-        const sprite = Sprites.MeteoroidSprites.getValue(this.level)[0]
-
-        this.sprite = new PIXI.Sprite(sprite.texture.clone());
-        this.sprite.scale = sprite.scale;
-        this.sprite.anchor = sprite.anchor;
-    }
-
     private createSubAsteroid(x: number, y: number, angle: number, playerPosition: number[]) {
-        // const shape = this.createAsteroidShape(this.level + 1);
-        // const r = (this.body.shapes[0] as p2.Circle).radius - shape.radius;
-
-        const r = (this.body.shapes[0] as p2.Circle).radius / 2;
+        const r = this.getRadius() / 2;
         const position = [
             x + r * Math.cos(angle),
             y + r * Math.sin(angle)
@@ -146,22 +112,27 @@ export class Asteroid {
     // Adds random to an asteroid body
     private addAsteroidVerticals() {
         this.verticals = [];
-        const radius = (this.body.shapes[0] as p2.Circle).radius;
+        const radius = this.getRadius();
         for (let j = 0; j < Asteroid.NumAsteroidVerticals; j++) {
             const angle = j * 2 * Math.PI / Asteroid.NumAsteroidVerticals;
-            const xv = radius * Math.cos(angle) + Math.random() * radius * 0.4;
-            const yv = radius * Math.sin(angle) + Math.random() * radius * 0.4;
+            const xv = Number((radius * Math.cos(angle) + Math.random() * radius * 0.4).toFixed(2));
+            const yv = Number((radius * Math.sin(angle) + Math.random() * radius * 0.4).toFixed(2));
             this.verticals.push([xv, yv]);
         }
     }
 
-    private createAsteroidShape() {
-        const shape = new p2.Circle({
-            radius: Asteroid.AsteroidRadius * (Asteroid.NumAsteroidLevels - this.level) / Asteroid.NumAsteroidLevels,
-            collisionGroup: Asteroid.ASTEROID, // Belongs to the ASTEROID group
-            collisionMask: Asteroid.ASTEROID | Bullet.BULLET | Player.SHIP // Can collide with the BULLET or SHIP group
-        });
-        return shape;
+    private getRadius() {
+        return Asteroid.AsteroidRadius * (Asteroid.NumAsteroidLevels - this.level) / Asteroid.NumAsteroidLevels
     }
+
+    // private createAsteroidShape() {
+
+    // const shape = new p2.Circle({
+    //     radius: Asteroid.AsteroidRadius * (Asteroid.NumAsteroidLevels - this.level) / Asteroid.NumAsteroidLevels,
+    //     collisionGroup: Asteroid.ASTEROID, // Belongs to the ASTEROID group
+    //     collisionMask: Asteroid.ASTEROID | Bullet.BULLET | Player.SHIP // Can collide with the BULLET or SHIP group
+    // });
+    // return shape;
+    // }
 
 }

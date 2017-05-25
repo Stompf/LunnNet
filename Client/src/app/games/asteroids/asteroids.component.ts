@@ -6,7 +6,6 @@ import { Player } from './scripts/Player';
 import { Asteroid } from './scripts/Asteroid';
 import { Bullet } from './scripts/Bullet';
 import { LunnEngineComponent } from 'lunnEngine/LunnEngineComponent';
-import { Sprites } from './scripts/Sprites';
 import * as $ from 'jquery';
 
 @Component({
@@ -39,7 +38,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   playerSprite: PIXI.Sprite;
 
-  DRAW_BODIES = true;
+  DRAW_COLLISION_BODIES = true;
   SPAWN_ASTEROIDS = true;
 
   private container: PIXI.Container;
@@ -70,8 +69,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   }
 
   private loadTextures() {
-    Sprites.MeteoroidSprites.clear();
-
     const deferred = $.Deferred();
 
     const playerTexture = this.loadTexture('player', 'assets/games/asteroids/PNG/playerShip1_blue.png').done(sprite => {
@@ -80,59 +77,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       }
     });
 
-    const meteorLevel0_0 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_big1.png').done(sprite => {
-      if (sprite != null) {
-        Sprites.MeteoroidSprites.setValue(0, sprite);
-      }
+    $.when(playerTexture).done(() => {
+      deferred.resolve();
     });
-
-    const meteorLevel0_1 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_big2.png').done(sprite => {
-      if (sprite != null) {
-        Sprites.MeteoroidSprites.setValue(0, sprite);
-      }
-    });
-
-    const meteorLevel1_0 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_med1.png').done(sprite => {
-      if (sprite != null) {
-        Sprites.MeteoroidSprites.setValue(1, sprite);
-      }
-    });
-
-    const meteorLevel1_1 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_med3.png').done(sprite => {
-      if (sprite != null) {
-        Sprites.MeteoroidSprites.setValue(1, sprite);
-      }
-    });
-
-    const meteorLevel2_0 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_small1.png').done(sprite => {
-      if (sprite != null) {
-        Sprites.MeteoroidSprites.setValue(2, sprite);
-      }
-    });
-
-    const meteorLevel2_1 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_small2.png').done(sprite => {
-      if (sprite != null) {
-        Sprites.MeteoroidSprites.setValue(2, sprite);
-      }
-    });
-
-    const meteorLevel3_0 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_small1.png').done(sprite => {
-      if (sprite != null) {
-        Sprites.MeteoroidSprites.setValue(3, sprite);
-      }
-    });
-
-    const meteorLevel3_1 = this.loadTexture('player', 'assets/games/asteroids/PNG/Meteors/meteorBrown_small2.png').done(sprite => {
-      if (sprite != null) {
-        Sprites.MeteoroidSprites.setValue(3, sprite);
-      }
-    });
-
-    $.when(playerTexture,
-      meteorLevel0_0, meteorLevel0_1, meteorLevel1_0, meteorLevel1_1,
-      meteorLevel2_0, meteorLevel2_1, meteorLevel3_0, meteorLevel3_1).done(() => {
-        deferred.resolve();
-      });
 
     return deferred.promise();
   }
@@ -153,13 +100,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.container.scale.x = zoom;
     this.container.scale.y = -zoom;
 
-    Sprites.MeteoroidSprites.values().forEach(sprite => {
-      sprite.anchor.x = 0.5;
-      sprite.anchor.y = 0.5;
-      sprite.scale.x = 1 / this.container.scale.x;
-      sprite.scale.y = -1 / this.container.scale.y;
-    });
-
     // Init physics world
     this.world = new p2.World({
       gravity: [0, 0]
@@ -175,7 +115,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.player.init(this.world, Player.SHIP, Asteroid.ASTEROID);
     this.container.addChild(this.player.sprite);
 
-    if (this.DRAW_BODIES) {
+    if (this.DRAW_COLLISION_BODIES) {
       this.container.addChild(this.player.createBodyGraphics());
     }
 
@@ -203,7 +143,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
         const otherBody = (bodyA === this.player.body ? bodyB : bodyA);
         const foundAsteroid = _.find(this.asteroids, asteroid => { return asteroid.body === otherBody; });
-
 
         if (foundAsteroid != null) {
           this.player.lives--;
@@ -254,7 +193,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
         if (collidedAsteroid != null && bullet != null) {
           // Remove asteroid
           this.world.removeBody(collidedAsteroid.body);
-          this.container.removeChild(collidedAsteroid.sprite);
           this.container.removeChild(collidedAsteroid.bodyGraphics);
 
           this.asteroids.splice(this.asteroids.indexOf(collidedAsteroid), 1);
@@ -268,10 +206,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
           collidedAsteroid.explode(this.player.body.position).forEach(subAsteroid => {
             this.asteroids.push(subAsteroid);
             this.world.addBody(subAsteroid.body);
-            this.container.addChild(subAsteroid.sprite);
-            if (this.DRAW_BODIES) {
-              this.container.addChild(subAsteroid.createBodyGraphics());
-            }
+            this.container.addChild(subAsteroid.createBodyGraphics());
           });
 
           if (this.asteroids.length === 0) {
@@ -301,7 +236,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   }
 
   private updatePhysics(time: number) {
-    this.player.allowCollision = true;
+    this.player.allowCollision = false;
 
     if (this.keyShoot && this.player.visible && this.world.time - this.player.lastShootTime > this.player.reloadTime) {
       this.shoot();
@@ -427,11 +362,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       const asteroid = new Asteroid([x, y], [vx, vy], va, 0);
       this.asteroids.push(asteroid);
       this.world.addBody(asteroid.body);
-      this.container.addChild(asteroid.sprite);
-
-      if (this.DRAW_BODIES) {
-        this.container.addChild(asteroid.createBodyGraphics());
-      }
+      this.container.addChild(asteroid.createBodyGraphics());
     }
   }
 

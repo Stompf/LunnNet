@@ -28,4 +28,8 @@ declare module 'p2' {
         setSideFriction(sideFriction: number): void;
         update(): void;
     }
+
+    export interface Body {
+        concavePath: Array<number[]>
+    }
 }

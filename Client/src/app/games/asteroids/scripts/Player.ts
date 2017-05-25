@@ -25,12 +25,6 @@ export class Player {
     init(world: p2.World, shipMask: number, asteroidMask: number) {
         this.visible = true;
 
-        // this.shape = new p2.Circle({
-        //     radius: this.size,
-        //     collisionGroup: shipMask,
-        //     collisionMask: asteroidMask
-        // });
-
         const shape = new p2.Box({
             height: this.sprite.height,
             width: this.sprite.width
