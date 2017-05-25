@@ -42,6 +42,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   SPAWN_ASTEROIDS = true;
 
   private container: PIXI.Container;
+  private animationFrame: number;
 
   constructor() {
     super();
@@ -84,21 +85,46 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     return deferred.promise();
   }
 
-  private initAsteroids() {
+  private setCanvasSize() {
+    let height = $('body').height() - 25;
+    let width = $('body').width();
 
-    this.init(800, 600, { view: document.getElementById('canvas') as HTMLCanvasElement, backgroundColor: 0x000000 });
+    if (height < 30) {
+      height = 30;
+    }
+    if (width < 30) {
+      width = 30;
+    }
 
-    this.container = new PIXI.Container();
+    this.app.renderer.resize(width, height);
+
     this.container.position.x = this.app.renderer.width / 2; // center at origin
     this.container.position.y = this.app.renderer.height / 2;
 
-    let zoom = this.app.view.height / this.spaceHeight;
-    if (this.app.view.width / this.spaceWidth < zoom) {
-      zoom = this.app.view.width / this.spaceWidth;
+    let zoom = this.app.renderer.height / this.spaceHeight;
+    if (this.app.renderer.width / this.spaceWidth < zoom) {
+      zoom = this.app.renderer.width / this.spaceWidth;
     }
 
     this.container.scale.x = zoom;
     this.container.scale.y = -zoom;
+
+    const playerWidth = 45;
+    this.playerSprite.width = playerWidth * (1 / this.container.scale.x);
+    this.playerSprite.height = (playerWidth / 1.5) * (1 / this.container.scale.y);
+
+    if (this.player != null) {
+      this.player.updateShape(this.playerSprite);
+    }
+  }
+
+  private initAsteroids() {
+    this.init(800, 600,
+      { view: document.getElementById('canvas') as HTMLCanvasElement, backgroundColor: 0x000000 });
+
+    this.container = new PIXI.Container();
+
+    this.setCanvasSize();
 
     // Init physics world
     this.world = new p2.World({
@@ -108,11 +134,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     // Turn off friction, we don't need it.
     this.world.defaultContactMaterial.friction = 0;
 
-    this.playerSprite.scale.x = 1 / this.container.scale.x;
-    this.playerSprite.scale.y = 1 / this.container.scale.y;
-
     this.player = new Player(this.playerSprite);
-    this.player.init(this.world, Player.SHIP, Asteroid.ASTEROID);
+    this.player.init(this.world);
     this.container.addChild(this.player.sprite);
 
     if (this.DRAW_COLLISION_BODIES) {
@@ -225,11 +248,15 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     // Update the text boxes
     this.updateLevel();
     this.updateLives();
+
+    $(window).resize(() => {
+      this.setCanvasSize();
+    });
   }
 
   // Animation loop
   private animate = (time: number) => {
-    requestAnimationFrame(this.animate);
+    this.animationFrame = requestAnimationFrame(this.animate);
 
     this.updatePhysics(time);
     this.render();
@@ -295,7 +322,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     body.previousPosition[0] = p[0];
     body.previousPosition[1] = p[1];
   }
-
 
   private render() {
     // Draw all things

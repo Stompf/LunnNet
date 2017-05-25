@@ -39,10 +39,7 @@ export class Asteroid {
             shp.collisionGroup = Asteroid.ASTEROID;
             shp.collisionMask = Asteroid.ASTEROID | Bullet.BULLET | Player.SHIP;
         });
-
-        // asteroidBody.addShape(this.createAsteroidShape());
         this.body = asteroidBody;
-
     }
 
     explode(playerPosition: number[]) {
@@ -72,6 +69,7 @@ export class Asteroid {
     createBodyGraphics() {
         const concavePath = this.body.concavePath;
         this.bodyGraphics = new PIXI.Graphics();
+        this.bodyGraphics.lineStyle(0.05, 0xac7339);
         this.bodyGraphics.beginFill(0x7A5230);
         for (let j = 0; j < concavePath.length; j++) {
             const xv = concavePath[j][0];
@@ -83,6 +81,10 @@ export class Asteroid {
             }
         }
         this.bodyGraphics.endFill();
+        if (concavePath.length > 2) {
+            this.bodyGraphics.moveTo(concavePath[concavePath.length - 1][0], concavePath[concavePath.length - 1][1]);
+            this.bodyGraphics.lineTo(concavePath[0][0], concavePath[0][1]);
+        }
 
         return this.bodyGraphics;
     }
@@ -124,15 +126,4 @@ export class Asteroid {
     private getRadius() {
         return Asteroid.AsteroidRadius * (Asteroid.NumAsteroidLevels - this.level) / Asteroid.NumAsteroidLevels
     }
-
-    // private createAsteroidShape() {
-
-    // const shape = new p2.Circle({
-    //     radius: Asteroid.AsteroidRadius * (Asteroid.NumAsteroidLevels - this.level) / Asteroid.NumAsteroidLevels,
-    //     collisionGroup: Asteroid.ASTEROID, // Belongs to the ASTEROID group
-    //     collisionMask: Asteroid.ASTEROID | Bullet.BULLET | Player.SHIP // Can collide with the BULLET or SHIP group
-    // });
-    // return shape;
-    // }
-
 }

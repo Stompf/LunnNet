@@ -1,10 +1,10 @@
 import * as p2 from 'p2';
+import { Asteroid } from './Asteroid';
 // import * as PIXI from 'pixi.js';
 
 export class Player {
     static SHIP = Math.pow(2, 1);
 
-    // private size = 0.3
     visible: boolean;
     allowCollision: boolean;
     body: p2.Body;
@@ -22,15 +22,8 @@ export class Player {
         this.sprite.anchor.y = 0.5;
     }
 
-    init(world: p2.World, shipMask: number, asteroidMask: number) {
+    init(world: p2.World) {
         this.visible = true;
-
-        const shape = new p2.Box({
-            height: this.sprite.height,
-            width: this.sprite.width
-        });
-        shape.collisionGroup = shipMask;
-        shape.collisionMask = asteroidMask;
 
         this.body = new p2.Body({
             mass: 1
@@ -38,9 +31,26 @@ export class Player {
         this.body.damping = 0;
         this.body.angularDamping = 0;
 
+        this.updateShape(this.sprite);
+        world.addBody(this.body);
+    }
+
+    updateShape(sprite: PIXI.Sprite) {
+        if (this.body.shapes.length > 0) {
+            this.body.removeShape(this.body.shapes[0]);
+        }
+
+        this.sprite = sprite;
+
+        const shape = new p2.Box({
+            height: sprite.height,
+            width: sprite.width
+        });
+        shape.collisionGroup = Player.SHIP;
+        shape.collisionMask = Asteroid.ASTEROID;
         this.body.addShape(shape);
 
-        world.addBody(this.body);
+        this.createBodyGraphics();
     }
 
     update() {
@@ -58,10 +68,13 @@ export class Player {
     }
 
     createBodyGraphics() {
-        this.bodyGraphics = new PIXI.Graphics();
+        if (this.bodyGraphics == null) {
+            this.bodyGraphics = new PIXI.Graphics();
+        } else {
+            this.bodyGraphics.clear();
+        }
         this.bodyGraphics.beginFill(0xffffff);
         this.bodyGraphics.alpha = 0.75;
-        // this.bodyGraphics.drawCircle(this.body.interpolatedPosition[0], this.body.interpolatedPosition[1], this.size);
         this.bodyGraphics.drawRect(this.body.interpolatedPosition[0] - (this.body.shapes[0] as p2.Box).width / 2,
             this.body.interpolatedPosition[1] - (this.body.shapes[0] as p2.Box).height / 2,
             (this.body.shapes[0] as p2.Box).width, (this.body.shapes[0] as p2.Box).height);

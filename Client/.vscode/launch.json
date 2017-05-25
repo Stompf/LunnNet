@@ -13,6 +13,7 @@
             "skipFiles": [
                 "zone.js"
             ],
+            "smartStep": true,
             "webRoot": "${workspaceRoot}"
         },
         {
@@ -20,6 +21,7 @@
             "type": "chrome",
             "request": "attach",
             "port": 9222,
+            "smartStep": true,
             "sourceMaps": true,
             "webRoot": "${workspaceRoot}"
         }
