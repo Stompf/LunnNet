@@ -1,10 +1,8 @@
 import * as p2 from 'p2';
-import { Asteroid } from './Asteroid';
+import { Utils } from './Utils';
 import * as PIXI from 'pixi.js';
 
 export class Bullet {
-
-    static BULLET = Math.pow(2, 2);
     static BulletRadius = 0.03;
     static BulletLifeTime = 0.9;
     static BulletSpeed = 6;
@@ -31,8 +29,8 @@ export class Bullet {
 
         const bulletShape = new p2.Circle({
             radius: Bullet.BulletRadius,
-            collisionGroup: Bullet.BULLET, // Belongs to the BULLET group
-            collisionMask: Asteroid.ASTEROID // Can only collide with the ASTEROID group
+            collisionGroup: Utils.MASKS.BULLET, // Belongs to the BULLET group
+            collisionMask: Utils.MASKS.ASTEROID | Utils.MASKS.POWER_UP // Can only collide with the ASTEROID group
         });
         bulletBody.addShape(bulletShape);
 

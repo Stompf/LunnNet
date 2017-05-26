@@ -1,14 +1,12 @@
 import * as p2 from 'p2';
-import { Asteroid } from './Asteroid';
+import { Utils } from './Utils';
 // import * as PIXI from 'pixi.js';
 
 export class Player {
-    static SHIP = Math.pow(2, 1);
-
     visible: boolean;
     allowCollision: boolean;
     body: p2.Body;
-    reloadTime = 0.1;
+    reloadTime = 0.2;
     turnSpeed = 4;
     lives = 3;
     lastShootTime = 0;
@@ -39,8 +37,8 @@ export class Player {
             height: this.sprite.height,
             width: this.sprite.width
         });
-        shape.collisionGroup = Player.SHIP;
-        shape.collisionMask = Asteroid.ASTEROID;
+        shape.collisionGroup = Utils.MASKS.PLAYER;
+        shape.collisionMask = Utils.MASKS.ASTEROID | Utils.MASKS.POWER_UP;
         this.body.addShape(shape);
 
         this.createBodyGraphics();

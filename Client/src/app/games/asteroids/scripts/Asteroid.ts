@@ -1,10 +1,9 @@
 import * as p2 from 'p2';
-import { Player } from './Player';
-import { Bullet } from './Bullet';
+import { Utils } from './Utils';
 
 export class Asteroid {
 
-    static ASTEROID = Math.pow(2, 3);
+
     static MaxAsteroidSpeed = 2;
     static NumAsteroidLevels = 4;
     static NumAsteroidVerticals = 10;
@@ -16,8 +15,11 @@ export class Asteroid {
     body: p2.Body;
     verticals: number[][] = [];
     level: number;
-
     bodyGraphics: PIXI.Graphics;
+
+    private fillColor = 0x7A5230;
+    private strokeColor = 0xAC7339;
+    private strokeWidth = 0.05;
 
     constructor(position: number[], velocity: number[], angularVelocity: number, level: number) {
         this.level = level;
@@ -36,27 +38,25 @@ export class Asteroid {
 
         asteroidBody.fromPolygon(this.verticals);
         asteroidBody.shapes.forEach(shp => {
-            shp.collisionGroup = Asteroid.ASTEROID;
-            shp.collisionMask = Asteroid.ASTEROID | Bullet.BULLET | Player.SHIP;
+            shp.collisionGroup = Utils.MASKS.ASTEROID;
+            shp.collisionMask = Utils.MASKS.ASTEROID | Utils.MASKS.BULLET | Utils.MASKS.PLAYER | Utils.MASKS.POWER_UP;
         });
         this.body = asteroidBody;
     }
 
-    explode(playerPosition: number[]) {
+    explode() {
         // Add new sub-asteroids
-        const x = this.body.position[0];
-        const y = this.body.position[1];
         const subAsteroids: Asteroid[] = [];
 
         if (this.level < Asteroid.MaxLevel) {
             const angleDisturb = Math.PI / 2 * (Math.random() - 0.5);
-            for (let i = 0; i < Asteroid.Splits; i++) {
+            for (let i = 0; i < this.level + 2; i++) {
                 const angle = Math.PI / 2 * i + angleDisturb;
-                const subAsteroid = this.createSubAsteroid(x, y, angle, playerPosition);
+                const position = this.getSubAstroidPosition(this.body.interpolatedPosition, this.getRadius(), i, Asteroid.Splits);
+                const subAsteroid = this.createSubAsteroid(position[0], position[1], angle);
                 subAsteroids.push(subAsteroid);
             }
         }
-
         return subAsteroids;
     }
 
@@ -69,8 +69,8 @@ export class Asteroid {
     createBodyGraphics() {
         const concavePath = this.body.concavePath;
         this.bodyGraphics = new PIXI.Graphics();
-        this.bodyGraphics.lineStyle(0.05, 0xac7339);
-        this.bodyGraphics.beginFill(0x7A5230);
+        this.bodyGraphics.lineStyle(this.strokeWidth, this.strokeColor);
+        this.bodyGraphics.beginFill(this.fillColor);
         for (let j = 0; j < concavePath.length; j++) {
             const xv = concavePath[j][0];
             const yv = concavePath[j][1];
@@ -89,21 +89,20 @@ export class Asteroid {
         return this.bodyGraphics;
     }
 
-    private createSubAsteroid(x: number, y: number, angle: number, playerPosition: number[]) {
+    private getSubAstroidPosition(bodyPosition: number[], radius: number, index: number, totalSplits: number) {
+        if (totalSplits === 1) {
+            return bodyPosition.splice(0);
+        }
+        return [this.body.position[0] + (radius / 1.25) * ((index <= totalSplits / 2) ? 1 : -1),
+        this.body.position[1] + (radius / 1.25) * (index % 2 === 0 ? 1 : -1)];
+    }
+
+    private createSubAsteroid(x: number, y: number, angle: number) {
         const r = this.getRadius() / 2;
         const position = [
             x + r * Math.cos(angle),
             y + r * Math.sin(angle)
         ];
-
-        // Avoid the ship!
-        if (Math.abs(x - playerPosition[0]) < Asteroid.InitSpace) {
-            if (y - playerPosition[1] > 0) {
-                y += Asteroid.InitSpace;
-            } else {
-                y -= Asteroid.InitSpace;
-            }
-        }
 
         const velocity = [Math.random() - 0.5, Math.random() - 0.5];
 
@@ -117,8 +116,8 @@ export class Asteroid {
         const radius = this.getRadius();
         for (let j = 0; j < Asteroid.NumAsteroidVerticals; j++) {
             const angle = j * 2 * Math.PI / Asteroid.NumAsteroidVerticals;
-            const xv = Number((radius * Math.cos(angle) + Math.random() * radius * 0.4).toFixed(2));
-            const yv = Number((radius * Math.sin(angle) + Math.random() * radius * 0.4).toFixed(2));
+            const xv = Number((radius * Math.cos(angle) + (Math.random() - 0.5) * radius * 0.4).toFixed(2));
+            const yv = Number((radius * Math.sin(angle) + (Math.random() - 0.5) * radius * 0.4).toFixed(2));
             this.verticals.push([xv, yv]);
         }
     }

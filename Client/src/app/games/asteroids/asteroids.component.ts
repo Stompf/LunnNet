@@ -7,6 +7,8 @@ import { Asteroid } from './scripts/Asteroid';
 import { Bullet } from './scripts/Bullet';
 import { LunnEngineComponent } from 'lunnEngine/LunnEngineComponent';
 import * as $ from 'jquery';
+import { Sprites } from './scripts/Sprites';
+import * as PowerUps from './scripts/PowerUps';
 
 @Component({
   selector: 'app-asteroids',
@@ -16,11 +18,11 @@ import * as $ from 'jquery';
 
 export class AsteroidsComponent extends LunnEngineComponent implements OnInit, OnDestroy {
   player: Player;
-  spaceWidth = 16;
+  spaceWidth = 9;
   spaceHeight = 9;
   world: p2.World;
   bullets: Bullet[] = [];
-
+  powerUps: PowerUps.BasePowerUp[] = [];
   asteroids: Asteroid[] = [];
   asteroidsToAdd: Asteroid[] = [];
   asteroidsToRemove: Asteroid[] = [];
@@ -43,6 +45,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   private container: PIXI.Container;
   private animationFrame: number;
+  private powerUpShieldPercent = 1;
 
   constructor() {
     super();
@@ -78,7 +81,21 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       }
     });
 
-    $.when(playerTexture).done(() => {
+    const powerUp_shootSpeed = this.loadTexture('powerUp_shootSpeed_Sprite',
+      'assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png').done(sprite => {
+        if (sprite != null) {
+          Sprites.PowerUps.ShootSpeed = sprite;
+        }
+      });
+
+    const powerUp_shield = this.loadTexture('powerUp_shootSpeed_Sprite',
+      'assets/games/asteroids/PNG/Power-ups/powerUpBlue_shield.png').done(sprite => {
+        if (sprite != null) {
+          Sprites.PowerUps.Shield = sprite;
+        }
+      });
+
+    $.when(playerTexture, powerUp_shootSpeed, powerUp_shield).done(() => {
       deferred.resolve();
     });
 
@@ -113,6 +130,12 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       const playerWidth = this.app.renderer.width / 30;
       this.playerSprite.width = playerWidth / zoom;
       this.playerSprite.height = ((playerWidth / 1.5) / -zoom);
+
+      Sprites.PowerUps.Shield.scale.x = 1 / zoom;
+      Sprites.PowerUps.Shield.scale.y = 1 / -zoom;
+
+      Sprites.PowerUps.ShootSpeed.scale.x = 1 / zoom;
+      Sprites.PowerUps.ShootSpeed.scale.y = 1 / -zoom;
     }
   }
 
@@ -224,11 +247,15 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
           this.bullets.splice(this.bullets.indexOf(bullet), 1);
 
-          collidedAsteroid.explode(this.player.body.position).forEach(subAsteroid => {
+          collidedAsteroid.explode().forEach(subAsteroid => {
             this.asteroids.push(subAsteroid);
             this.world.addBody(subAsteroid.body);
             this.container.addChild(subAsteroid.createBodyGraphics());
           });
+
+          if (Math.random() <= this.powerUpShieldPercent) {
+            this.spawnRandomPowerUp(collidedAsteroid.body.position);
+          }
 
           if (this.asteroids.length === 0) {
             this.currentLevel++;
@@ -250,6 +277,13 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     $(window).resize(() => {
       this.setCanvasSize();
     });
+  }
+
+  private spawnRandomPowerUp(position: number[]) {
+    const powerUp = new PowerUps.PowerUpShootSpeed(position, [0, 0], 1);
+    this.world.addBody(powerUp.body);
+    this.container.addChild(powerUp.sprite);
+    this.powerUps.push(powerUp);
   }
 
   // Animation loop
@@ -327,12 +361,19 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.updateBullets();
     //  this.drawBounds();
     this.updateAsteroids();
+    this.updatePowerUps();
 
     this.app.renderer.render(this.container);
   }
 
   private updateShip() {
     this.player.update();
+  }
+
+  private updatePowerUps() {
+    this.powerUps.forEach(powerUp => {
+      powerUp.update();
+    });
   }
 
   private updateAsteroids() {
@@ -368,11 +409,11 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     }
 
     for (let i = 0; i < this.currentLevel; i++) {
-      const x = Math.random() * this.spaceWidth;
-      let y = Math.random() * this.spaceHeight;
-      const vx = Math.random() * Asteroid.MaxAsteroidSpeed;
-      const vy = Math.random() * Asteroid.MaxAsteroidSpeed;
-      const va = Math.random() * Asteroid.MaxAsteroidSpeed;
+      const x = (Math.random() - 0.5) * this.spaceWidth;
+      let y = (Math.random() - 0.5) * this.spaceHeight;
+      const vx = (Math.random() - 0.5) * Asteroid.MaxAsteroidSpeed;
+      const vy = (Math.random() - 0.5) * Asteroid.MaxAsteroidSpeed;
+      const va = (Math.random() - 0.5) * Asteroid.MaxAsteroidSpeed;
 
       // Avoid the ship!
       if (Math.abs(x - this.player.body.position[0]) < Asteroid.InitSpace) {
