@@ -48,13 +48,15 @@ export class BasePowerUp {
 }
 
 export class PowerUpShield extends BasePowerUp {
-    private durationMs = 5000;
+    private durationMs = 10000;
+    private graphics: PIXI.Graphics;
 
     constructor(position: number[], velocity: number[], angularVelocity: number) {
         super(Sprites.getCloneSprite(Sprites.PowerUps.Shield), position, velocity, angularVelocity);
     }
 
     onActivate(player: Player) {
+        this.createShieldGraphics(player);
         player.allowCollision = false;
 
         setTimeout(() => {
@@ -64,6 +66,15 @@ export class PowerUpShield extends BasePowerUp {
 
     deactivate(player: Player) {
         player.allowCollision = true;
+        player.sprite.removeChild(this.graphics);
+    }
+
+    private createShieldGraphics(player: Player) {
+        this.graphics = new PIXI.Graphics();
+        this.graphics.beginFill(0x428cf4, 0.5);
+        this.graphics.drawCircle(player.body.interpolatedPosition[0], player.body.interpolatedPosition[1], 80);
+        this.graphics.endFill();
+        player.sprite.addChild(this.graphics);
     }
 }
 

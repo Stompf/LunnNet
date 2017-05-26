@@ -319,7 +319,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     const randomRoll = Math.random();
     let powerUp: PowerUps.BasePowerUp;
     if (randomRoll >= 0.5) {
-      powerUp = new PowerUps.PowerUpShootSpeed(position, [0, 0], 1);
+      powerUp = new PowerUps.PowerUpShield(position, [0, 0], 1);
     } else {
       powerUp = new PowerUps.PowerUpShield(position, [0, 0], 1);
     }
