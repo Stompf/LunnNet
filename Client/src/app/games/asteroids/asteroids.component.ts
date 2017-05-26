@@ -38,7 +38,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   playerSprite: PIXI.Sprite;
 
-  DRAW_COLLISION_BODIES = true;
+  DRAW_COLLISION_BODIES = false;
   SPAWN_ASTEROIDS = true;
 
   private container: PIXI.Container;
