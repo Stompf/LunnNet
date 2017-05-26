@@ -7,7 +7,7 @@ export class Asteroid {
     static MaxAsteroidSpeed = 2;
     static NumAsteroidLevels = 4;
     static NumAsteroidVerticals = 10;
-    static AsteroidRadius = 0.9;
+    static AsteroidRadius = 0.5;
     static InitSpace = Asteroid.AsteroidRadius * 2;
     static MaxLevel = 3;
     static Splits = 4;

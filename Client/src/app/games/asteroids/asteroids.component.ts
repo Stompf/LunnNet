@@ -9,6 +9,7 @@ import { LunnEngineComponent } from 'lunnEngine/LunnEngineComponent';
 import * as $ from 'jquery';
 import { Sprites } from './scripts/Sprites';
 import * as PowerUps from './scripts/PowerUps';
+import { Utils } from './scripts/Utils';
 
 @Component({
   selector: 'app-asteroids',
@@ -18,8 +19,8 @@ import * as PowerUps from './scripts/PowerUps';
 
 export class AsteroidsComponent extends LunnEngineComponent implements OnInit, OnDestroy {
   player: Player;
-  spaceWidth = 9;
-  spaceHeight = 9;
+  spaceWidth = 20;
+  spaceHeight = 10;
   world: p2.World;
   bullets: Bullet[] = [];
   powerUps: PowerUps.BasePowerUp[] = [];
@@ -45,7 +46,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   private container: PIXI.Container;
   private animationFrame: number;
-  private powerUpShieldPercent = 1;
+  private powerUpShieldPercent = 0.1;
+  private maxPowerUpsOnScreen = 2;
 
   constructor() {
     super();
@@ -81,14 +83,14 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       }
     });
 
-    const powerUp_shootSpeed = this.loadTexture('powerUp_shootSpeed_Sprite',
+    const powerUp_shootSpeed = this.loadTexture('powerUp_shootSpeed',
       'assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png').done(sprite => {
         if (sprite != null) {
           Sprites.PowerUps.ShootSpeed = sprite;
         }
       });
 
-    const powerUp_shield = this.loadTexture('powerUp_shootSpeed_Sprite',
+    const powerUp_shield = this.loadTexture('powerUp_shield',
       'assets/games/asteroids/PNG/Power-ups/powerUpBlue_shield.png').done(sprite => {
         if (sprite != null) {
           Sprites.PowerUps.Shield = sprite;
@@ -136,6 +138,30 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
       Sprites.PowerUps.ShootSpeed.scale.x = 1 / zoom;
       Sprites.PowerUps.ShootSpeed.scale.y = 1 / -zoom;
+
+      const leftBound = new PIXI.Graphics();
+      leftBound.lineStyle(1 / zoom, 0xFFFFFF);
+      leftBound.moveTo(-this.spaceWidth / 2, -this.spaceHeight / 2);
+      leftBound.lineTo(-this.spaceWidth / 2, this.spaceHeight / 2);
+      this.container.addChild(leftBound);
+
+      const rightBound = new PIXI.Graphics();
+      rightBound.lineStyle(1 / zoom, 0xFFFFFF);
+      rightBound.moveTo(this.spaceWidth / 2, -this.spaceHeight / 2);
+      rightBound.lineTo(this.spaceWidth / 2, this.spaceHeight / 2);
+      this.container.addChild(rightBound);
+
+      const topBound = new PIXI.Graphics();
+      topBound.lineStyle(1 / zoom, 0xFFFFFF);
+      topBound.moveTo(-this.spaceWidth / 2, -this.spaceHeight / 2);
+      topBound.lineTo(this.spaceWidth / 2, -this.spaceHeight / 2);
+      this.container.addChild(topBound);
+
+      const bottomBound = new PIXI.Graphics();
+      bottomBound.lineStyle(1 / zoom, 0xFFFFFF);
+      bottomBound.moveTo(this.spaceWidth / 2, this.spaceHeight / 2);
+      bottomBound.lineTo(-this.spaceWidth / 2, this.spaceHeight / 2);
+      this.container.addChild(bottomBound);
     }
   }
 
@@ -174,18 +200,25 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
     // Catch impacts in the world
     // Todo: check if several bullets hit the same asteroid in the same time step
-    this.world.on('beginContact', (evt: any) => {
-      const bodyA = evt.bodyA as p2.Body;
-      const bodyB = evt.bodyB as p2.Body;
-      const foundBulletA = _.find(this.bullets, bullet => { return bullet.body === bodyA; });
-      const foundBulletB = _.find(this.bullets, bullet => { return bullet.body === bodyB; });
+    this.world.on('beginContact', (evt: p2.BeginContactEvent) => {
+      if (evt.shapeA.collisionGroup === Utils.MASKS.POWER_UP && evt.shapeB.collisionGroup === Utils.MASKS.PLAYER) {
+        this.handlePowerUpActivated(evt.bodyA);
+        return;
+      } else if (evt.shapeA.collisionGroup === Utils.MASKS.PLAYER && evt.shapeB.collisionGroup === Utils.MASKS.POWER_UP) {
+        this.handlePowerUpActivated(evt.bodyB);
+        return;
+      }
 
-      if (this.player.visible && this.player.allowCollision && (bodyA === this.player.body || bodyB === this.player.body)) {
+
+      const foundBulletA = _.find(this.bullets, bullet => { return bullet.body === evt.bodyA; });
+      const foundBulletB = _.find(this.bullets, bullet => { return bullet.body === evt.bodyB; });
+
+      if (this.player.visible && this.player.allowCollision && (evt.bodyA === this.player.body || evt.bodyB === this.player.body)) {
 
         // Ship collided with something
         this.player.allowCollision = false;
 
-        const otherBody = (bodyA === this.player.body ? bodyB : bodyA);
+        const otherBody = (evt.bodyA === this.player.body ? evt.bodyB : evt.bodyA);
         const foundAsteroid = _.find(this.asteroids, asteroid => { return asteroid.body === otherBody; });
 
         if (foundAsteroid != null) {
@@ -231,7 +264,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
         // Bullet collided with something
         const bullet = (foundBulletA ? foundBulletA : foundBulletB);
-        const body = (bodyB === (bullet ? bullet.body : undefined) ? bodyA : bodyB);
+        const body = (evt.bodyB === (bullet ? bullet.body : undefined) ? evt.bodyA : evt.bodyB);
 
         const collidedAsteroid = _.find(this.asteroids, asteroid => { return asteroid.body === body; })
         if (collidedAsteroid != null && bullet != null) {
@@ -253,7 +286,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
             this.container.addChild(subAsteroid.createBodyGraphics());
           });
 
-          if (Math.random() <= this.powerUpShieldPercent) {
+          if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
             this.spawnRandomPowerUp(collidedAsteroid.body.position);
           }
 
@@ -279,8 +312,26 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     });
   }
 
+  private handlePowerUpActivated(powerUpBody: p2.Body) {
+    const foundPowerUp = _.find(this.powerUps, powerUp => { return powerUp.body === powerUpBody });
+
+    if (foundPowerUp) {
+      this.powerUps.splice(this.powerUps.indexOf(foundPowerUp), 1);
+      this.world.removeBody(powerUpBody);
+      this.container.removeChild(foundPowerUp.sprite);
+      foundPowerUp.onActivate(this.player);
+    }
+  }
+
   private spawnRandomPowerUp(position: number[]) {
-    const powerUp = new PowerUps.PowerUpShootSpeed(position, [0, 0], 1);
+
+    const randomRoll = Math.random();
+    let powerUp: PowerUps.BasePowerUp;
+    if (randomRoll >= 0.5) {
+      powerUp = new PowerUps.PowerUpShootSpeed(position, [0, 0], 1);
+    } else {
+      powerUp = new PowerUps.PowerUpShield(position, [0, 0], 1);
+    }
     this.world.addBody(powerUp.body);
     this.container.addChild(powerUp.sprite);
     this.powerUps.push(powerUp);

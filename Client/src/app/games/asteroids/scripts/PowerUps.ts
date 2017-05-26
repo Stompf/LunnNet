@@ -41,24 +41,49 @@ export class BasePowerUp {
     onActivate(_player: Player) {
         // Override what happens when activating
     }
+
+    deactivate(_player: Player) {
+        // Override what happens when deactivating
+    }
 }
 
 export class PowerUpShield extends BasePowerUp {
+    private durationMs = 5000;
+
     constructor(position: number[], velocity: number[], angularVelocity: number) {
         super(Sprites.getCloneSprite(Sprites.PowerUps.Shield), position, velocity, angularVelocity);
     }
 
-    onActivate(_player: Player) {
-        // Override what happens when activating
+    onActivate(player: Player) {
+        player.allowCollision = false;
+
+        setTimeout(() => {
+            this.deactivate(player);
+        }, this.durationMs);
+    }
+
+    deactivate(player: Player) {
+        player.allowCollision = true;
     }
 }
 
 export class PowerUpShootSpeed extends BasePowerUp {
+    private shootSpeedIncrease = 0.5;
+    private durationMs = 5000;
+
     constructor(position: number[], velocity: number[], angularVelocity: number) {
         super(Sprites.getCloneSprite(Sprites.PowerUps.ShootSpeed), position, velocity, angularVelocity);
     }
 
-    onActivate(_player: Player) {
-        // Override what happens when activating
+    onActivate(player: Player) {
+        player.reloadTime -= this.shootSpeedIncrease;
+
+        setTimeout(() => {
+            this.deactivate(player);
+        }, this.durationMs);
+    }
+
+    deactivate(player: Player) {
+        player.reloadTime += this.shootSpeedIncrease;
     }
 }

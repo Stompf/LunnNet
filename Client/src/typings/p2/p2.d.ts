@@ -32,4 +32,57 @@ declare module 'p2' {
     export interface Body {
         concavePath: Array<number[]>
     }
+
+    export interface PostStepEvent {
+        type: string;
+    }
+
+    export interface AddBodyEvent {
+        type: string;
+    }
+
+    export interface RemoveBodyEvent {
+        type: string;
+    }
+
+    export interface AddSpringEvent {
+        type: string;
+    }
+
+    export interface ImpactEvent {
+        type: string;
+        bodyA: Body;
+        bodyB: Body;
+        shapeA: Shape;
+        shapeB: Shape;
+        contactEquation: ContactEquation;
+    }
+
+    export interface PostBroadphaseEvent {
+        type: string;
+        pairs: Body[];
+    }
+
+    export interface BeginContactEvent {
+        type: string;
+        shapeA: Shape;
+        shapeB: Shape;
+        bodyA: Body;
+        bodyB: Body;
+        contactEquations: ContactEquation[];
+    }
+
+    export interface EndContactEvent {
+        type: string;
+        shapeA: Shape;
+        shapeB: Shape;
+        bodyA: Body;
+        bodyB: Body;
+    }
+
+    export interface PreSolveEvent {
+        type: string;
+        contactEquations: ContactEquation[];
+        frictionEquations: FrictionEquation[];
+    }
 }
