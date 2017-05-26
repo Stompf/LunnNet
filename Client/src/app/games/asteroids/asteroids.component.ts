@@ -10,6 +10,7 @@ import * as $ from 'jquery';
 import { Sprites } from './scripts/Sprites';
 import * as PowerUps from './scripts/PowerUps';
 import { Utils } from './scripts/Utils';
+import { KeyMapping } from './scripts/KeyMapping';
 
 @Component({
   selector: 'app-asteroids',
@@ -54,16 +55,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   }
 
   ngOnInit() {
-    // Catch key down events
-    window.onkeydown = (evt) => {
-      this.handleKey(evt.keyCode, 1);
-    }
-
-    // Catch key up events
-    window.onkeyup = (evt) => {
-      this.handleKey(evt.keyCode, 0);
-    }
-
     this.loadTextures().done(() => {
       this.initAsteroids();
       this.animate(0);
@@ -341,6 +332,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   private animate = (time: number) => {
     this.animationFrame = requestAnimationFrame(this.animate);
 
+    this.updateKeys();
     this.updatePhysics(time);
     this.render();
   }
@@ -482,19 +474,10 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     }
   }
 
-  // Handle key up or down
-  private handleKey(code: number, isDown: number) {
-    switch (code) {
-      case 32: this.keyShoot = isDown; break;
-      case 37: this.keyLeft = isDown; break;
-      case 38:
-        this.keyUp = isDown;
-        const instructions = document.getElementById('instructions');
-        if (instructions) {
-          instructions.classList.add('hidden')
-        }
-        break;
-      case 39: this.keyRight = isDown; break;
-    }
+  private updateKeys() {
+    this.keyUp = this.isKeyPressed(KeyMapping.Mapping.up) ? 1 : 0;
+    this.keyRight = this.isKeyPressed(KeyMapping.Mapping.right) ? 1 : 0;
+    this.keyLeft = this.isKeyPressed(KeyMapping.Mapping.left) ? 1 : 0;
+    this.keyShoot = this.isKeyPressed(KeyMapping.Mapping.fire) ? 1 : 0;
   }
 }
