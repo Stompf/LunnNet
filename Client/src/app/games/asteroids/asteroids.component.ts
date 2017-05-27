@@ -19,38 +19,38 @@ import { KeyMapping } from './scripts/KeyMapping';
 })
 
 export class AsteroidsComponent extends LunnEngineComponent implements OnInit, OnDestroy {
-  player: Player;
-  spaceWidth = 20;
-  spaceHeight = 10;
-  world: p2.World;
-  bullets: Bullet[] = [];
-  powerUps: PowerUps.BasePowerUp[] = [];
-  asteroids: Asteroid[] = [];
-  asteroidsToAdd: Asteroid[] = [];
-  asteroidsToRemove: Asteroid[] = [];
+  private player: Player;
+  private spaceWidth = 20;
+  private spaceHeight = 10;
+  private world: p2.World;
+  private bullets: Bullet[] = [];
+  private powerUps: PowerUps.BasePowerUp[] = [];
+  private asteroids: Asteroid[] = [];
 
-  currentLevel = 1;
+  private currentLevel = 1;
 
-  keyLeft = 0;
-  keyRight = 0;
-  keyUp = 0;
-  keyShoot = 0;
+  private keyLeft = 0;
+  private keyRight = 0;
+  private keyUp = 0;
+  private keyShoot = 0;
 
-  lastTime: number;
-  maxSubSteps = 5; // Max physics ticks per render frame
-  fixedDeltaTime = 1 / 30; // Physics "tick" delta time
+  private lastTime: number;
+  private maxSubSteps = 5; // Max physics ticks per render frame
+  private fixedDeltaTime = 1 / 30; // Physics "tick" delta time
 
-  playerSprite: PIXI.Sprite;
-  background: PIXI.Sprite;
+  private playerSprite: PIXI.Sprite;
+  private background: PIXI.Sprite;
 
-  DRAW_COLLISION_BODIES = false;
-  SPAWN_ASTEROIDS = true;
-  INVULNERABLE = false;
+  private DRAW_COLLISION_BODIES = false;
+  private SPAWN_ASTEROIDS = true;
+  private INVULNERABLE = false;
 
   private container: PIXI.Container;
   private animationFrame: number;
   private powerUpShieldPercent = 1;
   private maxPowerUpsOnScreen = 2;
+  private pointsText: PIXI.Text;
+  private livesText: PIXI.Text;
 
   constructor() {
     super();
@@ -192,6 +192,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.player.init(this.world);
     this.container.addChild(this.player.sprite);
 
+    this.initLivesText();
+    this.initPointsText();
+
     if (this.DRAW_COLLISION_BODIES) {
       this.container.addChild(this.player.createBodyGraphics());
     }
@@ -235,6 +238,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
           this.world.removeBody(this.player.body);
           this.player.visible = false;
 
+          this.removeAsteroid(foundAsteroid);
+
           if (this.player.lives > 0) {
             const interval = setInterval(() => {
               // Check if the ship position is free from asteroids
@@ -266,11 +271,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
         const collidedAsteroid = _.find(this.asteroids, asteroid => { return asteroid.body === body; })
         if (collidedAsteroid != null && bullet != null) {
-          // Remove asteroid
-          this.world.removeBody(collidedAsteroid.body);
-          this.container.removeChild(collidedAsteroid.bodyGraphics);
-
-          this.asteroids.splice(this.asteroids.indexOf(collidedAsteroid), 1);
+          this.removeAsteroid(collidedAsteroid);
+          this.player.points += 5 * this.currentLevel;
+          this.updatePoints();
 
           // Remove bullet
           this.world.removeBody(bullet.body);
@@ -278,20 +281,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
           this.bullets.splice(this.bullets.indexOf(bullet), 1);
 
-          collidedAsteroid.explode().forEach(subAsteroid => {
-            this.asteroids.push(subAsteroid);
-            this.world.addBody(subAsteroid.body);
-            this.container.addChild(subAsteroid.createBodyGraphics());
-          });
-
           if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
             this.spawnRandomPowerUp(collidedAsteroid.body.position);
-          }
-
-          if (this.asteroids.length === 0) {
-            this.currentLevel++;
-            this.updateLevel();
-            this.addAsteroids();
           }
         }
       }
@@ -310,6 +301,51 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     });
   }
 
+  private removeAsteroid(asteroid: Asteroid) {
+    this.world.removeBody(asteroid.body);
+    this.container.removeChild(asteroid.bodyGraphics);
+    this.asteroids.splice(this.asteroids.indexOf(asteroid), 1);
+
+    asteroid.explode().forEach(subAsteroid => {
+      this.asteroids.push(subAsteroid);
+      this.world.addBody(subAsteroid.body);
+      this.container.addChild(subAsteroid.createBodyGraphics());
+    });
+  }
+
+  private initLivesText() {
+    const textStyle = new PIXI.TextStyle({
+      fill: '#FFFFFF',
+      fontSize: 20
+    });
+    this.livesText = new PIXI.Text('Lives: ', textStyle);
+    this.livesText.x = -this.spaceWidth / 2 + 0.25;
+    this.livesText.y = this.spaceHeight / 2 - 0.25;
+    this.livesText.anchor.y = 0.5;
+    this.livesText.scale.x = 1 / this.container.scale.x;
+    this.livesText.scale.y = 1 / this.container.scale.y;
+    this.container.addChild(this.livesText);
+
+    this.updateLives();
+  }
+
+  private initPointsText() {
+    const textStyle = new PIXI.TextStyle({
+      fill: '#FFFFFF',
+      fontSize: 20
+    });
+
+    this.pointsText = new PIXI.Text(String(this.player.points), textStyle);
+    this.pointsText.x = -this.spaceWidth / 2 + 0.25;
+    this.pointsText.y = this.spaceHeight / 2 - 0.79;
+    this.pointsText.anchor.y = 0.5;
+    this.pointsText.scale.x = 1 / this.container.scale.x;
+    this.pointsText.scale.y = 1 / this.container.scale.y;
+    this.container.addChild(this.pointsText);
+
+    this.updatePoints();
+  }
+
   private respawnPlayer() {
     // Add ship again
     this.player.body.force[0] = 0;
@@ -324,7 +360,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     // Spawn with shield
     const shield = new PowerUps.PowerUpShield(this.player.body.interpolatedPosition,
       this.player.body.velocity, this.player.body.angularVelocity);
-    shield.onActivate(this.player);
+    shield.activate(this.player);
   }
 
   private handlePowerUpActivated(powerUpBody: p2.Body) {
@@ -334,7 +370,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       this.powerUps.splice(this.powerUps.indexOf(foundPowerUp), 1);
       this.world.removeBody(powerUpBody);
       this.container.removeChild(foundPowerUp.sprite);
-      foundPowerUp.onActivate(this.player);
+      foundPowerUp.activate(this.player);
     }
   }
 
@@ -354,6 +390,12 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   // Animation loop
   private animate = (time: number) => {
     this.animationFrame = requestAnimationFrame(this.animate);
+
+    if (this.asteroids.length === 0) {
+      this.currentLevel++;
+      this.updateLevel();
+      this.addAsteroids();
+    }
 
     this.updateKeys();
     this.updatePhysics(time);
@@ -461,9 +503,19 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   }
 
   private updateLives() {
-    const el = document.getElementById('lives');
-    if (el) {
-      el.innerHTML = 'Lives ' + this.player.lives;
+    if (this.livesText && this.player) {
+      this.livesText.text = 'Lives: ' + this.player.lives;
+    }
+  }
+
+  private updatePoints() {
+    if (this.pointsText && this.player) {
+      this.pointsText.text = 'Points: ' + this.player.points;
+
+      if (this.player.points !== 0 && this.player.points % 1000 === 0) {
+        this.player.lives++;
+        this.updatePoints();
+      }
     }
   }
 

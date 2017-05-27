@@ -10,6 +10,7 @@ export class Player {
     reloadTime = 0.2;
     turnSpeed = 4;
     lives = 3;
+    points = 0;
     lastShootTime = 0;
     sprite: PIXI.Sprite;
 

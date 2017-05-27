@@ -7,6 +7,7 @@ export class BasePowerUp {
 
     sprite: PIXI.Sprite;
     body: p2.Body;
+    isActive: boolean;
 
     constructor(sprite: PIXI.Sprite, position: number[], velocity: number[], angularVelocity: number) {
         this.sprite = sprite;
@@ -38,35 +39,55 @@ export class BasePowerUp {
         this.sprite.rotation = this.body.interpolatedAngle;
     }
 
-    onActivate(_player: Player) {
+    activate(_player: Player) {
         // Override what happens when activating
+        this.isActive = true;
     }
 
     deactivate(_player: Player) {
         // Override what happens when deactivating
+        this.isActive = false;
     }
 }
 
 export class PowerUpShield extends BasePowerUp {
-    private durationMs = 10000;
+    private durationMs = 7000;
+    private warningMs = 2000;
     private graphics: PIXI.Graphics;
 
     constructor(position: number[], velocity: number[], angularVelocity: number) {
         super(Sprites.getCloneSprite(Sprites.PowerUps.Shield), position, velocity, angularVelocity);
     }
 
-    onActivate(player: Player) {
+    activate(player: Player) {
         this.createShieldGraphics(player);
         player.hasShield = true;
 
         setTimeout(() => {
+            this.warn();
+        }, this.durationMs - this.warningMs);
+
+        setTimeout(() => {
             this.deactivate(player);
         }, this.durationMs);
+
+        super.activate(player);
     }
 
     deactivate(player: Player) {
         player.hasShield = false;
         player.sprite.removeChild(this.graphics);
+        super.deactivate(player);
+    }
+
+    private warn = () => {
+        this.graphics.visible = !this.graphics.visible;
+
+        if (this.isActive) {
+            setTimeout(() => {
+                this.warn();
+            }, 200);
+        }
     }
 
     private createShieldGraphics(player: Player) {
@@ -86,7 +107,7 @@ export class PowerUpShootSpeed extends BasePowerUp {
         super(Sprites.getCloneSprite(Sprites.PowerUps.ShootSpeed), position, velocity, angularVelocity);
     }
 
-    onActivate(player: Player) {
+    activate(player: Player) {
         player.reloadTime -= this.shootSpeedIncrease;
 
         setTimeout(() => {
