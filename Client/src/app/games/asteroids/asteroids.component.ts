@@ -41,9 +41,11 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   fixedDeltaTime = 1 / 30; // Physics "tick" delta time
 
   playerSprite: PIXI.Sprite;
+  background: PIXI.Sprite;
 
   DRAW_COLLISION_BODIES = false;
   SPAWN_ASTEROIDS = true;
+  INVULNERABLE = false;
 
   private container: PIXI.Container;
   private animationFrame: number;
@@ -88,7 +90,14 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
         }
       });
 
-    $.when(playerTexture, powerUp_shootSpeed, powerUp_shield).done(() => {
+    const background = this.loadTexture('background',
+      'assets/games/asteroids/Backgrounds/space.png').done(sprite => {
+        if (sprite != null) {
+          this.background = sprite;
+        }
+      });
+
+    $.when(playerTexture, powerUp_shootSpeed, powerUp_shield, background).done(() => {
       deferred.resolve();
     });
 
@@ -119,6 +128,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.container.scale.x = zoom;
     this.container.scale.y = -zoom;
 
+    this.background.scale.x = 1 / zoom;
+    this.background.scale.y = 1 / -zoom;
+
     if (this.player == null) {
       const playerWidth = this.app.renderer.width / 30;
       this.playerSprite.width = playerWidth / zoom;
@@ -127,7 +139,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       const powerUpWidth = this.app.renderer.width / 45;
       Sprites.PowerUps.Shield.width = powerUpWidth / zoom;
       Sprites.PowerUps.Shield.height = powerUpWidth / -zoom;
-
       Sprites.PowerUps.ShootSpeed.width = powerUpWidth / zoom;
       Sprites.PowerUps.ShootSpeed.height = powerUpWidth / -zoom;
 
@@ -162,6 +173,10 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       { view: document.getElementById('canvas') as HTMLCanvasElement, backgroundColor: 0x000000 });
 
     this.container = new PIXI.Container();
+    this.background.anchor.x = 0.5;
+    this.background.anchor.y = 0.5;
+
+    this.container.addChild(this.background);
 
     this.setCanvasSize();
 
@@ -235,15 +250,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
                 }
               }
               if (free) {
-                // Add ship again
-                this.player.body.force[0] = 0;
-                this.player.body.force[1] = 0;
-                this.player.body.velocity[0] = 0;
-                this.player.body.velocity[1] = 0;
-                this.player.body.angularVelocity = 0;
-                this.player.body.angle = 0;
-                this.player.visible = true;
-                this.world.addBody(this.player.body);
+                this.respawnPlayer();
                 clearInterval(interval);
               }
             }, 100);
@@ -303,6 +310,23 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     });
   }
 
+  private respawnPlayer() {
+    // Add ship again
+    this.player.body.force[0] = 0;
+    this.player.body.force[1] = 0;
+    this.player.body.velocity[0] = 0;
+    this.player.body.velocity[1] = 0;
+    this.player.body.angularVelocity = 0;
+    this.player.body.angle = 0;
+    this.player.visible = true;
+    this.world.addBody(this.player.body);
+
+    // Spawn with shield
+    const shield = new PowerUps.PowerUpShield(this.player.body.interpolatedPosition,
+      this.player.body.velocity, this.player.body.angularVelocity);
+    shield.onActivate(this.player);
+  }
+
   private handlePowerUpActivated(powerUpBody: p2.Body) {
     const foundPowerUp = _.find(this.powerUps, powerUp => { return powerUp.body === powerUpBody });
 
@@ -315,13 +339,12 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   }
 
   private spawnRandomPowerUp(position: number[]) {
-
     const randomRoll = Math.random();
     let powerUp: PowerUps.BasePowerUp;
     if (randomRoll >= 0.5) {
       powerUp = new PowerUps.PowerUpShield(position, [0, 0], 1);
     } else {
-      powerUp = new PowerUps.PowerUpShield(position, [0, 0], 1);
+      powerUp = new PowerUps.PowerUpShootSpeed(position, [0, 0], 1);
     }
     this.world.addBody(powerUp.body);
     this.container.addChild(powerUp.sprite);
@@ -338,7 +361,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   }
 
   private updatePhysics(time: number) {
-    this.player.allowCollision = false;
+    this.player.allowCollision = !this.INVULNERABLE && !this.player.hasShield;
 
     if (this.keyShoot && this.player.visible && this.world.time - this.player.lastShootTime > this.player.reloadTime) {
       this.shoot();
@@ -402,7 +425,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     // Draw all things
     this.updateShip();
     this.updateBullets();
-    //  this.drawBounds();
     this.updateAsteroids();
     this.updatePowerUps();
 

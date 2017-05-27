@@ -17,8 +17,8 @@ export class Asteroid {
     level: number;
     bodyGraphics: PIXI.Graphics;
 
-    private fillColor = 0x7A5230;
-    private strokeColor = 0xAC7339;
+    private fillColor = 0xAC7339;
+    private strokeColor = 0x7A5230;
     private strokeWidth = 0.05;
 
     constructor(position: number[], velocity: number[], angularVelocity: number, level: number) {

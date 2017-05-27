@@ -5,6 +5,7 @@ import { Utils } from './Utils';
 export class Player {
     visible: boolean;
     allowCollision: boolean;
+    hasShield: boolean;
     body: p2.Body;
     reloadTime = 0.2;
     turnSpeed = 4;

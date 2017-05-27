@@ -57,7 +57,7 @@ export class PowerUpShield extends BasePowerUp {
 
     onActivate(player: Player) {
         this.createShieldGraphics(player);
-        player.allowCollision = false;
+        player.hasShield = true;
 
         setTimeout(() => {
             this.deactivate(player);
@@ -65,7 +65,7 @@ export class PowerUpShield extends BasePowerUp {
     }
 
     deactivate(player: Player) {
-        player.allowCollision = true;
+        player.hasShield = false;
         player.sprite.removeChild(this.graphics);
     }
 
