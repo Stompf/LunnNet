@@ -47,7 +47,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   private container: PIXI.Container;
   private animationFrame: number;
-  private powerUpShieldPercent = 0.1;
+  private powerUpShieldPercent = 1;
   private maxPowerUpsOnScreen = 2;
 
   constructor() {
@@ -124,11 +124,12 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       this.playerSprite.width = playerWidth / zoom;
       this.playerSprite.height = ((playerWidth / 1.5) / -zoom);
 
-      Sprites.PowerUps.Shield.scale.x = 1 / zoom;
-      Sprites.PowerUps.Shield.scale.y = 1 / -zoom;
+      const powerUpWidth = this.app.renderer.width / 45;
+      Sprites.PowerUps.Shield.width = powerUpWidth / zoom;
+      Sprites.PowerUps.Shield.height = powerUpWidth / -zoom;
 
-      Sprites.PowerUps.ShootSpeed.scale.x = 1 / zoom;
-      Sprites.PowerUps.ShootSpeed.scale.y = 1 / -zoom;
+      Sprites.PowerUps.ShootSpeed.width = powerUpWidth / zoom;
+      Sprites.PowerUps.ShootSpeed.height = powerUpWidth / -zoom;
 
       const leftBound = new PIXI.Graphics();
       leftBound.lineStyle(1 / zoom, 0xFFFFFF);
@@ -192,15 +193,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     // Catch impacts in the world
     // Todo: check if several bullets hit the same asteroid in the same time step
     this.world.on('beginContact', (evt: p2.BeginContactEvent) => {
-      if (evt.shapeA.collisionGroup === Utils.MASKS.POWER_UP && evt.shapeB.collisionGroup === Utils.MASKS.PLAYER) {
-        this.handlePowerUpActivated(evt.bodyA);
-        return;
-      } else if (evt.shapeA.collisionGroup === Utils.MASKS.PLAYER && evt.shapeB.collisionGroup === Utils.MASKS.POWER_UP) {
-        this.handlePowerUpActivated(evt.bodyB);
-        return;
-      }
-
-
       const foundBulletA = _.find(this.bullets, bullet => { return bullet.body === evt.bodyA; });
       const foundBulletB = _.find(this.bullets, bullet => { return bullet.body === evt.bodyB; });
 
@@ -208,6 +200,14 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
         // Ship collided with something
         this.player.allowCollision = false;
+
+        if (evt.shapeA.collisionGroup === Utils.MASKS.POWER_UP) {
+          this.handlePowerUpActivated(evt.bodyA);
+          return;
+        } else if (evt.shapeB.collisionGroup === Utils.MASKS.POWER_UP) {
+          this.handlePowerUpActivated(evt.bodyB);
+          return;
+        }
 
         const otherBody = (evt.bodyA === this.player.body ? evt.bodyB : evt.bodyA);
         const foundAsteroid = _.find(this.asteroids, asteroid => { return asteroid.body === otherBody; });
