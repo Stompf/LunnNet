@@ -241,24 +241,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
           this.removeAsteroid(foundAsteroid);
 
           if (this.player.lives > 0) {
-            const interval = setInterval(() => {
-              // Check if the ship position is free from asteroids
-              let free = true;
-              for (let i = 0; i < this.asteroids.length; i++) {
-                const a = this.asteroids[i];
-                if (Math.pow(a.body.position[0] -
-                  this.player.body.position[0], 2) +
-                  Math.pow(a.body.position[1] -
-                    this.player.body.position[1], 2) < Asteroid.InitSpace) {
-
-                  free = false;
-                }
-              }
-              if (free) {
-                this.respawnPlayer();
-                clearInterval(interval);
-              }
-            }, 100);
+            setTimeout(() => {
+              this.respawnPlayer();
+            }, 1000);
           } else {
             alert('Game Over!');
           }
