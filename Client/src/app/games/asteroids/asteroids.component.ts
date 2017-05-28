@@ -20,14 +20,16 @@ import { KeyMapping } from './scripts/KeyMapping';
 
 export class AsteroidsComponent extends LunnEngineComponent implements OnInit, OnDestroy {
   private player: Player;
-  private spaceWidth = 20;
-  private spaceHeight = 10;
+  private spaceWidth = 16;
+  private spaceHeight = 9;
   private world: p2.World;
   private bullets: Bullet[] = [];
   private powerUps: PowerUps.BasePowerUp[] = [];
   private asteroids: Asteroid[] = [];
 
   private currentLevel = 1;
+  private asteroidSpawnTimer = 14000;
+  private asteroidSpawnReference: number;
 
   private keyLeft = 0;
   private keyRight = 0;
@@ -36,7 +38,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   private lastTime: number;
   private maxSubSteps = 5; // Max physics ticks per render frame
-  private fixedDeltaTime = 1 / 30; // Physics "tick" delta time
+  private fixedDeltaTime = 1 / 60; // Physics "tick" delta time
 
   private playerSprite: PIXI.Sprite;
   private background: PIXI.Sprite;
@@ -246,6 +248,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
             }, 1000);
           } else {
             alert('Game Over!');
+            window.clearInterval(this.asteroidSpawnReference);
           }
         }
       } else if (foundBulletA != null || foundBulletB != null) {
@@ -257,7 +260,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
         const collidedAsteroid = _.find(this.asteroids, asteroid => { return asteroid.body === body; })
         if (collidedAsteroid != null && bullet != null) {
           this.removeAsteroid(collidedAsteroid);
-          this.player.points += 5 * this.currentLevel;
+          this.player.points += 10;
           this.updatePoints();
 
           // Remove bullet
@@ -278,8 +281,11 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.addAsteroids();
 
     // Update the text boxes
-    this.updateLevel();
     this.updateLives();
+
+    this.asteroidSpawnReference = window.setInterval(() => {
+      this.asteroidTick();
+    }, this.asteroidSpawnTimer);
 
     $(window).resize(() => {
       this.setCanvasSize();
@@ -376,11 +382,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   private animate = (time: number) => {
     this.animationFrame = requestAnimationFrame(this.animate);
 
-    if (this.asteroids.length === 0) {
-      this.currentLevel++;
-      this.updateLevel();
-      this.addAsteroids();
-    }
+    // if (this.asteroids.length === 0) {
+    //   this.asteroidTick();
+    // }
 
     this.updateKeys();
     this.updatePhysics(time);
@@ -421,6 +425,10 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
     // Move physics bodies forward in time
     this.world.step(this.fixedDeltaTime, deltaTime, this.maxSubSteps);
+  }
+
+  private asteroidTick = () => {
+    this.addAsteroids();
   }
 
   private shoot() {
@@ -480,11 +488,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     });
   }
 
-  private updateLevel() {
-    const el = document.getElementById('level');
-    if (el) {
-      el.innerHTML = 'Level ' + this.currentLevel;
-    }
+  private addPlayerLife() {
+    this.player.lives++;
+    this.updateLives();
   }
 
   private updateLives() {
@@ -498,8 +504,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       this.pointsText.text = 'Points: ' + this.player.points;
 
       if (this.player.points !== 0 && this.player.points % 1000 === 0) {
-        this.player.lives++;
-        this.updatePoints();
+        this.addPlayerLife();
       }
     }
   }
