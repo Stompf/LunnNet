@@ -54,6 +54,8 @@ export class PowerUpShield extends BasePowerUp {
     private durationMs = 7000;
     private warningMs = 2000;
     private graphics: PIXI.Graphics;
+    private shape: p2.Circle;
+    private radius = 80;
 
     constructor(position: number[], velocity: number[], angularVelocity: number) {
         super(Sprites.getCloneSprite(Sprites.PowerUps.Shield), position, velocity, angularVelocity);
@@ -71,12 +73,21 @@ export class PowerUpShield extends BasePowerUp {
             this.deactivate(player);
         }, this.durationMs);
 
+        this.shape = new p2.Circle({
+            position: player.body.interpolatedPosition,
+            radius: this.radius * player.sprite.scale.x,
+            collisionGroup: Utils.MASKS.PLAYER,
+            collisionMask: player.body.shapes[0].collisionMask
+        });
+        player.body.addShape(this.shape);
+
         super.activate(player);
     }
 
     deactivate(player: Player) {
         player.hasShield = false;
         player.sprite.removeChild(this.graphics);
+        player.body.removeShape(this.shape);
         super.deactivate(player);
     }
 
@@ -93,7 +104,7 @@ export class PowerUpShield extends BasePowerUp {
     private createShieldGraphics(player: Player) {
         this.graphics = new PIXI.Graphics();
         this.graphics.beginFill(0x428cf4, 0.5);
-        this.graphics.drawCircle(player.body.interpolatedPosition[0], player.body.interpolatedPosition[1], 80);
+        this.graphics.drawCircle(player.sprite.position.x, player.sprite.position.y, this.radius);
         this.graphics.endFill();
         player.sprite.addChild(this.graphics);
     }
@@ -113,9 +124,12 @@ export class PowerUpShootSpeed extends BasePowerUp {
         setTimeout(() => {
             this.deactivate(player);
         }, this.durationMs);
+
+        super.activate(player);
     }
 
     deactivate(player: Player) {
         player.reloadTime += this.shootSpeedIncrease;
+        super.deactivate(player);
     }
 }
