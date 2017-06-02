@@ -19,6 +19,11 @@ import { KeyMapping } from './scripts/KeyMapping';
 })
 
 export class AsteroidsComponent extends LunnEngineComponent implements OnInit, OnDestroy {
+  // Debug flags
+  private DRAW_COLLISION_BODIES = false;
+  private SPAWN_ASTEROIDS = true;
+  private INVULNERABLE = false;
+
   private player: Player;
   private spaceWidth = 16;
   private spaceHeight = 9;
@@ -42,10 +47,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   private playerSprite: PIXI.Sprite;
   private background: PIXI.Sprite;
-
-  private DRAW_COLLISION_BODIES = false;
-  private SPAWN_ASTEROIDS = true;
-  private INVULNERABLE = false;
+  private gameOverContainer: PIXI.Container;
 
   private container: PIXI.Container;
   private animationFrame: number;
@@ -69,6 +71,32 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   ngOnDestroy() {
     this.destroy();
+  }
+
+  private initGameOverStage() {
+    const gameOverContainer = new PIXI.Container();
+
+    const backgroundHeight = 4;
+    const backgroundWidth = 4;
+    const background = new PIXI.Graphics();
+    background.beginFill(0x000000);
+    background.drawRoundedRect(-backgroundWidth / 2, -backgroundHeight / 2, backgroundWidth, backgroundHeight, 0.5);
+    gameOverContainer.addChild(background);
+
+    const textStyle = new PIXI.TextStyle({
+      fill: 0xFFFFFF,
+      fontSize: 30
+    });
+    const gameOverText = new PIXI.Text('GAME OVER', textStyle);
+    gameOverText.anchor.x = 0.5;
+    gameOverText.anchor.y = 0.5;
+    gameOverText.scale.x = 1 / this.app.stage.scale.x;
+    gameOverText.scale.y = 1 / this.app.stage.scale.y;
+    gameOverText.position.x = 0;
+    gameOverText.position.y = backgroundHeight / 2 - gameOverText.height;
+    gameOverContainer.addChild(gameOverText);
+
+    this.gameOverContainer = gameOverContainer;
   }
 
   private loadTextures() {
@@ -121,28 +149,28 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
     this.app.renderer.resize(width, height);
 
-    this.container.position.x = this.app.renderer.width / 2; // center at origin
-    this.container.position.y = this.app.renderer.height / 2;
+    this.app.stage.position.x = this.app.renderer.width / 2; // center at origin
+    this.app.stage.position.y = this.app.renderer.height / 2;
 
     let zoom = this.app.renderer.height / this.spaceHeight;
     if (this.app.renderer.width / this.spaceWidth < zoom) {
       zoom = this.app.renderer.width / this.spaceWidth;
     }
 
-    this.container.scale.x = zoom;
-    this.container.scale.y = -zoom;
+    this.app.stage.scale.x = zoom;
+    this.app.stage.scale.y = -zoom;
 
     this.background.scale.x = 1 / zoom;
     this.background.scale.y = 1 / -zoom;
 
     if (this.livesText != null) {
-      this.livesText.scale.x = 1 / this.container.scale.x;
-      this.livesText.scale.y = 1 / this.container.scale.y;
+      this.livesText.scale.x = 1 / this.app.stage.scale.x;
+      this.livesText.scale.y = 1 / this.app.stage.scale.y;
     }
 
     if (this.pointsText != null) {
-      this.pointsText.scale.x = 1 / this.container.scale.x;
-      this.pointsText.scale.y = 1 / this.container.scale.y;
+      this.pointsText.scale.x = 1 / this.app.stage.scale.x;
+      this.pointsText.scale.y = 1 / this.app.stage.scale.y;
       this.pointsText.y = this.livesText.y - this.livesText.height;
     }
 
@@ -207,8 +235,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.player.init(this.world);
     this.container.addChild(this.player.sprite);
 
-    this.initLivesText();
-    this.initPointsText();
+    this.initStatusTexts();
+    this.initGameOverStage();
 
     if (this.DRAW_COLLISION_BODIES) {
       this.container.addChild(this.player.createBodyGraphics());
@@ -260,7 +288,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
               this.respawnPlayer();
             }, 1000);
           } else {
-            alert('Game Over!');
             window.clearInterval(this.asteroidSpawnReference);
           }
         }
@@ -303,6 +330,9 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     $(window).resize(() => {
       this.setCanvasSize();
     });
+
+    this.app.stage.addChild(this.container);
+    this.app.stage.addChild(this.gameOverContainer);
   }
 
   private removeAsteroid(asteroid: Asteroid) {
@@ -317,7 +347,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     });
   }
 
-  private initLivesText() {
+  private initStatusTexts() {
     const textStyle = new PIXI.TextStyle({
       fill: '#FFFFFF',
       fontSize: 20
@@ -326,25 +356,17 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.livesText.x = -this.spaceWidth / 2 + this.StatusTextsMarginLeft;
     this.livesText.y = this.spaceHeight - this.StatusTextsMarginTop;
     this.livesText.anchor.y = 0.5;
-    this.livesText.scale.x = 1 / this.container.scale.x;
-    this.livesText.scale.y = 1 / this.container.scale.y;
+    this.livesText.scale.x = 1 / this.app.stage.scale.x;
+    this.livesText.scale.y = 1 / this.app.stage.scale.y;
     this.container.addChild(this.livesText);
 
     this.updateLives();
-  }
-
-  private initPointsText() {
-    const textStyle = new PIXI.TextStyle({
-      fill: '#FFFFFF',
-      fontSize: 20
-    });
 
     this.pointsText = new PIXI.Text(String(this.player.points), textStyle);
     this.pointsText.x = this.livesText.x;
     this.pointsText.y = this.livesText.y - this.livesText.height;
-    this.pointsText.anchor.y = 0.5;
-    this.pointsText.scale.x = 1 / this.container.scale.x;
-    this.pointsText.scale.y = 1 / this.container.scale.y;
+    this.pointsText.anchor = this.livesText.anchor;
+    this.pointsText.scale = this.livesText.scale;
     this.container.addChild(this.pointsText);
 
     this.updatePoints();
@@ -395,9 +417,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   private animate = (time: number) => {
     this.animationFrame = requestAnimationFrame(this.animate);
 
-    // if (this.asteroids.length === 0) {
-    //   this.asteroidTick();
-    // }
+    this.gameOverContainer.visible = this.player.lives === 0;
 
     this.updateKeys();
     this.updatePhysics(time);
@@ -476,7 +496,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.updateAsteroids();
     this.updatePowerUps();
 
-    this.app.renderer.render(this.container);
+    this.app.renderer.render(this.app.stage);
   }
 
   private updateShip() {
