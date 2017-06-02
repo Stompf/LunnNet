@@ -53,6 +53,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   private maxPowerUpsOnScreen = 2;
   private pointsText: PIXI.Text;
   private livesText: PIXI.Text;
+  private readonly StatusTextsMarginLeft = 0.25;
+  private readonly StatusTextsMarginTop = 5;
 
   constructor() {
     super();
@@ -132,6 +134,17 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
     this.background.scale.x = 1 / zoom;
     this.background.scale.y = 1 / -zoom;
+
+    if (this.livesText != null) {
+      this.livesText.scale.x = 1 / this.container.scale.x;
+      this.livesText.scale.y = 1 / this.container.scale.y;
+    }
+
+    if (this.pointsText != null) {
+      this.pointsText.scale.x = 1 / this.container.scale.x;
+      this.pointsText.scale.y = 1 / this.container.scale.y;
+      this.pointsText.y = this.livesText.y - this.livesText.height;
+    }
 
     if (this.player == null) {
       const playerWidth = this.app.renderer.width / 30;
@@ -310,8 +323,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       fontSize: 20
     });
     this.livesText = new PIXI.Text('Lives: ', textStyle);
-    this.livesText.x = -this.spaceWidth / 2 + 0.25;
-    this.livesText.y = this.spaceHeight / 2 - 0.25;
+    this.livesText.x = -this.spaceWidth / 2 + this.StatusTextsMarginLeft;
+    this.livesText.y = this.spaceHeight - this.StatusTextsMarginTop;
     this.livesText.anchor.y = 0.5;
     this.livesText.scale.x = 1 / this.container.scale.x;
     this.livesText.scale.y = 1 / this.container.scale.y;
@@ -327,8 +340,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     });
 
     this.pointsText = new PIXI.Text(String(this.player.points), textStyle);
-    this.pointsText.x = -this.spaceWidth / 2 + 0.25;
-    this.pointsText.y = this.spaceHeight / 2 - 0.79;
+    this.pointsText.x = this.livesText.x;
+    this.pointsText.y = this.livesText.y - this.livesText.height;
     this.pointsText.anchor.y = 0.5;
     this.pointsText.scale.x = 1 / this.container.scale.x;
     this.pointsText.scale.y = 1 / this.container.scale.y;
