@@ -65,7 +65,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   ngOnInit() {
     this.loadTextures().done(() => {
       this.initAsteroids();
-      this.animate(0);
     });
   }
 
@@ -314,6 +313,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
     this.app.stage.addChild(this.container);
     this.app.stage.addChild(this.gameOverContainer);
+
+    this.animate(0);
   }
 
   private removeAsteroid(asteroid: Asteroid) {
@@ -473,7 +474,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       return;
     }
 
-    this.gameOverContainer.visible = true; // this.player.lives === 0;
+    this.gameOverContainer.visible = this.player.lives === 0;
 
     this.updateKeys();
     this.updatePhysics(time);
