@@ -182,13 +182,18 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       bottomBound.moveTo(this.spaceWidth / 2, this.spaceHeight / 2);
       bottomBound.lineTo(-this.spaceWidth / 2, this.spaceHeight / 2);
       this.container.addChild(bottomBound);
+    } else {
+      this.setGameOverStage();
     }
   }
 
   private initAsteroids() {
+    cancelAnimationFrame(this.animationFrame);
+
     this.init(800, 600,
       { view: document.getElementById('canvas') as HTMLCanvasElement, backgroundColor: 0x000000 });
 
+    this.app.stage.removeChildren();
     this.container = new PIXI.Container();
     this.background.anchor.x = 0.5;
     this.background.anchor.y = 0.5;
@@ -210,7 +215,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     this.container.addChild(this.player.sprite);
 
     this.initStatusTexts();
-    this.initGameOverStage();
+    this.setGameOverStage();
 
     if (this.DRAW_COLLISION_BODIES) {
       this.container.addChild(this.player.createBodyGraphics());
@@ -323,7 +328,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     });
   }
 
-  private initGameOverStage() {
+  private setGameOverStage() {
     const gameOverContainer = new PIXI.Container();
 
     const backgroundHeight = 4;
@@ -357,9 +362,39 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     scoreText.scale.y = 1 / this.app.stage.scale.y;
     scoreText.position.x = 0;
     scoreText.position.y = 0;
-
-
     gameOverContainer.addChild(scoreText);
+
+    const buttonWidth = 2.5;
+    const buttonHeight = 0.7;
+    const button = new PIXI.Graphics();
+    button.interactive = true;
+    button.buttonMode = true;
+    button.cursor = 'pointer';
+    button.lineStyle(0.05, 0xFFFFFF);
+    const tryAgainButtonHitArea = new PIXI.Rectangle(-buttonWidth / 2, -gameOverText.position.y,
+      buttonWidth, buttonHeight);
+    button.hitArea = tryAgainButtonHitArea
+
+    button.moveTo(tryAgainButtonHitArea.x, tryAgainButtonHitArea.y);
+    button.lineTo(tryAgainButtonHitArea.x, tryAgainButtonHitArea.y + tryAgainButtonHitArea.height);
+    button.lineTo(tryAgainButtonHitArea.x + tryAgainButtonHitArea.width, tryAgainButtonHitArea.y + tryAgainButtonHitArea.height);
+    button.lineTo(tryAgainButtonHitArea.x + tryAgainButtonHitArea.width, tryAgainButtonHitArea.y);
+    button.lineTo(tryAgainButtonHitArea.x, tryAgainButtonHitArea.y);
+
+    button.on('mousedown', () => { this.initAsteroids(); }, false);
+
+    const playAgainText = new PIXI.Text('Play Again');
+    playAgainText.style.fill = 0xFFFFFF;
+    playAgainText.style.fontSize = 20;
+    playAgainText.scale.x = 1 / this.app.stage.scale.x;
+    playAgainText.scale.y = 1 / this.app.stage.scale.y;
+    playAgainText.anchor.x = 0.5;
+    playAgainText.anchor.y = 0.5;
+    playAgainText.position.y = tryAgainButtonHitArea.y + tryAgainButtonHitArea.height / 2;
+
+    button.addChild(playAgainText);
+
+    gameOverContainer.addChild(button);
 
     this.gameOverContainer = gameOverContainer;
   }
