@@ -25,15 +25,15 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   private INVULNERABLE = false;
 
   private player: Player;
-  private spaceWidth = 16;
-  private spaceHeight = 9;
+  private readonly spaceWidth = 16;
+  private readonly spaceHeight = 9;
   private world: p2.World;
   private bullets: Bullet[] = [];
   private powerUps: PowerUps.BasePowerUp[] = [];
   private asteroids: Asteroid[] = [];
 
   private currentLevel = 1;
-  private asteroidSpawnTimer = 14000;
+  private readonly asteroidSpawnTimer = 14000;
   private asteroidSpawnReference: number;
 
   private keyLeft = 0;
@@ -42,8 +42,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   private keyShoot = 0;
 
   private lastTime: number;
-  private maxSubSteps = 5; // Max physics ticks per render frame
-  private fixedDeltaTime = 1 / 60; // Physics "tick" delta time
+  private readonly maxSubSteps = 5; // Max physics ticks per render frame
+  private readonly fixedDeltaTime = 1 / 60; // Physics "tick" delta time
 
   private playerSprite: PIXI.Sprite;
   private background: PIXI.Sprite;
@@ -51,8 +51,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   private container: PIXI.Container;
   private animationFrame: number;
-  private powerUpShieldPercent = 1;
-  private maxPowerUpsOnScreen = 2;
+  private readonly powerUpShieldPercent = 1;
+  private readonly maxPowerUpsOnScreen = 2;
   private pointsText: PIXI.Text;
   private livesText: PIXI.Text;
   private readonly StatusTextsMarginLeft = 0.25;
@@ -64,7 +64,14 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   ngOnInit() {
     this.loadTextures().done(() => {
+      this.init(800, 600,
+        { view: document.getElementById('canvas') as HTMLCanvasElement, backgroundColor: 0x000000 });
+
       this.initAsteroids();
+
+      $(window).resize(() => {
+        this.setCanvasSize();
+      });
     });
   }
 
@@ -188,9 +195,11 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   private initAsteroids() {
     cancelAnimationFrame(this.animationFrame);
+    this.lastTime = 0;
 
-    this.init(800, 600,
-      { view: document.getElementById('canvas') as HTMLCanvasElement, backgroundColor: 0x000000 });
+    this.asteroids = [];
+    this.bullets = [];
+    this.powerUps = [];
 
     this.app.stage.removeChildren();
     this.container = new PIXI.Container();
@@ -267,6 +276,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
             }, 1000);
           } else {
             window.clearInterval(this.asteroidSpawnReference);
+            this.setGameOverStage();
+            this.app.stage.addChild(this.gameOverContainer);
           }
         }
       } else if (foundBulletA != null || foundBulletB != null) {
@@ -307,12 +318,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       }
     }, this.asteroidSpawnTimer);
 
-    $(window).resize(() => {
-      this.setCanvasSize();
-    });
-
     this.app.stage.addChild(this.container);
-    this.app.stage.addChild(this.gameOverContainer);
 
     this.animate(0);
   }
@@ -474,8 +480,6 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       return;
     }
 
-    this.gameOverContainer.visible = this.player.lives === 0;
-
     this.updateKeys();
     this.updatePhysics(time);
     this.render();
@@ -507,7 +511,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     }
 
     // Get the elapsed time since last frame, in seconds
-    let deltaTime = this.lastTime ? (time - this.lastTime) / 1000 : 0;
+    let deltaTime = this.lastTime !== 0 ? (time - this.lastTime) / 1000 : 0;
     this.lastTime = time;
 
     // Make sure the time delta is not too big (can happen if user switches browser tab)
