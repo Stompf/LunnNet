@@ -46,7 +46,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
   private readonly fixedDeltaTime = 1 / 60; // Physics "tick" delta time
 
   private playerSprite: PIXI.Sprite;
-  private background: PIXI.Sprite;
+  private ufoSprite: PIXI.Sprite;
+  private background: PIXI.TilingSprite;
   private gameOverContainer: PIXI.Container;
 
   private container: PIXI.Container;
@@ -88,6 +89,12 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       }
     });
 
+    const ufoTexture = this.loadTexture('ufo', 'assets/games/asteroids/PNG/ufoRed.png').done(sprite => {
+      if (sprite != null) {
+        this.ufoSprite = sprite;
+      }
+    });
+
     const powerUp_shootSpeed = this.loadTexture('powerUp_shootSpeed',
       'assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png').done(sprite => {
         if (sprite != null) {
@@ -103,13 +110,13 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       });
 
     const background = this.loadTexture('background',
-      'assets/games/asteroids/Backgrounds/space.png').done(sprite => {
+      'assets/games/asteroids/Backgrounds/darkPurple.png').done(sprite => {
         if (sprite != null) {
-          this.background = sprite;
+          this.background = new PIXI.TilingSprite(sprite.texture, 1000, 1000);
         }
       });
 
-    $.when(playerTexture, powerUp_shootSpeed, powerUp_shield, background).done(() => {
+    $.when(playerTexture, ufoTexture, powerUp_shootSpeed, powerUp_shield, background).done(() => {
       deferred.resolve();
     });
 
@@ -142,6 +149,8 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
     this.background.scale.x = 1 / zoom;
     this.background.scale.y = 1 / -zoom;
+    this.background.width = width;
+    this.background.height = height;
 
     if (this.livesText != null) {
       this.livesText.scale.x = 1 / this.app.stage.scale.x;

@@ -1,7 +1,6 @@
 import * as p2 from 'p2';
 
 declare module 'p2' {
-
     export class TopDownVehicle {
         constructor(chassisBody: p2.Body);
         chassisBody: p2.Body;
