@@ -110,7 +110,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
       });
 
     const background = this.loadTexture('background',
-      'assets/games/asteroids/Backgrounds/darkPurple.png').done(sprite => {
+      'assets/games/asteroids/Backgrounds/space.jpg').done(sprite => {
         if (sprite != null) {
           this.background = new PIXI.TilingSprite(sprite.texture, 1000, 1000);
         }
