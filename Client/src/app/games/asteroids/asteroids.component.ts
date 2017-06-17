@@ -47,7 +47,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
 
   private playerSprite: PIXI.Sprite;
   private ufoSprite: PIXI.Sprite;
-  private background: PIXI.TilingSprite;
+  private background: PIXI.extras.TilingSprite;
   private gameOverContainer: PIXI.Container;
 
   private container: PIXI.Container;
@@ -112,7 +112,7 @@ export class AsteroidsComponent extends LunnEngineComponent implements OnInit, O
     const background = this.loadTexture('background',
       'assets/games/asteroids/Backgrounds/space.jpg').done(sprite => {
         if (sprite != null) {
-          this.background = new PIXI.TilingSprite(sprite.texture, 1000, 1000);
+          this.background = new PIXI.extras.TilingSprite(sprite.texture, 1000, 1000);
         }
       });
 
