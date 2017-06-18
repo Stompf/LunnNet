@@ -1,23 +1,27 @@
-// var app: Express.Application = require('express')();
-// var http = require('http').Server(app);
-// var io: SocketIO.Server = require('socket.io')(http);
-
 import * as express from 'express';
 import * as socketIO from 'socket.io';
 import * as http from 'http';
+import { Dictionary } from 'typescript-collections';
 
-// const port = process.env.PORT || 3333;
+const port = process.env.PORT || 3333;
 const app = express();
 const httpServer = http.createServer(app);
+const currentConnections = new Dictionary<string, SocketIO.Socket>();
 
 const io = socketIO();
-io.serveClient(true);
+io.serveClient(false);
 io.attach(httpServer);
 
-io.on('connection', (_socket) => {
-    console.log('a user connected');
+io.on('connection', socket => {
+    console.log('a user connected: ' + socket.id);
+    currentConnections.setValue(socket.id, socket);
+
+    socket.on('disconnect', () => {
+        console.log('a user disconnected: ' + socket.id);
+        currentConnections.remove(socket.id);
+    });
 });
 
-httpServer.listen(3000, () => {
-    console.log('listening on *:3000');
+httpServer.listen(port, () => {
+    console.log('listening on *:' + port);
 });

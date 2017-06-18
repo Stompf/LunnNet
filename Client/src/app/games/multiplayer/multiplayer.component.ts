@@ -9,6 +9,8 @@ import * as socketIO from 'socket.io-client';
 })
 export class MultiplayerComponent extends LunnEngineComponent implements OnInit, OnDestroy {
 
+  io: SocketIOClient.Socket;
+
   constructor() {
     super();
   }
@@ -21,16 +23,19 @@ export class MultiplayerComponent extends LunnEngineComponent implements OnInit,
   }
 
   ngOnDestroy(): void {
+    if (this.io != null) {
+      this.io.close();
+    }
     this.destroy();
   }
 
   private connect() {
-    const io = socketIO('http://localhost:3000');
-    io.on('connect', () => {
+    this.io = socketIO('http://localhost:3333');
+    this.io.on('connect', () => {
       alert('connected!');
     });
 
-    io.on('disconnect', () => {
+    this.io.on('disconnect', () => {
       alert('disconnect!');
     });
   }

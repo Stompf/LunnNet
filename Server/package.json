@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "0.0.1",
-  "description": "",
+  "description": "LunnNet Server side",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -12,11 +12,14 @@
   },
   "dependencies": {
     "express": "^4.15.3",
-    "socket.io": "^2.0.3"
+    "socket.io": "^2.0.3",
+    "typescript-collections": "^1.2.3",
+    "p2": "0.7.1"
   },
   "devDependencies": {
     "@types/express": "^4.0.36",
     "@types/socket.io": "^1.4.29",
+    "@types/p2": "0.7.30",
     "concurrently": "^3.4.0",
     "nodemon": "^1.11.0",
     "tslint": "^5.4.3",
