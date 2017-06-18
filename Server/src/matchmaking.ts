@@ -1,6 +1,6 @@
 import { MultiDictionary } from 'typescript-collections';
 
-class Matchmaking {
+export class Matchmaking {
 
     private currentQueue: MultiDictionary<LunnNet.Game, SocketIO.Socket>;
 
