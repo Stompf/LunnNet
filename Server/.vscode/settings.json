@@ -1,0 +1,33 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "node_modules": true,
+        "wwwroot": true,
+        "bin": true,
+        "obj": true,
+        ".gitattributes": true,
+        "dist": true,
+        "**/*.js": {
+            "when": "$(basename).ts"
+        },
+        "**/*.js.map": true,
+        "publish": true,
+        "*.log": true,
+        "npm-debug.log*": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/dist": true
+    },
+    "editor.formatOnSave": true,
+    "vsicons.presets.angular": true,
+    "tslint.autoFixOnSave": true,
+    "tslint.exclude": "**/node_modules/**/*",
+    "tslint.alwaysShowRuleFailuresAsWarnings": true,
+    "extensions.autoUpdate": true,
+    "typescript.tsdk": "./node_modules/typescript/lib"
+}

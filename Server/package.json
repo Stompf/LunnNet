@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "description": "",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "npm run watch",
+    "watch-ts": "tsc -w",
+    "serve": "node dist/server.js",
+    "watch": "concurrently \"npm run watch-ts\" \"nodemon --debug dist/server.js\""
+  },
+  "dependencies": {
+    "express": "^4.15.3",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.0.36",
+    "@types/socket.io": "^1.4.29",
+    "concurrently": "^3.4.0",
+    "nodemon": "^1.11.0",
+    "tslint": "^5.4.3",
+    "typescript": "^2.3.4"
+  }
+}
