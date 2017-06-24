@@ -5,7 +5,6 @@
 		// Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
 		"Angular.ng-template",
 		"formulahendry.auto-close-tag",
-		"yukidoi.blade-runner",
 		"streetsidesoftware.code-spell-checker",
 		"msjsdiag.debugger-for-chrome",
 		"christian-kohler.path-intellisense",
