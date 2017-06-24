@@ -11,6 +11,8 @@ export class MultiplayerComponent extends LunnEngineComponent implements OnInit,
 
   io: SocketIOClient.Socket;
 
+  private ip = 'http://localhost:3333';
+
   constructor() {
     super();
   }
@@ -30,13 +32,20 @@ export class MultiplayerComponent extends LunnEngineComponent implements OnInit,
   }
 
   private connect() {
-    this.io = socketIO('http://localhost:3333');
+    this.io = socketIO(this.ip);
     this.io.on('connect', () => {
-      alert('connected!');
+      this.appendTextareaLine('Connected');
     });
 
     this.io.on('disconnect', () => {
-      alert('disconnect!');
+      this.appendTextareaLine('Disconnected');
     });
+  }
+
+  private appendTextareaLine(text: string) {
+    const textarea = document.getElementById('multiplayer-textarea') as HTMLTextAreaElement;
+    if (textarea != null) {
+      textarea.value = text + '\n' + textarea.value;
+    }
   }
 }

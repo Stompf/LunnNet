@@ -1,5 +1,8 @@
 {
-  "compileOnSave": false,
+  "include": [
+    "../Server/src/typings/**/*.ts",
+    "./src/**/*.ts"
+  ],
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
     "allowUnreachableCode": false,

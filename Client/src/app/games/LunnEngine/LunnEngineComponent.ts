@@ -14,7 +14,7 @@ export class LunnEngineComponent {
         return Utils;
     }
 
-    init(width: number, height: number, options: PIXI.IApplicationOptions) {
+    init(width: number, height: number, options: PIXI.ApplicationOptions) {
         this.app = new PIXI.Application(width, height, options);
 
         $(document).keydown(this.keydown);

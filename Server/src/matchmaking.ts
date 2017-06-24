@@ -1,5 +1,5 @@
 import { MultiDictionary } from 'typescript-collections';
-//import * as AirHockey from './airHockey/main';
+import { AirHockey } from './airHockey/main';
 
 export class Matchmaking {
 
@@ -19,16 +19,19 @@ export class Matchmaking {
     }
 
     handleQueueChange(game: LunnNet.Game) {
-        const array = this.currentQueue.getValue(game);
-        while (array.length >= 2) {
-            const playerOne = array.pop() as SocketIO.Socket;
-            const playerTwo = array.pop() as SocketIO.Socket;
+        switch (game) {
+            case LunnNet.Game.AirHockey:
+                const array = this.currentQueue.getValue(game);
+                while (array.length >= 2) {
+                    const playerOne = array.pop() as SocketIO.Socket;
+                    const playerTwo = array.pop() as SocketIO.Socket;
 
-            this.startGame(playerOne, playerTwo);
+                    const airHockey = new AirHockey(playerOne, playerTwo);
+                    airHockey.startGame();
+                }
+                break;
+            default:
+                break;
         }
-    }
-
-    private startGame(_playerOne: SocketIO.Socket, _playerTwo: SocketIO.Socket) {
-
     }
 }

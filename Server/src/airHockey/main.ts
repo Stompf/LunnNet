@@ -1,6 +1,14 @@
 export class AirHockey {
 
-    startNewGame(_playerOne: SocketIO.Socket, _playerTwo: SocketIO.Socket) {
+    private playerOne: SocketIO.Socket;
+    private playerTwo: SocketIO.Socket;
+
+    constructor(playerOne: SocketIO.Socket, playerTwo: SocketIO.Socket) {
+        this.playerOne = playerOne;
+        this.playerTwo = playerTwo;
+    }
+
+    startGame() {
 
     }
 
