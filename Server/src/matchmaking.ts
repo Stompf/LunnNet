@@ -1,7 +1,7 @@
 import { MultiDictionary } from 'typescript-collections';
 import { AirHockey } from './airHockey/main';
 
-export class Matchmaking {
+export class MatchMaking {
 
     private currentQueue: MultiDictionary<LunnNet.Game, SocketIO.Socket>;
 
@@ -10,12 +10,17 @@ export class Matchmaking {
     }
 
     addToQueue(socket: SocketIO.Socket, game: LunnNet.Game) {
+        this.removeFromQueue(socket);
         this.currentQueue.setValue(game, socket);
         this.handleQueueChange(game);
     }
 
-    removeFromQueue(socket: SocketIO.Socket, game: LunnNet.Game) {
-        this.currentQueue.remove(game, socket);
+    removeFromQueue(socket: SocketIO.Socket) {
+        this.currentQueue.keys().forEach(game => {
+            if (this.currentQueue.remove(game, socket)) {
+                console.log('Removed player: ' + socket.id + ' from game: ' + game);
+            }
+        });
     }
 
     handleQueueChange(game: LunnNet.Game) {

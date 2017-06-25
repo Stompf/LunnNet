@@ -26,6 +26,7 @@ export class MultiplayerComponent extends LunnEngineComponent implements OnInit,
 
   ngOnDestroy(): void {
     if (this.io != null) {
+      this.io.emit('RemoveFromMatchMaking', {} as LunnNet.Network.RemoveFromMatchMaking);
       this.io.close();
     }
     this.destroy();
@@ -35,6 +36,7 @@ export class MultiplayerComponent extends LunnEngineComponent implements OnInit,
     this.io = socketIO(this.ip);
     this.io.on('connect', () => {
       this.appendTextareaLine('Connected');
+      this.queue();
     });
 
     this.io.on('disconnect', () => {
@@ -47,5 +49,10 @@ export class MultiplayerComponent extends LunnEngineComponent implements OnInit,
     if (textarea != null) {
       textarea.value = text + '\n' + textarea.value;
     }
+  }
+
+  private queue() {
+    this.io.emit('QueueMatchMaking', { game: LunnNet.Game.AirHockey } as LunnNet.Network.QueueMatchMaking)
+    this.appendTextareaLine('Looking for game...');
   }
 }
