@@ -1,0 +1,34 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "node_modules": true,
+        "wwwroot": true,
+        "bin": true,
+        "obj": true,
+        ".gitattributes": true,
+        "dist": true,
+        "**/*.js": {
+            "when": "$(basename).ts"
+        },
+        "**/*.jsx": {
+            "when": "$(basename).tsx"
+        },
+        "**/*.js.map": true,
+        "publish": true,
+        "*.log": true,
+        "npm-debug.log*": true
+    },
+    "editor.formatOnSave": true,
+    "vsicons.presets.angular": true,
+    "tslint.autoFixOnSave": true,
+    "tslint.alwaysShowRuleFailuresAsWarnings": true,
+    "extensions.autoUpdate": true,
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "path-intellisense.mappings": {
+        "lunnEngine": "${workspaceRoot}/src/app/games/lunnEngine",
+        "assets": "${workspaceRoot}/src/assets"
+    }
+}
