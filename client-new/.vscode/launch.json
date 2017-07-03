@@ -2,28 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch localhost",
+            "name": "Chrome",
             "type": "chrome",
             "request": "launch",
-            "url": "http://localhost:4300",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceRoot}/src",
+            "userDataDir": "${workspaceRoot}/.vscode/chrome",
+            "sourceMapPathOverrides": {
+                "webpack:///src/*": "${webRoot}/*"
+            },
             "sourceMaps": true,
             "runtimeArgs": [
                 "--incognito"
             ],
-            "skipFiles": [
-                "zone.js"
-            ],
-            "smartStep": true,
-            "webRoot": "${workspaceRoot}"
-        },
-        {
-            "name": "Attach to Chrome, with sourcemaps",
-            "type": "chrome",
-            "request": "attach",
-            "port": 9222,
-            "smartStep": true,
-            "sourceMaps": true,
-            "webRoot": "${workspaceRoot}"
+            "smartStep": true
         }
     ]
 }

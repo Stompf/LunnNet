@@ -7,7 +7,9 @@
     "@types/node": "^8.0.7",
     "@types/react": "^15.0.34",
     "@types/react-dom": "^15.5.1",
+    "bootstrap": "^3.3.7",
     "react": "^15.6.1",
+    "react-bootstrap": "^0.31.0",
     "react-dom": "^15.6.1",
     "react-scripts-ts": "2.3.2"
   },
