@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-// import App from './App';
+import About from './About';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import { HashRouter, Switch, Link, Route } from 'react-router-dom';
@@ -76,19 +76,12 @@ const Schedule = () => (
   </div>
 );
 
-const Home = () => (
-  <div>
-    <h1>Welcome to the Tornadoes Website!</h1>
-  </div>
-);
 const Header = () => (
   <header>
     <nav>
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/roster">Roster</Link></li>
-        <li><Link to="/schedule">Schedule</Link></li>
-      </ul>
+      <span><Link to="/">Home</Link></span> |
+      <span><Link to="/roster"> Roster</Link></span> |
+      <span><Link to="/schedule"> Schedule</Link></span>
     </nav>
   </header>
 );
@@ -96,7 +89,7 @@ const Header = () => (
 const Main = () => (
   <main>
     <Switch>
-      <Route exact={true} path="/" component={Home} />
+      <Route exact={true} path="/" component={About as any} />
       <Route path="/roster" component={Roster} />
       <Route path="/schedule" component={Schedule} />
     </Switch>

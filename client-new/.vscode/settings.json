@@ -19,7 +19,8 @@
         "**/*.js.map": true,
         "publish": true,
         "*.log": true,
-        "npm-debug.log*": true
+        "npm-debug.log*": true,
+        ".vscode/chrome": true
     },
     "editor.formatOnSave": true,
     "vsicons.presets.angular": true,
