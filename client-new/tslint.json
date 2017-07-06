@@ -3,12 +3,6 @@
         "tslint-react"
     ],
     "rules": {
-        "align": [
-            true,
-            "parameters",
-            "arguments",
-            "statements"
-        ],
         "ban": false,
         "class-name": true,
         "comment-format": [
@@ -32,11 +26,10 @@
         "label-position": true,
         "max-line-length": [
             true,
-            120
+            200
         ],
         "no-any": false,
         "no-arg": true,
-        "no-bitwise": true,
         "no-console": [
             true,
             "log",
@@ -58,7 +51,6 @@
         "no-switch-case-fall-through": true,
         "no-trailing-whitespace": false,
         "no-unused-expression": true,
-        "no-use-before-declare": true,
         "one-line": [
             true,
             "check-catch",

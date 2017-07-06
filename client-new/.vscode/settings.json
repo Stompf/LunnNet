@@ -28,10 +28,6 @@
     "tslint.alwaysShowRuleFailuresAsWarnings": true,
     "extensions.autoUpdate": true,
     "typescript.tsdk": "./node_modules/typescript/lib",
-    "path-intellisense.mappings": {
-        "lunnEngine": "${workspaceRoot}/src/app/games/lunnEngine",
-        "assets": "${workspaceRoot}/src/assets"
-    },
     "cSpell.ignorePaths": [
         "node_modules", // this will ignore anything the node_modules directory
         "**/node_modules", // the same for this one
