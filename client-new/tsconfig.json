@@ -20,6 +20,10 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true
   },
+  "include": [
+    "../Server/src/typings/**/*.ts",
+    "./src/**/*.ts"
+  ],
   "exclude": [
     "node_modules",
     "build",

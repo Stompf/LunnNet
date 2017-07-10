@@ -9,6 +9,7 @@ import { HashRouter, Switch, Link, Route } from 'react-router-dom';
 import About from './About';
 import Asteroids from './asteroids/Asteroids';
 import Car from './car/Car';
+import AirHockey from './airHockey/AirHockey';
 
 const Header = () => (
   <header>
@@ -16,6 +17,7 @@ const Header = () => (
       <span><Link to="/">Home</Link></span> |
       <span><Link to="/asteroids"> Asteroids</Link></span> |
       <span><Link to="/car"> Car</Link></span> |
+      <span><Link to="/airHockey"> AirHockey</Link></span> |
     </nav>
   </header>
 );
@@ -25,7 +27,8 @@ const Main = () => (
     <Switch>
       <Route exact={true} path="/" component={About as any} />
       <Route path="/asteroids" component={Asteroids as any} />
-      <Route path="/car" component={Car as any} />
+      <Route path="/car" component={Car as any} />+
+      <Route path="/airHockey" component={AirHockey as any} />
     </Switch>
   </main>
 );

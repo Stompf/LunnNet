@@ -1,6 +1,5 @@
 import * as React from 'react';
 import './About.css';
-// import { RouteComponentProps } from 'react-router-dom';
 
 const logo = require('./logo.svg');
 

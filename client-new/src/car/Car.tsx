@@ -2,7 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { CarGame } from './scripts/Game';
 
-class Asteroids extends React.Component<RouteComponentProps<any>, {}> {
+class Car extends React.Component<RouteComponentProps<any>, {}> {
 
     private game: CarGame;
 
@@ -28,4 +28,4 @@ class Asteroids extends React.Component<RouteComponentProps<any>, {}> {
     }
 }
 
-export default Asteroids;
+export default Car;

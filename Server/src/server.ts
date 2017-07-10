@@ -4,7 +4,7 @@ import * as http from 'http';
 import { Dictionary } from 'typescript-collections';
 import { MatchMaking } from './matchmaking';
 
-const port = process.env.PORT || 3333;
+const port = process.env.PORT || 4444;
 const app = express();
 const httpServer = http.createServer(app);
 const currentConnections = new Dictionary<string, SocketIO.Socket>();
@@ -20,6 +20,7 @@ io.on('connection', socket => {
     currentConnections.setValue(socket.id, socket);
 
     socket.on('QueueMatchMaking', (request: LunnNet.Network.QueueMatchMaking) => {
+        console.log('user: ' + socket.id + ' - queued: ' + request.game);
         matchMaking.addToQueue(socket, request.game);
     });
 
