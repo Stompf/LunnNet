@@ -8,12 +8,14 @@ import { HashRouter, Switch, Link, Route } from 'react-router-dom';
 
 import About from './About';
 import Asteroids from './asteroids/Asteroids';
+import Car from './car/Car';
 
 const Header = () => (
   <header>
     <nav>
       <span><Link to="/">Home</Link></span> |
       <span><Link to="/asteroids"> Asteroids</Link></span> |
+      <span><Link to="/car"> Car</Link></span> |
     </nav>
   </header>
 );
@@ -23,6 +25,7 @@ const Main = () => (
     <Switch>
       <Route exact={true} path="/" component={About as any} />
       <Route path="/asteroids" component={Asteroids as any} />
+      <Route path="/car" component={Car as any} />
     </Switch>
   </main>
 );
