@@ -83,7 +83,7 @@ export class AsteroidsGame extends LunnEngineComponent {
 
         const playerTexture = this.loadTexture(
             'player',
-            'assets/games/asteroids/PNG/playerShip1_blue.png').done(sprite => {
+            process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/playerShip1_blue.png').done(sprite => {
                 if (sprite != null) {
                     this.playerSprite = sprite;
                 }
@@ -91,7 +91,7 @@ export class AsteroidsGame extends LunnEngineComponent {
 
         const ufoTexture = this.loadTexture(
             'ufo',
-            'assets/games/asteroids/PNG/ufoRed.png').done(sprite => {
+            process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/ufoRed.png').done(sprite => {
                 if (sprite != null) {
                     this.ufoSprite = sprite;
                 }
@@ -99,7 +99,7 @@ export class AsteroidsGame extends LunnEngineComponent {
 
         const powerUpShootSpeed = this.loadTexture(
             'powerUp_shootSpeed',
-            'assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png').done(sprite => {
+            process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png').done(sprite => {
                 if (sprite != null) {
                     Sprites.PowerUps.ShootSpeed = sprite;
                 }
@@ -107,7 +107,7 @@ export class AsteroidsGame extends LunnEngineComponent {
 
         const powerUpShield = this.loadTexture(
             'powerUp_shield',
-            'assets/games/asteroids/PNG/Power-ups/powerUpBlue_shield.png').done(sprite => {
+            process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_shield.png').done(sprite => {
                 if (sprite != null) {
                     Sprites.PowerUps.Shield = sprite;
                 }
@@ -115,7 +115,7 @@ export class AsteroidsGame extends LunnEngineComponent {
 
         const background = this.loadTexture(
             'background',
-            'assets/games/asteroids/Backgrounds/space.jpg').done(sprite => {
+            process.env.PUBLIC_URL + '/assets/games/asteroids/Backgrounds/space.jpg').done(sprite => {
                 if (sprite != null) {
                     this.background = new PIXI.extras.TilingSprite(sprite.texture, 1000, 1000);
                 }
@@ -134,6 +134,8 @@ export class AsteroidsGame extends LunnEngineComponent {
 
         height = height ? height : 0;
         width = width ? width : 0;
+
+        height -= 25;
 
         if (height < 30) {
             height = 30;
