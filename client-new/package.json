@@ -12,19 +12,19 @@
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.6.1",
     "react-router-dom": "^4.1.1",
-    "react-scripts-ts": "2.3.2",
+    "react-scripts-ts": "2.4.0",
     "socket.io-client": "^2.0.3"
   },
   "devDependencies": {
     "@types/jest": "^20.0.2",
-    "@types/jquery": "^3.2.6",
+    "@types/jquery": "^3.2.7",
     "@types/lodash": "^4.14.68",
     "@types/node": "^8.0.8",
     "@types/p2": "^0.7.30",
     "@types/pixi.js": "^4.5.1",
-    "@types/react": "^15.0.35",
+    "@types/react": "^15.0.37",
     "@types/react-dom": "^15.5.1",
-    "@types/react-router-dom": "^4.0.5",
+    "@types/react-router-dom": "^4.0.7",
     "@types/socket.io-client": "^1.4.29",
     "typescript": "^2.4.1"
   },
