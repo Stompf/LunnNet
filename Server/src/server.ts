@@ -10,7 +10,6 @@ const httpServer = http.createServer(app);
 const currentConnections = new Dictionary<string, SocketIO.Socket>();
 const matchMaking = new MatchMaking();
 
-
 const io = socketIO();
 io.serveClient(false);
 io.attach(httpServer);
@@ -30,6 +29,7 @@ io.on('connection', socket => {
 
     socket.on('disconnect', () => {
         console.log('a user disconnected: ' + socket.id);
+        matchMaking.removeFromQueue(socket);
         currentConnections.remove(socket.id);
     });
 });

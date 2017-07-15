@@ -33,6 +33,10 @@ export class AirHockeyGame extends LunnEngineComponent {
             this.queue();
         });
 
+        this.io.on('GameFound', (_data: LunnNet.AirHockey.GameFound) => {
+            this.appendTextareaLine('GameFound');
+        });
+
         this.io.on('disconnect', () => {
             this.appendTextareaLine('Disconnected');
         });

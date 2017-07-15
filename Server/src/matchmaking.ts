@@ -28,11 +28,14 @@ export class MatchMaking {
             case LunnNet.Game.AirHockey:
                 const array = this.currentQueue.getValue(game);
                 while (array.length >= 2) {
-                    const playerOne = array.pop() as SocketIO.Socket;
-                    const playerTwo = array.pop() as SocketIO.Socket;
+                    const playerOne = array.shift() as SocketIO.Socket;
+                    const playerTwo = array.shift() as SocketIO.Socket;
+
+                    this.currentQueue.remove(game, playerOne);
+                    this.currentQueue.remove(game, playerTwo);
 
                     const airHockey = new AirHockey(playerOne, playerTwo);
-                    airHockey.startGame();
+                    airHockey.sendStartGame();
                 }
                 break;
             default:

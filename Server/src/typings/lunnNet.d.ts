@@ -10,4 +10,10 @@ declare namespace LunnNet {
 
         interface RemoveFromMatchMaking { }
     }
+
+    namespace AirHockey {
+        interface GameFound { }
+
+        interface ClientReady { }
+    }
 }
