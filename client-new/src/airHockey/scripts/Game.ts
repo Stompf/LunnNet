@@ -1,11 +1,14 @@
 import { LunnEngineComponent } from '../../lunnEngine/LunnEngineComponent';
-import * as socketIO from 'socket.io-client';
+import { NetworkGame } from './NetworkGame';
+import { LocalGame } from './LocalGame';
+import { BaseAirHockeyGame } from './BaseAirHockeyGame';
 
 export class AirHockeyGame extends LunnEngineComponent {
+    private baseAirHockeyGame: BaseAirHockeyGame;
 
-    io: SocketIOClient.Socket;
-
-    private ip = 'http://localhost:4444';
+    private USE_NETWORK: boolean = false;
+    private lastTime: number;
+    private animationFrame: number;
 
     constructor() {
         super();
@@ -13,44 +16,49 @@ export class AirHockeyGame extends LunnEngineComponent {
 
     onInit() {
         this.init(800, 600,
-            { view: document.getElementById('AirHockeyCanvas') as HTMLCanvasElement, backgroundColor: 0x000000 });
+            { view: document.getElementById('AirHockeyCanvas') as HTMLCanvasElement, backgroundColor: 0xFFFFFF });
 
-        this.connect();
+        if (this.USE_NETWORK) {
+            this.baseAirHockeyGame = new NetworkGame();
+        } else {
+            this.baseAirHockeyGame = new LocalGame();
+        }
+
+        this.startAnimation();
     }
 
     onDestroy(): void {
-        if (this.io != null) {
-            this.io.emit('RemoveFromMatchMaking', {} as LunnNet.Network.RemoveFromMatchMaking);
-            this.io.close();
+        cancelAnimationFrame(this.animationFrame);
+
+        if (this.baseAirHockeyGame) {
+            this.baseAirHockeyGame.onClose();
         }
         this.destroy();
     }
 
-    private connect() {
-        this.io = socketIO(this.ip);
-        this.io.on('connect', () => {
-            this.appendTextareaLine('Connected');
-            this.queue();
-        });
+    private startAnimation() {
+        this.lastTime = 0;
+        this.baseAirHockeyGame.initNewGame(this.app);
 
-        this.io.on('GameFound', (_data: LunnNet.AirHockey.GameFound) => {
-            this.appendTextareaLine('GameFound');
-        });
-
-        this.io.on('disconnect', () => {
-            this.appendTextareaLine('Disconnected');
-        });
+        this.animate(0);
     }
 
-    private appendTextareaLine(text: string) {
-        const textarea = document.getElementById('AirHockeyTextarea') as HTMLTextAreaElement;
-        if (textarea != null) {
-            textarea.value = text + '\n' + textarea.value;
+    private animate = (time: number) => {
+        this.animationFrame = requestAnimationFrame(this.animate);
+
+        if (!document.hasFocus()) {
+            return;
         }
-    }
 
-    private queue() {
-        this.io.emit('QueueMatchMaking', { game: LunnNet.Game.AirHockey } as LunnNet.Network.QueueMatchMaking);
-        this.appendTextareaLine('Looking for game...');
+        if (this.baseAirHockeyGame) {
+            // Get the elapsed time since last frame, in seconds
+            let deltaTime = this.lastTime !== 0 ? (time - this.lastTime) / 1000 : 0;
+            this.lastTime = time;
+
+            // Make sure the time delta is not too big (can happen if user switches browser tab)
+            deltaTime = Math.min(1 / 10, deltaTime);
+
+            this.baseAirHockeyGame.onUpdate(deltaTime);
+        }
     }
 }
