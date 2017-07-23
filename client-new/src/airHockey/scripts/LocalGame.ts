@@ -9,6 +9,7 @@ export class LocalGame extends BaseAirHockeyGame {
     private player1: Player;
     private player2: Player;
     private ball: Ball;
+    private middlePlaneGraphics: PIXI.Graphics;
     private world: p2.World;
 
     private readonly maxSubSteps = 5; // Max physics ticks per render frame
@@ -67,6 +68,7 @@ export class LocalGame extends BaseAirHockeyGame {
         this.app.stage.removeChildren();
         this.container = new PIXI.Container();
 
+        this.container.addChild(this.middlePlaneGraphics);
         this.container.addChild(this.ball.graphics);
         this.container.addChild(this.player1.graphics);
         this.container.addChild(this.player2.graphics);
@@ -123,15 +125,18 @@ export class LocalGame extends BaseAirHockeyGame {
         const planeMiddle = new p2.Body({
             position: [0, 0],
         });
-        const box = new p2.Box({
+        const middleBox = new p2.Box({
             height: height * 2,
             width: 0.1
         });
-        box.collisionGroup = Math.pow(2, AirHockey.MASKS.MIDDLE_PLANE);
-        box.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER);
-        planeMiddle.addShape(box);
-
+        middleBox.collisionGroup = Math.pow(2, AirHockey.MASKS.MIDDLE_PLANE);
+        middleBox.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER);
+        planeMiddle.addShape(middleBox);
         world.addBody(planeMiddle);
+
+        this.middlePlaneGraphics = new PIXI.Graphics();
+        this.middlePlaneGraphics.beginFill(0xD3D3D3);
+        this.middlePlaneGraphics.drawRect(planeMiddle.position[0] - middleBox.width / 2, -height, middleBox.width, middleBox.height);
     }
 
     private updatePhysics(deltaTime: number) {
