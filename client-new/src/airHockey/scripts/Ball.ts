@@ -5,46 +5,50 @@ export class Ball {
     private position: LunnEngine.Vector2D;
 
     private body: p2.Body;
-    private bodyGraphics: PIXI.Graphics;
+    graphics: PIXI.Graphics;
 
-    constructor() {
+    constructor(world: p2.World) {
         this.color = 0x000000;
         this.position = { x: 0, y: 0 };
 
         this.body = new p2.Body({
-            mass: 0.5
+            mass: 0.1
         });
         this.body.damping = 0;
         this.body.angularDamping = 0;
 
-        const shape = new p2.Box({
-            height: 5,
-            width: 5
+        const shape = new p2.Circle({
+            radius: 0.25,
+            collisionGroup: Math.pow(2, AirHockey.MASKS.BALL),
+            collisionMask: Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.PLANE) | Math.pow(2, AirHockey.MASKS.BALL)
         });
-        this.createBodyGraphics();
         this.body.addShape(shape);
+        this.createBodyGraphics();
+
+        world.addBody(this.body);
+    }
+
+    setPosition(position: LunnEngine.Vector2D) {
+        this.body.position = [position.x, position.y];
     }
 
     update() {
-        if (this.bodyGraphics) {
-            this.bodyGraphics.x = this.body.interpolatedPosition[0];
-            this.bodyGraphics.y = this.body.interpolatedPosition[1];
-            this.bodyGraphics.rotation = this.body.interpolatedAngle;
+        if (this.graphics) {
+            this.graphics.x = this.body.interpolatedPosition[0];
+            this.graphics.y = this.body.interpolatedPosition[1];
+            this.graphics.rotation = this.body.interpolatedAngle;
         }
     }
 
     private createBodyGraphics() {
-        if (this.bodyGraphics == null) {
-            this.bodyGraphics = new PIXI.Graphics();
+        if (this.graphics == null) {
+            this.graphics = new PIXI.Graphics();
         } else {
-            this.bodyGraphics.clear();
+            this.graphics.clear();
         }
-        this.bodyGraphics.beginFill(this.color);
-        this.bodyGraphics.alpha = 1;
-        this.bodyGraphics.drawRect(this.body.interpolatedPosition[0] - (this.body.shapes[0] as p2.Box).width / 2,
-            this.body.interpolatedPosition[1] - (this.body.shapes[0] as p2.Box).height / 2,
-            (this.body.shapes[0] as p2.Box).width, (this.body.shapes[0] as p2.Box).height);
-
-        return this.bodyGraphics;
+        this.graphics.beginFill(this.color);
+        this.graphics.alpha = 1;
+        this.graphics.drawCircle(this.body.interpolatedPosition[0], this.body.interpolatedPosition[1], (this.body.shapes[0] as p2.Circle).radius);
+        return this.graphics;
     }
 }
