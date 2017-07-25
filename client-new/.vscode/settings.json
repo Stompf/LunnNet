@@ -38,5 +38,19 @@
         "*.dll", // Ignore all .dll files.
         "**/*.dll", // Ignore all .dll files
         "README.md"
+    ],
+    "auto-close-tag.activationOnLanguage": [
+        "html",
+        "xml",
+        "php",
+        "blade",
+        "ejs",
+        "handlebars",
+        "jinja",
+        "plaintext",
+        "markdown",
+        "razor",
+        "vue",
+        "liquid"
     ]
 }

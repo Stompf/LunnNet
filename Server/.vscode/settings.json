@@ -32,5 +32,19 @@
     "typescript.tsdk": "./node_modules/typescript/lib",
     "path-intellisense.mappings": {
         "/": "${workspaceRoot}/src"
-    }
+    },
+    "auto-close-tag.activationOnLanguage": [
+        "html",
+        "xml",
+        "php",
+        "blade",
+        "ejs",
+        "handlebars",
+        "jinja",
+        "plaintext",
+        "markdown",
+        "razor",
+        "vue",
+        "liquid"
+    ]
 }
