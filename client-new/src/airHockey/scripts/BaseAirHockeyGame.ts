@@ -14,4 +14,11 @@ export class BaseAirHockeyGame {
     onUpdate(_deltaTime: number) {
         // Override
     }
+
+    protected appendTextareaLine(text: string) {
+        const textarea = document.getElementById('AirHockeyTextarea') as HTMLTextAreaElement;
+        if (textarea != null) {
+            textarea.value = text + '\n' + textarea.value;
+        }
+    }
 }

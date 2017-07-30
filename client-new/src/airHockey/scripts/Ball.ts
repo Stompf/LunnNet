@@ -33,6 +33,10 @@ export class Ball {
         this.body.position = [position.x, position.y];
     }
 
+    getPosition() {
+        return { x: this.body.interpolatedPosition[0], y: this.body.interpolatedPosition[1] } as LunnEngine.Vector2D;
+    }
+
     update() {
         if (this.graphics) {
             this.graphics.x = this.body.interpolatedPosition[0];

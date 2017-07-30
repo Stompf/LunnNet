@@ -6,19 +6,30 @@ import { BaseAirHockeyGame } from './BaseAirHockeyGame';
 import { KeyMapping } from './KeyMapping';
 
 export class LocalGame extends BaseAirHockeyGame {
+
     private player1: Player;
     private player2: Player;
     private ball: Ball;
     private middlePlaneGraphics: PIXI.Graphics;
     private world: p2.World;
 
+    private readonly WIDTH = 1600;
+    private readonly HEIGHT = 600;
+
     private readonly maxSubSteps = 5; // Max physics ticks per render frame
     private readonly fixedDeltaTime = 1 / 60; // Physics "tick" delta time
     private readonly spaceWidth = 16;
     private readonly spaceHeight = 9;
 
+    private goal1Rect: PIXI.Rectangle;
+    private goal2Rect: PIXI.Rectangle;
+
     initNewGame(app: PIXI.Application) {
         super.initNewGame(app);
+
+        this.app.view.width = this.WIDTH;
+        this.app.view.height = this.HEIGHT;
+        this.app.renderer.resize(this.WIDTH, this.HEIGHT);
 
         // Init physics world
         this.world = new p2.World({
@@ -27,7 +38,7 @@ export class LocalGame extends BaseAirHockeyGame {
 
         // Turn off friction, we don't need it.
         this.world.defaultContactMaterial.friction = 0;
-        this.addPlanes(this.world, 6, 8);
+        this.addPlanes(this.world, 4.5, 12);
 
         this.ball = new Ball(this.world);
 
@@ -67,8 +78,9 @@ export class LocalGame extends BaseAirHockeyGame {
 
         const goalWidth = 0.25;
         const goalY = -1;
-        const goal_1 = this.setGoal(this.world, { x: -6, y: goalY }, goalWidth);
-        const goal_2 = this.setGoal(this.world, { x: 6, y: goalY }, goalWidth);
+
+        this.goal1Rect = new PIXI.Rectangle(-9, goalY, goalWidth, Math.abs(goalY * 2));
+        this.goal2Rect = new PIXI.Rectangle(9, goalY, goalWidth, Math.abs(goalY * 2));
 
         this.app.stage.removeChildren();
         this.container = new PIXI.Container();
@@ -77,29 +89,73 @@ export class LocalGame extends BaseAirHockeyGame {
         this.container.addChild(this.ball.graphics);
         this.container.addChild(this.player1.graphics);
         this.container.addChild(this.player2.graphics);
-        this.container.addChild(goal_1);
-        this.container.addChild(goal_2);
+
+        this.setGoal(this.world, this.goal1Rect, this.container);
+        this.setGoal(this.world, this.goal2Rect, this.container);
 
         this.app.stage.addChild(this.container);
     }
 
-    private setGoal(world: p2.World, position: LunnEngine.Vector2D, width: number) {
-        const body = new p2.Body();
-        const box = new p2.Box({
-            height: Math.abs(position.y * 2),
-            width: width
+    private setGoal(world: p2.World, rect: PIXI.Rectangle, container: PIXI.Container) {
+        // BACK
+        const bodyBack = new p2.Body();
+        const boxBack = new p2.Box({
+            height: rect.height,
+            width: rect.width / 2
         });
-        body.position = [position.x + box.width / 2, position.y + box.height / 2];
-        box.collisionGroup = Math.pow(2, AirHockey.MASKS.GOAL);
-        box.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.BALL);
+        bodyBack.position = [rect.x + boxBack.width * 2, rect.y + boxBack.height / 2];
+        boxBack.collisionGroup = Math.pow(2, AirHockey.MASKS.GOAL);
+        boxBack.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.BALL);
 
-        body.addShape(box);
+        bodyBack.addShape(boxBack);
+        world.addBody(bodyBack);
 
-        const graphics = new PIXI.Graphics();
-        graphics.beginFill(0x000000);
-        graphics.drawRect(position.x, position.y, box.width, box.height);
-        world.addBody(body);
-        return graphics;
+        const goalBack = new PIXI.Graphics();
+        goalBack.beginFill(0xAAAAAA);
+        goalBack.drawRect(bodyBack.position[0], rect.y, boxBack.width, boxBack.height);
+        this.container.addChild(goalBack);
+
+        // TOP
+        const bodyTop = new p2.Body();
+        const boxTop = new p2.Box({
+            height: rect.width / 2,
+            width: rect.width + (rect.width / 2)
+        });
+        bodyTop.position = [rect.x, rect.y + rect.height];
+        boxTop.collisionGroup = Math.pow(2, AirHockey.MASKS.GOAL);
+        boxTop.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.BALL);
+
+        bodyTop.addShape(boxTop);
+        world.addBody(bodyTop);
+
+        const goalTop = new PIXI.Graphics();
+        goalTop.beginFill(0xAAAAAA);
+        goalTop.drawRect(bodyTop.position[0], rect.y + rect.height, boxTop.width, boxTop.height);
+        this.container.addChild(goalTop);
+
+        // BOTTOM
+        const bodyBottom = new p2.Body();
+        const boxBottom = new p2.Box({
+            height: rect.width / 2,
+            width: rect.width + (rect.width / 2)
+        });
+        bodyBottom.position = [rect.x, rect.y - boxBottom.height];
+        boxBottom.collisionGroup = Math.pow(2, AirHockey.MASKS.GOAL);
+        boxBottom.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.BALL);
+
+        bodyBottom.addShape(boxBottom);
+        world.addBody(bodyBottom);
+
+        const goalBottom = new PIXI.Graphics();
+        goalBottom.beginFill(0xAAAAAA);
+        goalBottom.drawRect(bodyBottom.position[0], rect.y - boxBottom.height, boxBottom.width, boxBottom.height);
+        this.container.addChild(goalBottom);
+
+        // GOAL
+        const goalGraphics = new PIXI.Graphics();
+        goalGraphics.beginFill(0x000000);
+        goalGraphics.drawRect(rect.x, rect.y, rect.width, rect.height);
+        this.container.addChild(goalGraphics);
     }
 
     private addPlanes(world: p2.World, height: number, width: number) {
@@ -170,15 +226,18 @@ export class LocalGame extends BaseAirHockeyGame {
     }
 
     private initWorldEvents(world: p2.World) {
-        // Add ship physics
         world.on('postStep', () => {
-
             this.player1.postStep();
             this.player2.postStep();
+
+            const ballPosition = this.ball.getPosition();
+            if (this.goal1Rect.contains(ballPosition.x, ballPosition.y)) {
+                this.appendTextareaLine('GOAL 1');
+            } else if (this.goal2Rect.contains(ballPosition.x, ballPosition.y)) {
+                this.appendTextareaLine('GOAL 2');
+            }
         }, this);
 
-        // Catch impacts in the world
-        // Todo: check if several bullets hit the same asteroid in the same time step
         world.on('beginContact', (evt: p2.BeginContactEvent) => {
 
         }, this);

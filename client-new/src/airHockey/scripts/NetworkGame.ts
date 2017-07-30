@@ -42,11 +42,4 @@ export class NetworkGame extends BaseAirHockeyGame {
         this.socket.emit('QueueMatchMaking', { game: LunnNet.Game.AirHockey } as LunnNet.Network.QueueMatchMaking);
         this.appendTextareaLine('Looking for game...');
     }
-
-    private appendTextareaLine(text: string) {
-        const textarea = document.getElementById('AirHockeyTextarea') as HTMLTextAreaElement;
-        if (textarea != null) {
-            textarea.value = text + '\n' + textarea.value;
-        }
-    }
 }
