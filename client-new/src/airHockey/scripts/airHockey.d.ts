@@ -3,6 +3,7 @@ declare namespace AirHockey {
         PLAYER,
         MIDDLE_PLANE,
         PLANE,
-        BALL
+        BALL,
+        GOAL
     }
 }

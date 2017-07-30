@@ -12,15 +12,16 @@ export class Ball {
         this.position = { x: 0, y: 0 };
 
         this.body = new p2.Body({
-            mass: 0.1
+            mass: 0.001,
         });
-        this.body.damping = 0;
-        this.body.angularDamping = 0;
+
+        this.body.damping = -0.2;
+        this.body.angularDamping = -0.2;
 
         const shape = new p2.Circle({
             radius: 0.25,
             collisionGroup: Math.pow(2, AirHockey.MASKS.BALL),
-            collisionMask: Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.PLANE) | Math.pow(2, AirHockey.MASKS.BALL)
+            collisionMask: Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.PLANE) | Math.pow(2, AirHockey.MASKS.BALL) | Math.pow(2, AirHockey.MASKS.GOAL)
         });
         this.body.addShape(shape);
         this.createBodyGraphics();

@@ -3,7 +3,7 @@ import { KeyboardStates } from '../../lunnEngine/utils/KeyboardStates';
 import { KeyMapping } from './KeyMapping';
 
 export class Player {
-    private SPEED = 8;
+    private SPEED = 10;
 
     private color: number;
 
@@ -27,7 +27,8 @@ export class Player {
             width: 1
         });
         shape.collisionGroup = Math.pow(2, AirHockey.MASKS.PLAYER);
-        shape.collisionMask = Math.pow(2, AirHockey.MASKS.BALL) | Math.pow(2, AirHockey.MASKS.MIDDLE_PLANE) | Math.pow(2, AirHockey.MASKS.PLANE) | Math.pow(2, AirHockey.MASKS.PLAYER);
+        shape.collisionMask = Math.pow(2, AirHockey.MASKS.BALL) | Math.pow(2, AirHockey.MASKS.GOAL) |
+            Math.pow(2, AirHockey.MASKS.MIDDLE_PLANE) | Math.pow(2, AirHockey.MASKS.PLANE) | Math.pow(2, AirHockey.MASKS.PLAYER);
 
         this.body.previousPosition = [0, 0];
         this.body.position = [0, 0];

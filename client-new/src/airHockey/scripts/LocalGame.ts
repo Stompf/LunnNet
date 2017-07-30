@@ -65,6 +65,11 @@ export class LocalGame extends BaseAirHockeyGame {
         this.app.stage.scale.x = zoom;
         this.app.stage.scale.y = -zoom;
 
+        const goalWidth = 0.25;
+        const goalY = -1;
+        const goal_1 = this.setGoal(this.world, { x: -6, y: goalY }, goalWidth);
+        const goal_2 = this.setGoal(this.world, { x: 6, y: goalY }, goalWidth);
+
         this.app.stage.removeChildren();
         this.container = new PIXI.Container();
 
@@ -72,8 +77,29 @@ export class LocalGame extends BaseAirHockeyGame {
         this.container.addChild(this.ball.graphics);
         this.container.addChild(this.player1.graphics);
         this.container.addChild(this.player2.graphics);
+        this.container.addChild(goal_1);
+        this.container.addChild(goal_2);
 
         this.app.stage.addChild(this.container);
+    }
+
+    private setGoal(world: p2.World, position: LunnEngine.Vector2D, width: number) {
+        const body = new p2.Body();
+        const box = new p2.Box({
+            height: Math.abs(position.y * 2),
+            width: width
+        });
+        body.position = [position.x + box.width / 2, position.y + box.height / 2];
+        box.collisionGroup = Math.pow(2, AirHockey.MASKS.GOAL);
+        box.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.BALL);
+
+        body.addShape(box);
+
+        const graphics = new PIXI.Graphics();
+        graphics.beginFill(0x000000);
+        graphics.drawRect(position.x, position.y, box.width, box.height);
+        world.addBody(body);
+        return graphics;
     }
 
     private addPlanes(world: p2.World, height: number, width: number) {
