@@ -16,7 +16,7 @@ export class LocalGame extends BaseAirHockeyGame {
     private readonly WIDTH = 1600;
     private readonly HEIGHT = 600;
 
-    private readonly maxSubSteps = 5; // Max physics ticks per render frame
+    private readonly maxSubSteps = 1; // Max physics ticks per render frame
     private readonly fixedDeltaTime = 1 / 60; // Physics "tick" delta time
     private readonly spaceWidth = 16;
     private readonly spaceHeight = 9;
@@ -103,7 +103,11 @@ export class LocalGame extends BaseAirHockeyGame {
             height: rect.height,
             width: rect.width / 2
         });
-        bodyBack.position = [rect.x + boxBack.width * 2, rect.y + boxBack.height / 2];
+        const xPos = rect.x > 0 ?
+            rect.x + rect.width :
+            rect.x - rect.width / 2;
+
+        bodyBack.position = [xPos, rect.y + boxBack.height / 2];
         boxBack.collisionGroup = Math.pow(2, AirHockey.MASKS.GOAL);
         boxBack.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.BALL);
 
@@ -112,16 +116,20 @@ export class LocalGame extends BaseAirHockeyGame {
 
         const goalBack = new PIXI.Graphics();
         goalBack.beginFill(0xAAAAAA);
-        goalBack.drawRect(bodyBack.position[0], rect.y, boxBack.width, boxBack.height);
+        goalBack.drawRect(xPos, rect.y, boxBack.width, boxBack.height);
         this.container.addChild(goalBack);
 
         // TOP
+        const sideWidth = rect.width + boxBack.width;
+        const adj = rect.x > 0 ? 0 : rect.width / 2;
+        const bodyAdj = rect.x > 0 ? sideWidth / 2 : 0;
+
         const bodyTop = new p2.Body();
         const boxTop = new p2.Box({
             height: rect.width / 2,
-            width: rect.width + (rect.width / 2)
+            width: sideWidth
         });
-        bodyTop.position = [rect.x, rect.y + rect.height];
+        bodyTop.position = [rect.x + bodyAdj, rect.y + rect.height + boxTop.height / 2];
         boxTop.collisionGroup = Math.pow(2, AirHockey.MASKS.GOAL);
         boxTop.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.BALL);
 
@@ -130,16 +138,16 @@ export class LocalGame extends BaseAirHockeyGame {
 
         const goalTop = new PIXI.Graphics();
         goalTop.beginFill(0xAAAAAA);
-        goalTop.drawRect(bodyTop.position[0], rect.y + rect.height, boxTop.width, boxTop.height);
+        goalTop.drawRect(rect.x - adj, rect.y + rect.height, boxTop.width, boxTop.height);
         this.container.addChild(goalTop);
 
         // BOTTOM
         const bodyBottom = new p2.Body();
         const boxBottom = new p2.Box({
             height: rect.width / 2,
-            width: rect.width + (rect.width / 2)
+            width: sideWidth
         });
-        bodyBottom.position = [rect.x, rect.y - boxBottom.height];
+        bodyBottom.position = [rect.x + bodyAdj, rect.y - boxBottom.height / 2];
         boxBottom.collisionGroup = Math.pow(2, AirHockey.MASKS.GOAL);
         boxBottom.collisionMask = Math.pow(2, AirHockey.MASKS.PLAYER) | Math.pow(2, AirHockey.MASKS.BALL);
 
@@ -148,7 +156,7 @@ export class LocalGame extends BaseAirHockeyGame {
 
         const goalBottom = new PIXI.Graphics();
         goalBottom.beginFill(0xAAAAAA);
-        goalBottom.drawRect(bodyBottom.position[0], rect.y - boxBottom.height, boxBottom.width, boxBottom.height);
+        goalBottom.drawRect(rect.x - adj, rect.y - boxBottom.height, boxBottom.width, boxBottom.height);
         this.container.addChild(goalBottom);
 
         // GOAL
@@ -239,7 +247,7 @@ export class LocalGame extends BaseAirHockeyGame {
         }, this);
 
         world.on('beginContact', (evt: p2.BeginContactEvent) => {
-
+            // TODO
         }, this);
     }
 }
