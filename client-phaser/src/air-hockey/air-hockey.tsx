@@ -50,10 +50,20 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         this.player1 = new Player(this.game, KeyMapping.Player1_Mapping, 0xFF0000, 0);
         this.player2 = new Player(this.game, KeyMapping.Player2_Mapping, 0x0000FF, 1);
         this.player1.setPosition(new Phaser.Point(this.game.width / 4, this.game.height / 2));
-        this.player2.setPosition(new Phaser.Point(this.game.width / 1.25 - this.player2.RECT_SIZE, this.game.height / 2));
+        this.player2.setPosition(new Phaser.Point(this.game.width / 1.25 - this.player2.RADIUS, this.game.height / 2));
 
         this.ball = new Ball(this.game);
         this.ball.setPosition(new Phaser.Point(this.game.width / 2, this.game.height / 2));
+
+        this.drawStage();
+    }
+
+    private drawStage() {
+        const middleLine = new Phaser.Graphics(this.game);
+        middleLine.beginFill(0xD3D3D3);
+        middleLine.drawRect(0, 0, 5, this.game.height);
+        const middleSprite = this.game.add.sprite(this.game.width / 2, 0, middleLine.generateTexture());
+        middleSprite.anchor.x = 0.5;
     }
 
     private update = () => {

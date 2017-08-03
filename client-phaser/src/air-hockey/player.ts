@@ -2,7 +2,7 @@ import * as Phaser from 'phaser-ce';
 import { KeyMapping } from './key-mapping';
 
 export class Player {
-    readonly RECT_SIZE = 60;
+    readonly RADIUS = 60;
     private SPEED = 300;
 
     private sprite: Phaser.Sprite;
@@ -17,10 +17,9 @@ export class Player {
 
         const graphics = new Phaser.Graphics(game);
         graphics.beginFill(color);
-        graphics.drawRect(0, 0, this.RECT_SIZE, this.RECT_SIZE);
+        graphics.drawCircle(0, 0, this.RADIUS);
 
         const sprite = game.add.sprite(0, 0, graphics.generateTexture());
-
         game.physics.p2.enable(sprite);
         this.sprite = sprite;
     }
@@ -45,18 +44,16 @@ export class Player {
         if (game.input.keyboard.isDown(this.keyMapping.down)) {
             input[1] -= this.SPEED;
         }
-        if (game.input.keyboard.isDown(this.keyMapping.left)) {
+        if (game.input.keyboard.isDown(this.keyMapping.left)
+            && (this.team !== 1 || this.sprite.body.x > (game.width / 2 + this.RADIUS / 2))) {
             input[0] -= this.SPEED;
         }
-        if (game.input.keyboard.isDown(this.keyMapping.right)) {
+        if (game.input.keyboard.isDown(this.keyMapping.right)
+            && (this.team !== 0 || this.sprite.body.x < (game.width / 2 - this.RADIUS / 2))) {
             input[0] += this.SPEED;
         }
 
         this.sprite.body.moveUp(input[1]);
-
-        if (this.sprite.body.x < (game.width / 2 - this.RECT_SIZE / 2){
-        
-            this.sprite.body.moveRight(input[0]);
-        }
+        this.sprite.body.moveRight(input[0]);
     }
 }
