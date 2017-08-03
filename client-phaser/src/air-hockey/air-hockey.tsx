@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Player } from './player';
+import { Player, Team } from './player';
 import { RouteComponentProps } from 'react-router-dom';
 import { KeyMapping } from './key-mapping';
 import * as Phaser from 'phaser-ce';
@@ -12,6 +12,9 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     private player1: Player;
     private player2: Player;
     private ball: Ball;
+
+    private goal1: Phaser.Sprite;
+    private goal2: Phaser.Sprite;
 
     constructor() {
         super();
@@ -41,21 +44,23 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     }
 
     private create = () => {
+        PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
+
         this.game.stage.backgroundColor = 0xFFFFFF;
         this.game.renderer.view.style.border = '1px solid black';
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.world.gravity = [0, 0];
-        this.game.physics.p2.restitution = 0.8;
+        this.game.physics.p2.restitution = 1;
 
-        this.player1 = new Player(this.game, KeyMapping.Player1_Mapping, 0xFF0000, 0);
-        this.player2 = new Player(this.game, KeyMapping.Player2_Mapping, 0x0000FF, 1);
+        this.drawStage();
+
+        this.player1 = new Player(this.game, KeyMapping.Player1Mapping, 0xFF0000, Team.Left);
+        this.player2 = new Player(this.game, KeyMapping.Player2Mapping, 0x0000FF, Team.Right);
         this.player1.setPosition(new Phaser.Point(this.game.width / 4, this.game.height / 2));
         this.player2.setPosition(new Phaser.Point(this.game.width / 1.25 - this.player2.RADIUS, this.game.height / 2));
 
         this.ball = new Ball(this.game);
         this.ball.setPosition(new Phaser.Point(this.game.width / 2, this.game.height / 2));
-
-        this.drawStage();
     }
 
     private drawStage() {
@@ -63,10 +68,62 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         middleLine.beginFill(0xD3D3D3);
         middleLine.drawRect(0, 0, 5, this.game.height);
         const middleSprite = this.game.add.sprite(this.game.width / 2, 0, middleLine.generateTexture());
-        middleSprite.anchor.x = 0.5;
+        middleSprite.anchor.y = 0;
+
+        this.goal1 = this.drawGoal(Team.Left);
+        this.goal2 = this.drawGoal(Team.Right);
+    }
+
+    private drawGoal(team: Team) {
+        const goalWidth = 20;
+        const goalHeight = 100;
+        const goalNetSize = 10;
+
+        let x = this.game.width / 10;
+
+        if (team === Team.Right) {
+            x = this.game.width - x;
+        }
+
+        const topAndBottomGraphics = new Phaser.Graphics(this.game);
+        topAndBottomGraphics.beginFill(0xD3D3D3);
+        topAndBottomGraphics.drawRect(0, 0, goalWidth, goalNetSize);
+        const top = this.game.add.sprite(x, this.game.height / 2 - goalHeight / 2 - goalNetSize / 2, topAndBottomGraphics.generateTexture());
+        const bottom = this.game.add.sprite(x, this.game.height / 2 + goalHeight / 2 + goalNetSize / 2, topAndBottomGraphics.generateTexture());
+
+        const backGraphics = new Phaser.Graphics(this.game);
+        backGraphics.beginFill(0xD3D3D3);
+        backGraphics.drawRect(0, 0, goalNetSize, goalHeight + goalNetSize * 2);
+        const offset = goalWidth / 2 + goalNetSize / 2;
+        const back = this.game.add.sprite(x - (team === Team.Left ? offset : -offset), this.game.height / 2, backGraphics.generateTexture());
+
+        this.game.physics.p2.enable(top);
+        this.game.physics.p2.enable(bottom);
+        this.game.physics.p2.enable(back);
+
+        top.body.static = true;
+        bottom.body.static = true;
+        back.body.static = true;
+
+        const graphics = new Phaser.Graphics(this.game);
+        graphics.beginFill(0x000000);
+        graphics.drawRect(0, 0, goalWidth, goalHeight);
+
+        const sprite = this.game.add.sprite(x, this.game.height / 2, graphics.generateTexture());
+        return sprite;
     }
 
     private update = () => {
+        const ballPosition = this.ball.getPosition();
+        if (this.goal1.getBounds().contains(ballPosition.x, ballPosition.y)) {
+            console.log('GOAL 1');
+
+            this.game.paused = true;
+        } else if (this.goal2.getBounds().contains(ballPosition.x, ballPosition.y)) {
+            console.log('GOAL 2');
+            this.game.paused = true;
+        }
+
         this.player1.onUpdate(this.game);
         this.player2.onUpdate(this.game);
     }

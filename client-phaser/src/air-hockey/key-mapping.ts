@@ -11,7 +11,7 @@ export namespace KeyMapping {
         fire: number;
     }
 
-    export const Player1_Mapping = {
+    export const Player1Mapping = {
         up: Phaser.Keyboard.W,
         down: Phaser.Keyboard.S,
         left: Phaser.Keyboard.A,
@@ -19,7 +19,7 @@ export namespace KeyMapping {
         fire: Phaser.Keyboard.F
     };
 
-    export const Player2_Mapping = {
+    export const Player2Mapping = {
         up: Phaser.Keyboard.UP,
         down: Phaser.Keyboard.DOWN,
         left: Phaser.Keyboard.LEFT,
