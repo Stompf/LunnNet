@@ -8,6 +8,7 @@ import { Ball } from './ball';
 class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     private game: Phaser.Game;
     private readonly canvasId = 'AirHockeyCanvas';
+    private readonly TOP_OFFSET = 75;
 
     private player1: Player;
     private player2: Player;
@@ -39,6 +40,10 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         }
     }
 
+    private totalAreaHeight() {
+        return this.game.height - this.TOP_OFFSET;
+    }
+
     private preload = () => {
         // Assets
     }
@@ -56,18 +61,29 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
 
         this.player1 = new Player(this.game, KeyMapping.Player1Mapping, 0xFF0000, Team.Left);
         this.player2 = new Player(this.game, KeyMapping.Player2Mapping, 0x0000FF, Team.Right);
-        this.player1.setPosition(new Phaser.Point(this.game.width / 4, this.game.height / 2));
-        this.player2.setPosition(new Phaser.Point(this.game.width / 1.25 - this.player2.RADIUS, this.game.height / 2));
+        this.player1.setPosition(new Phaser.Point(this.game.width / 4, this.TOP_OFFSET + this.totalAreaHeight() / 2));
+        this.player2.setPosition(new Phaser.Point(this.game.width / 1.25 - this.player2.RADIUS, this.TOP_OFFSET + this.totalAreaHeight() / 2));
 
         this.ball = new Ball(this.game);
-        this.ball.setPosition(new Phaser.Point(this.game.width / 2, this.game.height / 2));
+        this.ball.setPosition(new Phaser.Point(this.game.width / 2, this.TOP_OFFSET + this.totalAreaHeight() / 2));
     }
 
     private drawStage() {
+        const topLine = new Phaser.Graphics(this.game);
+        topLine.lineStyle(1, 0x000000);
+        topLine.moveTo(0, 0);
+        topLine.lineTo(this.game.width, 0);
+        const topSprite = this.game.add.sprite(0, this.TOP_OFFSET, topLine.generateTexture());
+        this.game.physics.p2.enable(topSprite);
+
+        topSprite.body.setRectangle(this.game.width, this.TOP_OFFSET, this.game.width / 2, -this.TOP_OFFSET / 2);
+        topSprite.body.static = true;
+        topSprite.anchor.x = 0;
+
         const middleLine = new Phaser.Graphics(this.game);
         middleLine.beginFill(0xD3D3D3);
-        middleLine.drawRect(0, 0, 5, this.game.height);
-        const middleSprite = this.game.add.sprite(this.game.width / 2, 0, middleLine.generateTexture());
+        middleLine.drawRect(0, 0, 5, this.totalAreaHeight());
+        const middleSprite = this.game.add.sprite(this.game.width / 2, this.TOP_OFFSET, middleLine.generateTexture());
         middleSprite.anchor.y = 0;
 
         this.goal1 = this.drawGoal(Team.Left);
@@ -88,14 +104,14 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         const topAndBottomGraphics = new Phaser.Graphics(this.game);
         topAndBottomGraphics.beginFill(0xD3D3D3);
         topAndBottomGraphics.drawRect(0, 0, goalWidth, goalNetSize);
-        const top = this.game.add.sprite(x, this.game.height / 2 - goalHeight / 2 - goalNetSize / 2, topAndBottomGraphics.generateTexture());
-        const bottom = this.game.add.sprite(x, this.game.height / 2 + goalHeight / 2 + goalNetSize / 2, topAndBottomGraphics.generateTexture());
+        const top = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2 - goalHeight / 2 - goalNetSize / 2, topAndBottomGraphics.generateTexture());
+        const bottom = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2 + goalHeight / 2 + goalNetSize / 2, topAndBottomGraphics.generateTexture());
 
         const backGraphics = new Phaser.Graphics(this.game);
         backGraphics.beginFill(0xD3D3D3);
         backGraphics.drawRect(0, 0, goalNetSize, goalHeight + goalNetSize * 2);
         const offset = goalWidth / 2 + goalNetSize / 2;
-        const back = this.game.add.sprite(x - (team === Team.Left ? offset : -offset), this.game.height / 2, backGraphics.generateTexture());
+        const back = this.game.add.sprite(x - (team === Team.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2, backGraphics.generateTexture());
 
         this.game.physics.p2.enable(top);
         this.game.physics.p2.enable(bottom);
@@ -109,7 +125,7 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         graphics.beginFill(0x000000);
         graphics.drawRect(0, 0, goalWidth, goalHeight);
 
-        const sprite = this.game.add.sprite(x, this.game.height / 2, graphics.generateTexture());
+        const sprite = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2, graphics.generateTexture());
         return sprite;
     }
 
