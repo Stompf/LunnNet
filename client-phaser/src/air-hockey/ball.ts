@@ -2,6 +2,7 @@ import * as Phaser from 'phaser-ce';
 
 export class Ball {
     private readonly DIAMETER = 30;
+    private readonly MAX_VELOCITY = 70;
     private sprite: Phaser.Sprite;
 
     constructor(game: Phaser.Game) {
@@ -22,5 +23,29 @@ export class Ball {
 
     getPosition() {
         return { x: this.sprite.body.x, y: this.sprite.body.y };
+    }
+
+    onUpdate() {
+        this.constrainVelocity(this.sprite, this.MAX_VELOCITY);
+    }
+
+    private constrainVelocity(sprite: Phaser.Sprite, maxVelocity: number) {
+        var body = sprite.body;
+        var angle, currVelocitySqr, vx, vy;
+
+        vx = body.data.velocity[0];
+        vy = body.data.velocity[1];
+
+        currVelocitySqr = vx * vx + vy * vy;
+
+        if (currVelocitySqr > maxVelocity * maxVelocity) {
+            angle = Math.atan2(vy, vx);
+
+            vx = Math.cos(angle) * maxVelocity;
+            vy = Math.sin(angle) * maxVelocity;
+
+            body.data.velocity[0] = vx;
+            body.data.velocity[1] = vy;
+        }
     }
 }

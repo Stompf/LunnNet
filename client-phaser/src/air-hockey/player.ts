@@ -8,7 +8,7 @@ export const enum Team {
 
 export class Player {
     readonly RADIUS = 60;
-    private SPEED = 500;
+    private SPEED = 600;
 
     private sprite: Phaser.Sprite;
     private keyMapping: KeyMapping.Mapping;

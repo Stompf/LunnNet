@@ -76,7 +76,7 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
 
     private drawGoal(team: Team) {
         const goalWidth = 20;
-        const goalHeight = 100;
+        const goalHeight = 125;
         const goalNetSize = 10;
 
         let x = this.game.width / 10;
@@ -114,6 +114,8 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     }
 
     private update = () => {
+        this.ball.onUpdate();
+
         const ballPosition = this.ball.getPosition();
         if (this.goal1.getBounds().contains(ballPosition.x, ballPosition.y)) {
             console.log('GOAL 1');
