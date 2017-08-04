@@ -9,6 +9,7 @@
 		"christian-kohler.path-intellisense",
 		"eg2.tslint",
 		"robertohuertasm.vscode-icons",
-		"eamodio.gitlens"
+		"eamodio.gitlens",
+		"CoenraadS.bracket-pair-colorizer"
 	]
 }
