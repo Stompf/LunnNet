@@ -1,15 +1,18 @@
 import * as React from 'react';
-import { Player, Team } from './player';
+import { Player } from './player';
 import { RouteComponentProps } from 'react-router-dom';
 import { KeyMapping } from './key-mapping';
 import * as Phaser from 'phaser-ce';
 import { Ball } from './ball';
+import { Team, TeamSide } from './team';
 
 class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     private game: Phaser.Game;
     private readonly canvasId = 'AirHockeyCanvas';
     private readonly TOP_OFFSET = 75;
 
+    private teamLeft: Team;
+    private teamRight: Team;
     private player1: Player;
     private player2: Player;
     private ball: Ball;
@@ -57,10 +60,13 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         this.game.physics.p2.world.gravity = [0, 0];
         this.game.physics.p2.restitution = 1;
 
+        this.teamLeft = new Team(TeamSide.Left);
+        this.teamRight = new Team(TeamSide.Right);
+
         this.drawStage();
 
-        this.player1 = new Player(this.game, KeyMapping.Player1Mapping, 0xFF0000, Team.Left);
-        this.player2 = new Player(this.game, KeyMapping.Player2Mapping, 0x0000FF, Team.Right);
+        this.player1 = new Player(this.game, KeyMapping.Player1Mapping, this.teamLeft);
+        this.player2 = new Player(this.game, KeyMapping.Player2Mapping, this.teamRight);
         this.player1.setPosition(new Phaser.Point(this.game.width / 4, this.TOP_OFFSET + this.totalAreaHeight() / 2));
         this.player2.setPosition(new Phaser.Point(this.game.width / 1.25 - this.player2.RADIUS, this.TOP_OFFSET + this.totalAreaHeight() / 2));
 
@@ -86,8 +92,10 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         const middleSprite = this.game.add.sprite(this.game.width / 2, this.TOP_OFFSET, middleLine.generateTexture());
         middleSprite.anchor.y = 0;
 
-        this.goal1 = this.drawGoal(Team.Left);
-        this.goal2 = this.drawGoal(Team.Right);
+        this.goal1 = this.drawGoal(this.teamLeft);
+        this.goal2 = this.drawGoal(this.teamRight);
+
+        this.game.add.text(this.game.width / 2, this.TOP_OFFSET / 2, this.teamLeft.Score + ' - ' + this.teamRight.Score);
     }
 
     private drawGoal(team: Team) {
@@ -97,7 +105,7 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
 
         let x = this.game.width / 10;
 
-        if (team === Team.Right) {
+        if (team.TeamSide === TeamSide.Right) {
             x = this.game.width - x;
         }
 
@@ -111,7 +119,7 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         backGraphics.beginFill(0xD3D3D3);
         backGraphics.drawRect(0, 0, goalNetSize, goalHeight + goalNetSize * 2);
         const offset = goalWidth / 2 + goalNetSize / 2;
-        const back = this.game.add.sprite(x - (team === Team.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2, backGraphics.generateTexture());
+        const back = this.game.add.sprite(x - (team.TeamSide === TeamSide.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2, backGraphics.generateTexture());
 
         this.game.physics.p2.enable(top);
         this.game.physics.p2.enable(bottom);
@@ -134,11 +142,10 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
 
         const ballPosition = this.ball.getPosition();
         if (this.goal1.getBounds().contains(ballPosition.x, ballPosition.y)) {
-            console.log('GOAL 1');
-
+            this.teamRight.addScore();
             this.game.paused = true;
         } else if (this.goal2.getBounds().contains(ballPosition.x, ballPosition.y)) {
-            console.log('GOAL 2');
+            this.teamLeft.addScore();
             this.game.paused = true;
         }
 

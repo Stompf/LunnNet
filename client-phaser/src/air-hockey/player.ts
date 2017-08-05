@@ -1,10 +1,6 @@
 import * as Phaser from 'phaser-ce';
 import { KeyMapping } from './key-mapping';
-
-export const enum Team {
-    Left,
-    Right
-}
+import { Team, TeamSide } from './team';
 
 export class Player {
     readonly RADIUS = 60;
@@ -12,16 +8,14 @@ export class Player {
 
     private sprite: Phaser.Sprite;
     private keyMapping: KeyMapping.Mapping;
-    private color: number;
     private team: Team;
 
-    constructor(game: Phaser.Game, keyMapping: KeyMapping.Mapping, color: number, team: Team) {
+    constructor(game: Phaser.Game, keyMapping: KeyMapping.Mapping, team: Team) {
         this.keyMapping = keyMapping;
-        this.color = color;
         this.team = team;
 
         const graphics = new Phaser.Graphics(game);
-        graphics.beginFill(color);
+        graphics.beginFill(team.Color);
         graphics.drawCircle(0, 0, this.RADIUS);
 
         const sprite = game.add.sprite(0, 0, graphics.generateTexture());
@@ -51,11 +45,11 @@ export class Player {
             input[1] -= this.SPEED;
         }
         if (game.input.keyboard.isDown(this.keyMapping.left)
-            && (this.team !== Team.Right || this.sprite.body.x > (game.width / 2 + this.RADIUS / 2))) {
+            && (this.team.TeamSide !== TeamSide.Right || this.sprite.body.x > (game.width / 2 + this.RADIUS / 2))) {
             input[0] -= this.SPEED;
         }
         if (game.input.keyboard.isDown(this.keyMapping.right)
-            && (this.team !== Team.Left || this.sprite.body.x < (game.width / 2 - this.RADIUS / 2))) {
+            && (this.team.TeamSide !== TeamSide.Left || this.sprite.body.x < (game.width / 2 - this.RADIUS / 2))) {
             input[0] += this.SPEED;
         }
 
