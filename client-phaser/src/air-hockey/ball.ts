@@ -29,9 +29,17 @@ export class Ball {
         this.constrainVelocity(this.sprite, this.MAX_VELOCITY);
     }
 
+    resetVelocity(velocityX?: number) {
+        this.sprite.body.data.velocity = [velocityX ? velocityX : 0, 0];
+    }
+
+    setDebug(debug: boolean) {
+        this.sprite.body.debug = debug;
+    }
+
     private constrainVelocity(sprite: Phaser.Sprite, maxVelocity: number) {
-        var body = sprite.body;
-        var angle, currVelocitySqr, vx, vy;
+        const body = sprite.body;
+        let angle, currVelocitySqr, vx, vy;
 
         vx = body.data.velocity[0];
         vy = body.data.velocity[1];

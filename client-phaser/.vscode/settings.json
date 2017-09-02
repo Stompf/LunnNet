@@ -52,5 +52,6 @@
         "razor",
         "vue",
         "liquid"
-    ]
+    ],
+    "emmet.showExpandedAbbreviation": "never"
 }

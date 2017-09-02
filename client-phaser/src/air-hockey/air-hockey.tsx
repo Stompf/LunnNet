@@ -10,6 +10,9 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     private game: Phaser.Game;
     private readonly canvasId = 'AirHockeyCanvas';
     private readonly TOP_OFFSET = 75;
+    private readonly SCORE_DELAY_MS = 2000;
+    private readonly BALL_INIT_VELOCITY = 10;
+    private readonly DEBUG_BODIES = true;
 
     private teamLeft: Team;
     private teamRight: Team;
@@ -19,6 +22,8 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
 
     private goal1: Phaser.Sprite;
     private goal2: Phaser.Sprite;
+
+    private _scoreText: Phaser.Text;
 
     constructor() {
         super();
@@ -67,10 +72,18 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
 
         this.player1 = new Player(this.game, KeyMapping.Player1Mapping, this.teamLeft);
         this.player2 = new Player(this.game, KeyMapping.Player2Mapping, this.teamRight);
+        this.ball = new Ball(this.game);
+
+        this.player1.setDebug(this.DEBUG_BODIES);
+        this.player2.setDebug(this.DEBUG_BODIES);
+        this.ball.setDebug(this.DEBUG_BODIES);
+
+        this.resetPositions();
+    }
+
+    private resetPositions() {
         this.player1.setPosition(new Phaser.Point(this.game.width / 4, this.TOP_OFFSET + this.totalAreaHeight() / 2));
         this.player2.setPosition(new Phaser.Point(this.game.width / 1.25 - this.player2.RADIUS, this.TOP_OFFSET + this.totalAreaHeight() / 2));
-
-        this.ball = new Ball(this.game);
         this.ball.setPosition(new Phaser.Point(this.game.width / 2, this.TOP_OFFSET + this.totalAreaHeight() / 2));
     }
 
@@ -82,9 +95,10 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         const topSprite = this.game.add.sprite(0, this.TOP_OFFSET, topLine.generateTexture());
         this.game.physics.p2.enable(topSprite);
 
-        topSprite.body.setRectangle(this.game.width, this.TOP_OFFSET, this.game.width / 2, -this.TOP_OFFSET / 2);
+        topSprite.body.setRectangle(this.game.width + 10, this.TOP_OFFSET, this.game.width / 2, -this.TOP_OFFSET / 2);
         topSprite.body.static = true;
         topSprite.anchor.x = 0;
+        topSprite.body.debug = this.DEBUG_BODIES;
 
         const middleLine = new Phaser.Graphics(this.game);
         middleLine.beginFill(0xD3D3D3);
@@ -95,13 +109,13 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         this.goal1 = this.drawGoal(this.teamLeft);
         this.goal2 = this.drawGoal(this.teamRight);
 
-        this.game.add.text(this.game.width / 2, this.TOP_OFFSET / 2, this.teamLeft.Score + ' - ' + this.teamRight.Score);
+        this._scoreText = this.game.add.text(this.game.width / 2, this.TOP_OFFSET / 2, this.teamLeft.Score + ' - ' + this.teamRight.Score);
     }
 
     private drawGoal(team: Team) {
         const goalWidth = 20;
         const goalHeight = 125;
-        const goalNetSize = 10;
+        const goalNetSize = 30;
 
         let x = this.game.width / 10;
 
@@ -129,6 +143,10 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
         bottom.body.static = true;
         back.body.static = true;
 
+        top.body.debug = this.DEBUG_BODIES;
+        bottom.body.debug = this.DEBUG_BODIES;
+        back.body.debug = this.DEBUG_BODIES;
+
         const graphics = new Phaser.Graphics(this.game);
         graphics.beginFill(0x000000);
         graphics.drawRect(0, 0, goalWidth, goalHeight);
@@ -142,15 +160,26 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
 
         const ballPosition = this.ball.getPosition();
         if (this.goal1.getBounds().contains(ballPosition.x, ballPosition.y)) {
-            this.teamRight.addScore();
-            this.game.paused = true;
+            this.score(this.teamRight);
         } else if (this.goal2.getBounds().contains(ballPosition.x, ballPosition.y)) {
-            this.teamLeft.addScore();
-            this.game.paused = true;
+            this.score(this.teamLeft);
         }
 
         this.player1.onUpdate(this.game);
         this.player2.onUpdate(this.game);
+    }
+
+    private score(team: Team) {
+        this.ball.resetVelocity();
+        team.addScore();
+        this._scoreText.setText(this.teamLeft.Score + ' - ' + this.teamRight.Score, true);
+        this.game.paused = true;
+
+        setTimeout(() => {
+            this.resetPositions();
+            this.ball.resetVelocity(team === this.teamLeft ? -(this.BALL_INIT_VELOCITY) : this.BALL_INIT_VELOCITY);
+            this.game.paused = false;
+        }, this.SCORE_DELAY_MS);
     }
 }
 

@@ -21,7 +21,12 @@ export class Player {
         const sprite = game.add.sprite(0, 0, graphics.generateTexture());
         game.physics.p2.enable(sprite);
         sprite.body.setCircle(this.RADIUS / 2);
+
         this.sprite = sprite;
+    }
+
+    setDebug(debug: boolean) {
+        this.sprite.body.debug = debug;
     }
 
     setPosition(position: Phaser.Point) {
