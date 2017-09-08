@@ -16,7 +16,7 @@ export class Ball {
         this.sprite.body.mass = 0.1;
     }
 
-    setPosition(position: Phaser.Point) {
+    setPosition(position: WebKitPoint) {
         this.sprite.body.x = position.x;
         this.sprite.body.y = position.y;
     }

@@ -7,10 +7,10 @@ export class Player {
     private SPEED = 600;
 
     private sprite: Phaser.Sprite;
-    private keyMapping: KeyMapping.Mapping;
+    private keyMapping: KeyMapping.Mapping | null | undefined;
     private team: Team;
 
-    constructor(game: Phaser.Game, keyMapping: KeyMapping.Mapping, team: Team) {
+    constructor(game: Phaser.Game, team: Team, keyMapping?: KeyMapping.Mapping) {
         this.keyMapping = keyMapping;
         this.team = team;
 
@@ -29,7 +29,7 @@ export class Player {
         this.sprite.body.debug = debug;
     }
 
-    setPosition(position: Phaser.Point) {
+    setPosition(position: WebKitPoint) {
         this.sprite.body.x = position.x;
         this.sprite.body.y = position.y;
     }
@@ -39,6 +39,10 @@ export class Player {
     }
 
     onUpdate(game: Phaser.Game) {
+        if (this.keyMapping == null) {
+            return;
+        }
+
         // this.sprite.body.setZeroVelocity();
 
         var input = [0, 0];
@@ -60,5 +64,12 @@ export class Player {
 
         this.sprite.body.moveUp(input[1]);
         this.sprite.body.moveRight(input[0]);
+    }
+}
+
+export class NetworkPlayer extends Player {
+
+    constructor(game: Phaser.Game, team: Team) {
+        super(game, team);
     }
 }

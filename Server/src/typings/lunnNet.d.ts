@@ -15,5 +15,11 @@ declare namespace LunnNet {
         interface GameFound { }
 
         interface ClientReady { }
+
+        interface ServerTick {
+            tick: number;
+            playerPos: number[];
+            ballPos: number[];
+        }
     }
 }
