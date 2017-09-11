@@ -8,7 +8,7 @@
     "start": "npm run watch",
     "watch-ts": "tsc -w",
     "serve": "node dist/server.js",
-    "watch": "concurrently \"npm run watch-ts\" \"nodemon --debug dist/server.js\""
+    "watch": "concurrently \"npm run watch-ts\" \"nodemon --inspect dist/server.js\""
   },
   "dependencies": {
     "express": "^4.15.4",

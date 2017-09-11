@@ -210,6 +210,7 @@ export class NetworkGame extends BaseGame {
     }
 
     private initNewNetworkGame() {
+        this.game.world.removeAll();
         this.currentTick = 0;
         this.teamLeft = new Team(TeamSide.Left);
         this.teamRight = new Team(TeamSide.Right);
