@@ -11,20 +11,20 @@
     "watch": "concurrently \"npm run watch-ts\" \"nodemon --inspect dist/server.js\""
   },
   "dependencies": {
-    "express": "^4.15.5",
+    "express": "^4.16.2",
     "lodash": "^4.17.4",
     "p2": "0.7.1",
-    "socket.io": "^2.0.3",
+    "socket.io": "^2.0.4",
     "typescript-collections": "^1.2.5"
   },
   "devDependencies": {
     "@types/express": "^4.0.37",
-    "@types/lodash": "^4.14.76",
+    "@types/lodash": "^4.14.78",
     "@types/p2": "0.7.30",
-    "@types/socket.io": "^1.4.30",
+    "@types/socket.io": "^1.4.31",
     "concurrently": "^3.5.0",
     "nodemon": "^1.12.1",
-    "tslint": "^5.7.0",
-    "typescript": "^2.5.2"
+    "tslint": "^5.8.0",
+    "typescript": "^2.5.3"
   }
 }
