@@ -1,30 +1,30 @@
 {
-  "name": "server",
-  "version": "0.0.1",
-  "description": "LunnNet Server side",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "start": "npm run watch-ts",
-    "watch-ts": "tsc -w",
-    "serve": "node dist/server.js",
-    "debug-serve": "nodemon --inspect dist/server.js"
-  },
-  "dependencies": {
-    "express": "^4.16.2",
-    "lodash": "^4.17.4",
-    "p2": "^0.7.1",
-    "socket.io": "^2.0.4",
-    "typescript-collections": "^1.2.5"
-  },
-  "devDependencies": {
-    "@types/express": "^4.0.39",
-    "@types/lodash": "^4.14.80",
-    "@types/p2": "0.7.30",
-    "@types/socket.io": "^1.4.31",
-    "concurrently": "^3.5.0",
-    "nodemon": "^1.12.1",
-    "tslint": "^5.8.0",
-    "typescript": "^2.6.1"
-  }
+    "name": "server",
+    "version": "0.0.1",
+    "description": "LunnNet Server side",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "start": "npm run watch-ts",
+        "watch-ts": "tsc -w",
+        "serve": "node dist/server.js",
+        "debug-serve": "nodemon --inspect dist/server.js"
+    },
+    "dependencies": {
+        "express": "^4.16.2",
+        "lodash": "^4.17.4",
+        "p2": "^0.7.1",
+        "socket.io": "^2.0.4",
+        "typescript-collections": "^1.2.5"
+    },
+    "devDependencies": {
+        "@types/express": "^4.0.39",
+        "@types/lodash": "^4.14.80",
+        "@types/p2": "0.7.30",
+        "@types/socket.io": "^1.4.31",
+        "concurrently": "^3.5.0",
+        "nodemon": "^1.12.1",
+        "tslint": "^5.8.0",
+        "typescript": "^2.6.1"
+    }
 }

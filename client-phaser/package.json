@@ -1,38 +1,38 @@
 {
-  "name": "client-phaser",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "bootstrap": "^3.3.7",
-    "expose-loader": "^0.7.3",
-    "jquery": "^3.2.1",
-    "lodash": "^4.17.4",
-    "p2": "^0.7.1",
-    "phaser-ce": "^2.9.1",
-    "pixi.js": "^4.6.0",
-    "react": "^16.0.0",
-    "react-bootstrap": "^0.31.5",
-    "react-dom": "^16.0.0",
-    "react-router-dom": "^4.2.2",
-    "react-scripts-ts": "^2.8.0",
-    "socket.io-client": "^2.0.4"
-  },
-  "devDependencies": {
-    "@types/jest": "^21.1.5",
-    "@types/jquery": "^3.2.16",
-    "@types/lodash": "^4.14.80",
-    "@types/node": "^8.0.47",
-    "@types/react": "^16.0.19",
-    "@types/react-dom": "^16.0.2",
-    "@types/react-router-dom": "^4.2.0",
-    "@types/socket.io-client": "^1.4.31",
-    "tslint": "^5.8.0",
-    "typescript": "^2.6.1"
-  },
-  "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
-  }
+    "name": "client-phaser",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "bootstrap": "^3.3.7",
+        "expose-loader": "^0.7.3",
+        "jquery": "^3.2.1",
+        "lodash": "^4.17.4",
+        "p2": "^0.7.1",
+        "phaser-ce": "^2.9.1",
+        "pixi.js": "^4.6.0",
+        "react": "^16.0.0",
+        "react-bootstrap": "^0.31.5",
+        "react-dom": "^16.0.0",
+        "react-router-dom": "^4.2.2",
+        "react-scripts-ts": "^2.8.0",
+        "socket.io-client": "^2.0.4"
+    },
+    "devDependencies": {
+        "@types/jest": "^21.1.5",
+        "@types/jquery": "^3.2.16",
+        "@types/lodash": "^4.14.80",
+        "@types/node": "^8.0.47",
+        "@types/react": "^16.0.19",
+        "@types/react-dom": "^16.0.2",
+        "@types/react-router-dom": "^4.2.0",
+        "@types/socket.io-client": "^1.4.31",
+        "tslint": "^5.8.0",
+        "typescript": "^2.6.1"
+    },
+    "scripts": {
+        "start": "react-scripts-ts start",
+        "build": "react-scripts-ts build",
+        "test": "react-scripts-ts test --env=jsdom",
+        "eject": "react-scripts-ts eject"
+    }
 }
