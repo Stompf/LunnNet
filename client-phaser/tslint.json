@@ -63,6 +63,8 @@
             "single",
             "jsx-double"
         ],
+        "encoding": true,
+        "no-var-keyword": true,
         "radix": true,
         "semicolon": [
             true,
