@@ -45,7 +45,7 @@ export class Player {
 
         // this.sprite.body.setZeroVelocity();
 
-        var input = [0, 0];
+        let input = [0, 0];
 
         if (game.input.keyboard.isDown(this.keyMapping.up)) {
             input[1] += this.SPEED;
