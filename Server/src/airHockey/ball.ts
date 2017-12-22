@@ -25,7 +25,10 @@ export class Ball extends NetworkObject {
     }
 
     private constrainVelocity(body: p2.Body, maxVelocity: number) {
-        let angle, currVelocitySqr, vx, vy;
+        let angle = 0;
+        let currVelocitySqr = 0;
+        let vx = 0;
+        let vy = 0;
 
         vx = body.velocity[0];
         vy = body.velocity[1];

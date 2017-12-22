@@ -22,4 +22,12 @@ declare namespace LunnNet {
             ballPos: number[];
         }
     }
+
+    namespace Utils {
+        interface Rectangle {
+            width: number;
+            height: number;
+            position: number[];
+        }
+    }
 }

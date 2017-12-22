@@ -8,9 +8,16 @@ export class AirHockey {
     private readonly BALL_INIT_VELOCITY = 10;
     private readonly TOP_OFFSET = 75;
 
-    private playerOne: Player;
-    private playerTwo: Player;
+    private player1: Player;
+    private player2: Player;
+    private teamLeft: Team;
+    private teamRight: Team;
+
     private ball: Ball;
+    private goal1: LunnNet.Utils.Rectangle;
+    private goal2: LunnNet.Utils.Rectangle;
+    private tick = 0;
+    private paused = false;
 
     private world: p2.World;
     private canvas = {
@@ -23,23 +30,27 @@ export class AirHockey {
             gravity: [0, 0]
         });
 
-        this.playerOne = new Player(this.world, playerOneSocket, new Team(TeamSide.Left), this.canvas.width);
-        this.playerTwo = new Player(this.world, playerTwoSocket, new Team(TeamSide.Right), this.canvas.width);
+        this.teamLeft = new Team(TeamSide.Left);
+        this.teamRight = new Team(TeamSide.Right);
+
+        this.player1 = new Player(this.world, playerOneSocket, this.teamLeft, this.canvas.width);
+        this.player2 = new Player(this.world, playerTwoSocket, this.teamRight, this.canvas.width);
 
         this.ball = new Ball(this.world);
 
-        this.initSockets(this.playerOne);
-        this.initSockets(this.playerTwo);
+        this.initSockets(this.player1);
+        this.initSockets(this.player2);
     }
 
     sendStartGame() {
-        console.log('AirHockey, starting game with players: ' + this.playerOne.id + ' : ' + this.playerTwo.id);
-        this.playerOne.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
-        this.playerTwo.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
+        console.log('AirHockey, starting game with players: ' + this.player1.id + ' : ' + this.player2.id);
+        this.player1.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
+        this.player2.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
     }
 
     private resetWorld() {
         this.world.clear();
+        this.setStage();
     }
 
     private initSockets(player: Player) {
@@ -47,26 +58,59 @@ export class AirHockey {
             console.log('AirHockey - player is ready: ' + player.id);
             player.isReady = true;
 
-            if (this.playerOne.isReady && this.playerTwo.isReady) {
+            if (this.player1.isReady && this.player2.isReady) {
                 console.log('AirHockey - both players ready! Starting game!');
                 this.startNewGame();
             }
         });
     }
 
+    private update = () => {
+        if (this.paused) {
+            return;
+        }
+
+        this.tick++;
+
+        this.ball.onUpdate();
+
+        const ballPosition = this.ball.getPosition();
+        if (this.pointInsideRect(ballPosition.x, ballPosition.y, this.goal1)) {
+            this.score(this.teamRight);
+        } else if (this.pointInsideRect(ballPosition.x, ballPosition.y, this.goal2)) {
+            this.score(this.teamLeft);
+        }
+
+        this.player1.onUpdate(this.game);
+        this.player2.onUpdate(this.game);
+    };
+
+    private score(team: Team) {
+        this.ball.resetVelocity();
+        team.addScore();
+        this.paused = true;
+
+        setTimeout(() => {
+            this.setStartPositions();
+            this.ball.resetVelocity(team === this.teamLeft ? -(this.BALL_INIT_VELOCITY) : this.BALL_INIT_VELOCITY);
+            this.paused = false;
+        }, this.SCORE_DELAY_MS);
+    }
+
     private startNewGame() {
+        this.tick = 0;
         this.resetWorld();
         this.setStartPositions();
     }
 
     private setStartPositions() {
-        this.playerOne.setPosition({
+        this.player1.setPosition({
             x: this.canvas.width / 4,
             y: this.TOP_OFFSET + this.totalAreaHeight() / 2
         });
 
-        this.playerTwo.setPosition({
-            x: this.canvas.width / 1.25 - this.playerTwo.DIAMETER,
+        this.player2.setPosition({
+            x: this.canvas.width / 1.25 - this.player2.DIAMETER,
             y: this.TOP_OFFSET + this.totalAreaHeight() / 2
         });
 
@@ -80,7 +124,7 @@ export class AirHockey {
         return this.canvas.height - this.TOP_OFFSET;
     }
 
-    protected drawStage() {
+    private setStage() {
         const topBody = new p2.Body({
             position: [0, this.TOP_OFFSET]
         });
@@ -97,8 +141,13 @@ export class AirHockey {
         topBody.addShape(topBodyShape);
         this.world.addBody(topBody);
 
-        this.goal1 = this.drawGoal(this.playerOne.team);
-        this.goal2 = this.drawGoal(this.playerTwo.team);
+        this.goal1 = this.drawGoal(this.player1.team);
+        this.goal2 = this.drawGoal(this.player2.team);
+    }
+
+    private pointInsideRect(x: number, y: number, rect: LunnNet.Utils.Rectangle) {
+        return rect.position[0] <= x && x <= rect.position[0] + rect.width &&
+            rect.position[1] <= y && y <= rect.position[1] + rect.height;
     }
 
     private drawGoal(team: Team) {
@@ -112,27 +161,33 @@ export class AirHockey {
             x = this.canvas.width - x;
         }
 
-        const topAndBottomGraphics = new Phaser.Graphics(this.game);
-        topAndBottomGraphics.beginFill(0xD3D3D3);
-        topAndBottomGraphics.drawRect(0, 0, goalWidth, goalNetSize);
-        const top = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2 - goalHeight / 2 - goalNetSize / 2, topAndBottomGraphics.generateTexture());
-        const bottom = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2 + goalHeight / 2 + goalNetSize / 2, topAndBottomGraphics.generateTexture());
+        const top = new p2.Box({
+            width: goalWidth,
+            height: goalNetSize
+        });
+        top.position = [x, this.TOP_OFFSET + this.totalAreaHeight() / 2 - goalHeight / 2 - goalNetSize / 2];
 
-        const backGraphics = new Phaser.Graphics(this.game);
-        backGraphics.beginFill(0xD3D3D3);
-        backGraphics.drawRect(0, 0, goalNetSize, goalHeight + goalNetSize * 2);
+        const bottom = new p2.Box({
+            width: goalWidth,
+            height: goalNetSize
+        });
+        bottom.position = [x, this.TOP_OFFSET + this.totalAreaHeight() / 2 + goalHeight / 2 + goalNetSize / 2];
+
+        const back = new p2.Box({
+            width: goalNetSize,
+            height: goalNetSize + goalNetSize * 2
+        });
         const offset = goalWidth / 2 + goalNetSize / 2;
-        const back = this.game.add.sprite(x - (team.TeamSide === TeamSide.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2, backGraphics.generateTexture());
+        back.position = [x - (team.TeamSide === TeamSide.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2]
 
-        top.body.static = true;
-        bottom.body.static = true;
-        back.body.static = true;
+        top.type = p2.Body.STATIC;
+        back.type = p2.Body.STATIC;
+        bottom.type = p2.Body.STATIC;
 
-        const graphics = new Phaser.Graphics(this.game);
-        graphics.beginFill(0x000000);
-        graphics.drawRect(0, 0, goalWidth, goalHeight);
-
-        const sprite = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2, graphics.generateTexture());
-        return sprite;
+        return <LunnNet.Utils.Rectangle>{
+            width: goalWidth,
+            height: goalHeight,
+            position: [x, this.TOP_OFFSET + this.totalAreaHeight() / 2]
+        }
     }
 }

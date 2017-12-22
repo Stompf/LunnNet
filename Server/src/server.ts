@@ -14,10 +14,6 @@ const io = socketIO();
 io.serveClient(false);
 io.attach(httpServer);
 
-(window as any).PIXI = require('phaser-ce/build/custom/pixi');
-(window as any).p2 = require('phaser-ce/build/custom/p2');
-(window as any).Phaser = require('phaser-ce/build/custom/phaser-split');
-
 io.on('connection', socket => {
     console.log('a user connected: ' + socket.id);
     currentConnections.setValue(socket.id, socket);
