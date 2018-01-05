@@ -8,10 +8,6 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     private readonly CANVAS_ID = 'AirHockeyCanvas';
     private readonly NETWORK_GAME = true;
 
-    constructor() {
-        super();
-    }
-
     render() {
         return (
             <div>
