@@ -81,8 +81,8 @@ export class AirHockey {
             this.score(this.teamLeft);
         }
 
-        this.player1.onUpdate(this.game);
-        this.player2.onUpdate(this.game);
+        this.player1.onUpdate();
+        this.player2.onUpdate();
     };
 
     private score(team: Team) {

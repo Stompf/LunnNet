@@ -5,6 +5,7 @@ import * as ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import { HashRouter, Switch, Link, Route } from 'react-router-dom';
+import Asteroids from './asteroids/Asteroids';
 
 import AirHockey from './air-hockey/air-hockey';
 
@@ -15,7 +16,8 @@ import AirHockey from './air-hockey/air-hockey';
 const Header = () => (
   <header>
     <nav>
-      <span><Link to="/">AirHockey</Link></span>
+      <span><Link to="/">AirHockey</Link></span> |
+      <span><Link to="/asteroids"> Asteroids</Link></span>
     </nav>
   </header>
 );
@@ -23,7 +25,8 @@ const Header = () => (
 const Main = () => (
   <main>
     <Switch>
-      <Route exact={true} path="/" component={AirHockey as any} />
+      <Route exact={true} path="/" component={AirHockey} />
+      <Route path="/asteroids" component={Asteroids} />
     </Switch>
   </main>
 );

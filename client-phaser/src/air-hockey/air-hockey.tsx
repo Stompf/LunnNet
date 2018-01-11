@@ -6,7 +6,7 @@ import { BaseGame, NetworkGame } from './game';
 class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     private _currentGame: BaseGame;
     private readonly CANVAS_ID = 'AirHockeyCanvas';
-    private readonly NETWORK_GAME = true;
+    private readonly NETWORK_GAME = false;
 
     render() {
         return (
@@ -18,7 +18,9 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     }
 
     componentDidMount() {
-        this._currentGame = this.NETWORK_GAME ? new NetworkGame(this.CANVAS_ID) : new BaseGame(this.CANVAS_ID);
+        this._currentGame = this.NETWORK_GAME ?
+            new NetworkGame(this.CANVAS_ID) :
+            new BaseGame(this.CANVAS_ID);
     }
 
     componentWillUnmount() {
