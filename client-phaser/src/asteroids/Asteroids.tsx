@@ -18,7 +18,7 @@ class Asteroids extends React.Component<RouteComponentProps<any>, {}> {
 
     componentWillUnmount() {
         if (this.game) {
-            this.game.onDestroy();
+            this.game.destroy();
         }
     }
 }

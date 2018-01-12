@@ -6,65 +6,78 @@ export class Asteroid {
     static MaxAsteroidSpeed = 2;
     static NumAsteroidLevels = 4;
     static NumAsteroidVerticals = 10;
-    static AsteroidRadius = 0.5;
+    static AsteroidRadius = 50;
     static InitSpace = Asteroid.AsteroidRadius * 2;
     static MaxLevel = 3;
     static Splits = 4;
 
-    verticals: number[][] = [];
     level: number;
-    graphics: Phaser.Graphics;
+    sprite: Phaser.Sprite;
 
     private fillColor = 0xbfbfbf;
     private strokeColor = 0x6d6d6d;
     private strokeWidth = 0.05;
 
-    constructor(game: Phaser.Game, position: number[], velocity: number[], angularVelocity: number, level: number) {
+    constructor(
+        game: Phaser.Game,
+        position: WebKitPoint,
+        velocity: WebKitPoint,
+        angularVelocity: number,
+        level: number) {
+
         this.level = level;
 
+        const verticals = this.addAsteroidVerticals();
+
         const graphics = new Phaser.Graphics(game);
-        game.physics.p2.enable(graphics);
+        this.createBodyGraphics(graphics, verticals);
 
-        graphics.body.addPolygon({}, this.addAsteroidVerticals());
-        this.createBodyGraphics(graphics);
+        const sprite = game.add.sprite(position.x, position.y, graphics.generateTexture());
+        game.physics.p2.enable(sprite);
+        sprite.body.addPolygon({}, verticals);
 
-        graphics.position.set(position[0], position[1]);
-        graphics.previousPosition = graphics.position;
+        sprite.body.setCollisionGroup(Utils.MASKS.ASTEROID);
+        sprite.body.collides([Utils.MASKS.ASTEROID, Utils.MASKS.BULLET, Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP]);
+        sprite.body.mass = 10 / (level + 1);
+        sprite.body.velocity.x = velocity.x;
+        sprite.body.velocity.y = velocity.y;
+        sprite.body.angularVelocity = angularVelocity;
+        sprite.body.damping = 0;
+        sprite.body.angularDamping = 0;
 
-        graphics.body.setCollisionGroup(Utils.MASKS.ASTEROID);
-        graphics.body.collides([Utils.MASKS.ASTEROID, Utils.MASKS.BULLET, Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP]);
-        graphics.body.mass = 10 / (level + 1);
-        graphics.body.velocity.x = velocity[0];
-        graphics.body.velocity.y = velocity[1];
-        graphics.body.angularVelocity = angularVelocity;
-        graphics.body.damping = 0;
-        graphics.body.angularDamping = 0;
+        sprite.body.createGroupCallback(Utils.MASKS.BULLET, (thisBody: Phaser.Physics.P2.Body, impactedBody: Phaser.Physics.P2.Body) => {
+            // this.removeAsteroid(collidedAsteroid);
+            // this.player.points += 10;
+            // this.updatePoints();
+
+            // // Remove bullet
+            // this.game.stage.removeChild(bullet.graphics);
+
+            // this.bullets.splice(this.bullets.indexOf(bullet), 1);
+
+            // if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
+            //      this.spawnRandomPowerUp(collidedAsteroid.graphics.position);
+            // }
+            this.explode();
+            this.sprite.destroy();
+
+        }, this);
+
+        this.sprite = sprite;
     }
 
-    explode() {
-        // Add new sub-asteroids
-        const subAsteroids: Asteroid[] = [];
-
+    explode = () => {
         if (this.level < Asteroid.MaxLevel) {
             const angleDisturb = Math.PI / 2 * (Math.random() - 0.5);
             for (let i = 0; i < this.level + 2; i++) {
                 const angle = Math.PI / 2 * i + angleDisturb;
-                const position = this.getSubAstroidPosition(this.graphics.body.data.interpolatedPosition, this.getRadius(), i, Asteroid.Splits);
-                const subAsteroid = this.createSubAsteroid(position[0], position[1], angle);
-                subAsteroids.push(subAsteroid);
+                const position = this.getSubAstroidPosition(this.sprite.body.data.interpolatedPosition, this.getRadius(), i, Asteroid.Splits);
+                this.createSubAsteroid(position[0], position[1], angle);
             }
         }
-        return subAsteroids;
     }
 
-    // update() {
-    //     this.graphics.x = this.body.interpolatedPosition[0];
-    //     this.graphics.y = this.body.interpolatedPosition[1];
-    //     this.graphics.rotation = this.body.interpolatedAngle;
-    // }
-
-    private createBodyGraphics(graphics: Phaser.Graphics) {
-        const concavePath = (graphics.body.data as any).concavePath;
+    private createBodyGraphics(graphics: Phaser.Graphics, concavePath: number[][]) {
         graphics.lineStyle(this.strokeWidth, this.strokeColor);
         graphics.beginFill(this.fillColor);
         for (let j = 0; j < concavePath.length; j++) {
@@ -83,24 +96,24 @@ export class Asteroid {
         }
     }
 
-    private getSubAstroidPosition(bodyPosition: number[], radius: number, index: number, totalSplits: number) {
+    private getSubAstroidPosition = (bodyPosition: number[], radius: number, index: number, totalSplits: number) => {
         if (totalSplits === 1) {
             return bodyPosition.splice(0);
         }
-        return [this.graphics.position[0] + (radius / 1.25) * ((index <= totalSplits / 2) ? 1 : -1),
-        this.graphics.position[1] + (radius / 1.25) * (index % 2 === 0 ? 1 : -1)];
+        return [this.sprite.body.x + (radius / 1.25) * ((index <= totalSplits / 2) ? 1 : -1),
+        this.sprite.body.y + (radius / 1.25) * (index % 2 === 0 ? 1 : -1)];
     }
 
-    private createSubAsteroid(x: number, y: number, angle: number) {
+    private createSubAsteroid = (x: number, y: number, angle: number) => {
         const r = this.getRadius() / 2;
-        const position = [
-            x + r * Math.cos(angle),
-            y + r * Math.sin(angle)
-        ];
+        const position = {
+            x: x + r * Math.cos(angle),
+            y: y + r * Math.sin(angle)
+        };
 
-        const velocity = [Math.random() - 0.5, Math.random() - 0.5];
+        const velocity = { x: Math.random() - 0.5, y: Math.random() - 0.5 };
 
-        const subAsteroid = new Asteroid(this.graphics.game, position, velocity, this.graphics.body.angularVelocity, this.level + 1);
+        const subAsteroid = new Asteroid(this.sprite.game, position, velocity, this.sprite.body.angularVelocity, this.level + 1);
         return subAsteroid;
     }
 

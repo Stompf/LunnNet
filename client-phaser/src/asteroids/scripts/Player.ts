@@ -15,14 +15,12 @@ export class Player {
     constructor(game: Phaser.Game) {
         this.visible = true;
 
-        const graphics = new Phaser.Graphics(game);
-        graphics.beginFill(0xFF0000);
-        graphics.drawRect(0, 0, 10, 10);
-
-        const sprite = game.add.sprite(game.world.centerX, game.world.centerY, graphics.generateTexture());
+        const sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
         game.physics.p2.enable(sprite);
+        sprite.width = 40;
+        sprite.height = 30;
         sprite.body.mass = 1;
         sprite.body.damping = 0;
         sprite.body.angularDamping = 0;
@@ -32,11 +30,4 @@ export class Player {
 
         this.sprite = sprite;
     }
-
-    // update() {
-    //     this.sprite.x = this.body.interpolatedPosition[0];
-    //     this.sprite.y = this.body.interpolatedPosition[1];
-    //     this.sprite.rotation = this.body.interpolatedAngle;
-    //     this.sprite.visible = this.visible;
-    // }
 }
