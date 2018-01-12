@@ -14,7 +14,12 @@ export class Player {
 
     constructor(game: Phaser.Game) {
         this.visible = true;
-        const sprite = game.add.sprite(0, 0, 'player');
+
+        const graphics = new Phaser.Graphics(game);
+        graphics.beginFill(0xFF0000);
+        graphics.drawRect(0, 0, 10, 10);
+
+        const sprite = game.add.sprite(game.world.centerX, game.world.centerY, graphics.generateTexture());
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
         game.physics.p2.enable(sprite);

@@ -33,7 +33,7 @@ export class AsteroidsGame {
 
     private gameOverContainer: Phaser.Group;
 
-    private container: Phaser.Group;
+    // private container: Phaser.Group;
     private readonly powerUpShieldPercent = 1;
     private readonly maxPowerUpsOnScreen = 2;
     private pointsText: Phaser.Text;
@@ -91,7 +91,7 @@ export class AsteroidsGame {
     protected initPixi() {
         PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
 
-        this.game.stage.backgroundColor = 0x000000;
+        this.game.stage.backgroundColor = 0xFFFFFF;
         this.game.renderer.view.style.border = '1px solid black';
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.world.gravity = [0, 0];
@@ -99,89 +99,81 @@ export class AsteroidsGame {
         this.game.physics.p2.restitution = 1;
     }
 
-    // private setCanvasSize() {
-    //     let height = $('body').height();
-    //     let width = $('body').width();
+    private setCanvasSize() {
+        let { height, width } = this.game.canvas.getBoundingClientRect();
 
-    //     height = height ? height : 0;
-    //     width = width ? width : 0;
+        height = height ? height : 0;
+        width = width ? width : 0;
 
-    //     height -= 25;
+        height -= 25;
 
-    //     if (height < 30) {
-    //         height = 30;
-    //     }
-    //     if (width < 30) {
-    //         width = 30;
-    //     }
+        if (height < 30) {
+            height = 30;
+        }
+        if (width < 30) {
+            width = 30;
+        }
 
-    //     this.app.renderer.resize(width, height);
+        this.game.renderer.resize(width, height);
 
-    //     this.app.stage.position.x = this.app.renderer.width / 2; // center at origin
-    //     this.app.stage.position.y = this.app.renderer.height / 2;
+        let zoom = this.game.renderer.height / this.spaceHeight;
+        if (this.game.renderer.width / this.spaceWidth < zoom) {
+            zoom = this.game.renderer.width / this.spaceWidth;
+        }
 
-    //     let zoom = this.app.renderer.height / this.spaceHeight;
-    //     if (this.app.renderer.width / this.spaceWidth < zoom) {
-    //         zoom = this.app.renderer.width / this.spaceWidth;
-    //     }
+        this.game.stage.scale.x = zoom;
+        this.game.stage.scale.y = -zoom;
 
-    //     this.app.stage.scale.x = zoom;
-    //     this.app.stage.scale.y = -zoom;
+        // this.background.scale.x = 1 / zoom;
+        // this.background.scale.y = 1 / -zoom;
+        // this.background.width = width;
+        // this.background.height = height;
 
-    //     this.background.scale.x = 1 / zoom;
-    //     this.background.scale.y = 1 / -zoom;
-    //     this.background.width = width;
-    //     this.background.height = height;
+        if (this.livesText != null) {
+            this.livesText.scale.x = 1 / this.game.stage.scale.x;
+            this.livesText.scale.y = 1 / this.game.stage.scale.y;
+        }
 
-    //     if (this.livesText != null) {
-    //         this.livesText.scale.x = 1 / this.app.stage.scale.x;
-    //         this.livesText.scale.y = 1 / this.app.stage.scale.y;
-    //     }
+        if (this.pointsText != null) {
+            this.pointsText.scale.x = 1 / this.game.stage.scale.x;
+            this.pointsText.scale.y = 1 / this.game.stage.scale.y;
+            this.pointsText.y = this.livesText.y - this.livesText.height;
+        }
 
-    //     if (this.pointsText != null) {
-    //         this.pointsText.scale.x = 1 / this.app.stage.scale.x;
-    //         this.pointsText.scale.y = 1 / this.app.stage.scale.y;
-    //         this.pointsText.y = this.livesText.y - this.livesText.height;
-    //     }
+        // if (this.player == null) {
+        const playerWidth = this.game.renderer.width / 30;
+        this.player.sprite.width = playerWidth / zoom;
+        this.player.sprite.height = ((playerWidth / 1.5) / -zoom);
 
-    //     if (this.player == null) {
-    //         const playerWidth = this.app.renderer.width / 30;
-    //         this.playerSprite.width = playerWidth / zoom;
-    //         this.playerSprite.height = ((playerWidth / 1.5) / -zoom);
+        // const powerUpWidth = this.game.renderer.width / 45;
+        // Sprites.PowerUps.Shield.width = powerUpWidth / zoom;
+        // Sprites.PowerUps.Shield.height = powerUpWidth / -zoom;
+        // Sprites.PowerUps.ShootSpeed.width = powerUpWidth / zoom;
+        // Sprites.PowerUps.ShootSpeed.height = powerUpWidth / -zoom;
 
-    //         const powerUpWidth = this.app.renderer.width / 45;
-    //         Sprites.PowerUps.Shield.width = powerUpWidth / zoom;
-    //         Sprites.PowerUps.Shield.height = powerUpWidth / -zoom;
-    //         Sprites.PowerUps.ShootSpeed.width = powerUpWidth / zoom;
-    //         Sprites.PowerUps.ShootSpeed.height = powerUpWidth / -zoom;
+        const leftBound = new Phaser.Graphics(this.game);
+        leftBound.lineStyle(1 / zoom, 0x000000);
+        leftBound.moveTo(-this.spaceWidth / 2, -this.spaceHeight / 2);
+        leftBound.lineTo(-this.spaceWidth / 2, this.spaceHeight / 2);
 
-    //         const leftBound = new PIXI.Graphics();
-    //         leftBound.lineStyle(1 / zoom, 0xFFFFFF);
-    //         leftBound.moveTo(-this.spaceWidth / 2, -this.spaceHeight / 2);
-    //         leftBound.lineTo(-this.spaceWidth / 2, this.spaceHeight / 2);
-    //         this.container.addChild(leftBound);
+        const rightBound = new Phaser.Graphics(this.game);
+        rightBound.lineStyle(1 / zoom, 0x000000);
+        rightBound.moveTo(this.spaceWidth / 2, -this.spaceHeight / 2);
+        rightBound.lineTo(this.spaceWidth / 2, this.spaceHeight / 2);
 
-    //         const rightBound = new PIXI.Graphics();
-    //         rightBound.lineStyle(1 / zoom, 0xFFFFFF);
-    //         rightBound.moveTo(this.spaceWidth / 2, -this.spaceHeight / 2);
-    //         rightBound.lineTo(this.spaceWidth / 2, this.spaceHeight / 2);
-    //         this.container.addChild(rightBound);
+        const topBound = new Phaser.Graphics(this.game);
+        topBound.lineStyle(1 / zoom, 0x000000);
+        topBound.moveTo(-this.spaceWidth / 2, -this.spaceHeight / 2);
+        topBound.lineTo(this.spaceWidth / 2, -this.spaceHeight / 2);
 
-    //         const topBound = new PIXI.Graphics();
-    //         topBound.lineStyle(1 / zoom, 0xFFFFFF);
-    //         topBound.moveTo(-this.spaceWidth / 2, -this.spaceHeight / 2);
-    //         topBound.lineTo(this.spaceWidth / 2, -this.spaceHeight / 2);
-    //         this.container.addChild(topBound);
-
-    //         const bottomBound = new PIXI.Graphics();
-    //         bottomBound.lineStyle(1 / zoom, 0xFFFFFF);
-    //         bottomBound.moveTo(this.spaceWidth / 2, this.spaceHeight / 2);
-    //         bottomBound.lineTo(-this.spaceWidth / 2, this.spaceHeight / 2);
-    //         this.container.addChild(bottomBound);
-    //     } else {
-    //         this.setGameOverStage();
-    //     }
-    // }
+        const bottomBound = new Phaser.Graphics(this.game);
+        bottomBound.lineStyle(1 / zoom, 0x000000);
+        bottomBound.moveTo(this.spaceWidth / 2, this.spaceHeight / 2);
+        bottomBound.lineTo(-this.spaceWidth / 2, this.spaceHeight / 2);
+        // } else {
+        //     this.setGameOverStage();
+        // }
+    }
 
     private initAsteroids() {
         this.asteroids = [];
@@ -189,12 +181,13 @@ export class AsteroidsGame {
         this.powerUps = [];
 
         this.game.stage.removeChildren();
-        this.container = new Phaser.Group(this.game);
+        // this.container = new Phaser.Group(this.game);
 
         // this.container.addChild(this.background);
         this.game.add.sprite(0, 0, 'background');
 
         this.player = new Player(this.game);
+        this.setCanvasSize();
 
         // this.initStatusTexts();
         // this.setGameOverStage();
@@ -280,7 +273,7 @@ export class AsteroidsGame {
 
     private removeAsteroid(asteroid: Asteroid) {
         this.game.stage.removeChild(asteroid.graphics);
-        this.container.removeChild(asteroid.graphics);
+        // this.container.removeChild(asteroid.graphics);
         this.asteroids.splice(this.asteroids.indexOf(asteroid), 1);
 
         asteroid.explode().forEach(subAsteroid => {
