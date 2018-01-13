@@ -3,15 +3,19 @@ import { Player } from './Player';
 import { KeyMapping } from './KeyMapping';
 import { Bullet } from './Bullet';
 import { Asteroid } from './Asteroid';
+import { eventEmitter, Events } from './Events';
 
 export class AsteroidsGame {
     protected game: Phaser.Game;
+
+    private readonly powerUpShieldPercent = 1;
+    private readonly maxPowerUpsOnScreen = 2;
 
     private player: Player;
     private INVULNERABLE = false;
     private SPAWN_ASTEROIDS = true;
     private currentLevel = 1;
-    private bullets: Bullet[] = [];
+    private powerUps: PowerUps.BasePowerUp[] = [];
 
     private keyLeft = 0;
     private keyRight = 0;
@@ -34,6 +38,32 @@ export class AsteroidsGame {
         this.initPixi();
         this.player = new Player(this.game);
         this.addAsteroids();
+        this.listenToEvents();
+    }
+
+    private listenToEvents() {
+        eventEmitter.on(Events.AsteroidDestroyed, (asteroidBody: Phaser.Physics.P2.Body, bulletBody: Phaser.Physics.P2.Body) => {
+            this.player.points += 10;
+            // this.updatePoints();
+
+            // Remove bullet
+            this.game.world.removeChild(bulletBody.sprite);
+
+            if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
+                this.spawnRandomPowerUp(collidedAsteroid.graphics.position);
+            }
+        });
+    }
+
+    private spawnRandomPowerUp(position: number[]) {
+        const randomRoll = Math.random();
+        let powerUp: PowerUps.BasePowerUp;
+        if (randomRoll >= 0.5) {
+            powerUp = new PowerUps.PowerUpShield(position, [0, 0], 1);
+        } else {
+            powerUp = new PowerUps.PowerUpShootSpeed(position, [0, 0], 1);
+        }
+        this.powerUps.push(powerUp);
     }
 
     protected update = () => {
@@ -67,18 +97,6 @@ export class AsteroidsGame {
             this.shoot();
         }
 
-        for (let i = 0; i < this.bullets.length; i++) {
-            const b = this.bullets[i];
-
-            // If the bullet is old, delete it
-            if (b.dieTime <= this.game.physics.p2.world.time) {
-                this.bullets.splice(i, 1);
-                this.game.world.removeChild(b.sprite);
-                i--;
-                continue;
-            }
-        }
-
         // Warp all bodies
         this.game.world.children.forEach(child => {
             this.warp(child as Phaser.Sprite);
@@ -95,10 +113,10 @@ export class AsteroidsGame {
             this.player.sprite.body.velocity,
             this.game.physics.p2.world.time);
 
-        this.bullets.push(bullet);
-
         // Keep track of the last time we shot
         this.player.lastShootTime = this.game.physics.p2.world.time;
+
+        return bullet;
     }
 
     private warp(sprite: Phaser.Sprite) {
@@ -141,7 +159,6 @@ export class AsteroidsGame {
 
     private createAstroid(position: WebKitPoint, velocity: WebKitPoint, va: number) {
         const asteroid = new Asteroid(this.game, position, velocity, va, 0);
-
         return asteroid;
     }
 

@@ -30,5 +30,11 @@ export class Bullet {
 
         this.dieTime = worldTime + Bullet.BulletLifeTime;
         this.sprite = sprite;
+
+        setTimeout(() => {
+            if (this.sprite.renderable) {
+                this.sprite.destroy();
+            }
+        }, this.dieTime);
     }
 }

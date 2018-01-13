@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser-ce';
 import { Utils } from './Utils';
+import { eventEmitter, Events } from './Events';
 
 export class Asteroid {
 
@@ -16,7 +17,7 @@ export class Asteroid {
 
     private fillColor = 0xbfbfbf;
     private strokeColor = 0x6d6d6d;
-    private strokeWidth = 0.05;
+    private strokeWidth = 1;
 
     constructor(
         game: Phaser.Game,
@@ -46,21 +47,9 @@ export class Asteroid {
         sprite.body.angularDamping = 0;
 
         sprite.body.createGroupCallback(Utils.MASKS.BULLET, (thisBody: Phaser.Physics.P2.Body, impactedBody: Phaser.Physics.P2.Body) => {
-            // this.removeAsteroid(collidedAsteroid);
-            // this.player.points += 10;
-            // this.updatePoints();
-
-            // // Remove bullet
-            // this.game.stage.removeChild(bullet.graphics);
-
-            // this.bullets.splice(this.bullets.indexOf(bullet), 1);
-
-            // if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
-            //      this.spawnRandomPowerUp(collidedAsteroid.graphics.position);
-            // }
             this.explode();
+            eventEmitter.emit(Events.AsteroidDestroyed, thisBody, impactedBody);
             this.sprite.destroy();
-
         }, this);
 
         this.sprite = sprite;
