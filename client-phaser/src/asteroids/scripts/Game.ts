@@ -4,7 +4,6 @@ import { KeyMapping } from './KeyMapping';
 import { Bullet } from './Bullet';
 import { Asteroid } from './Asteroid';
 import { eventEmitter, Events } from './Events';
-import { Point } from 'phaser-ce';
 import { BasePowerUp, PowerUpShield, PowerUpShootSpeed } from './PowerUps';
 
 export class AsteroidsGame {
@@ -17,7 +16,7 @@ export class AsteroidsGame {
     private INVULNERABLE = false;
     private SPAWN_ASTEROIDS = true;
     private currentLevel = 1;
-    private powerUps: PowerUps.BasePowerUp[] = [];
+    private powerUps: BasePowerUp[] = [];
 
     private keyLeft = 0;
     private keyRight = 0;
@@ -34,6 +33,10 @@ export class AsteroidsGame {
 
     private preload = () => {
         this.game.load.image('player', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/playerShip1_blue.png');
+        this.game.load.image('ufo', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/ufoRed.png');
+        this.game.load.image('powerUp_shootSpeed', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png');
+        this.game.load.image('powerUp_shield', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_shield.png');
+        this.game.load.image('background', process.env.PUBLIC_URL + '/assets/games/asteroids/Backgrounds/space.jpg');
     }
 
     protected create = () => {
@@ -41,6 +44,8 @@ export class AsteroidsGame {
         this.player = new Player(this.game);
         this.addAsteroids();
         this.listenToEvents();
+
+        this.game.add.text(0, 0, 'Test', { backgroundColor: 'white' });
     }
 
     private listenToEvents() {
@@ -53,6 +58,13 @@ export class AsteroidsGame {
 
             if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
                 this.spawnRandomPowerUp(asteroidBody.sprite.position);
+            }
+        });
+
+        eventEmitter.on(Events.PowerUpActivated, (powerUp: BasePowerUp) => {
+            const index = this.powerUps.indexOf(powerUp);
+            if (index >= 0) {
+                this.powerUps.splice(index, 1);
             }
         });
     }
@@ -81,13 +93,11 @@ export class AsteroidsGame {
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.setImpactEvents(true);
         this.game.physics.p2.world.gravity = [0, 0];
-        this.game.physics.p2.restitution = 1;
         this.game.physics.p2.world.defaultContactMaterial.friction = 0;
     }
 
     private updatePhysics() {
         this.player.allowCollision = !this.INVULNERABLE && !this.player.hasShield;
-        this.player.sprite.body.setZeroForce();
 
         // Thrust: add some force in the ship direction
         this.player.sprite.body.applyImpulseLocal([0, this.keyUp], 0, 0);
@@ -101,7 +111,9 @@ export class AsteroidsGame {
 
         // Warp all bodies
         this.game.world.children.forEach(child => {
-            this.warp(child as Phaser.Sprite);
+            if ((child as Phaser.Sprite).body != null) {
+                this.warp(child as Phaser.Sprite);
+            }
         });
     }
 

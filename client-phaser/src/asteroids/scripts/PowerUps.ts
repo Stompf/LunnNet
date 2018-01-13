@@ -1,6 +1,7 @@
 import { Utils } from './Utils';
 import * as Phaser from 'phaser-ce';
 import { Player } from './Player';
+import { Events, eventEmitter } from './Events';
 
 export class BasePowerUp {
 
@@ -27,11 +28,19 @@ export class BasePowerUp {
         sprite.body.setCollisionGroup(Utils.MASKS.POWER_UP);
         sprite.body.collides([Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP, Utils.MASKS.BULLET, Utils.MASKS.ASTEROID]);
 
+        sprite.body.createGroupCallback(Utils.MASKS.PLAYER, (thisBody: Phaser.Physics.P2.Body, playerBody: Phaser.Physics.P2.Body) => {
+            this.activate(playerBody.sprite.data);
+            eventEmitter.emit(Events.PowerUpActivated, this);
+        }, this);
+
+        sprite.data = this;
+
         this.sprite = sprite;
     }
 
     activate(_player: Player) {
         // Override what happens when activating
+        this.sprite.destroy();
         this.isActive = true;
     }
 
@@ -52,6 +61,8 @@ export class PowerUpShield extends BasePowerUp {
     }
 
     activate(player: Player) {
+        this.radius = player.sprite.width * 3;
+
         this.createShieldGraphics(player);
         player.hasShield = true;
 
@@ -68,11 +79,12 @@ export class PowerUpShield extends BasePowerUp {
 
     deactivate(player: Player) {
         player.hasShield = false;
+        this.shieldSprite.destroy();
         super.deactivate(player);
     }
 
     private warn = () => {
-        this.sprite.visible = !this.sprite.visible;
+        this.shieldSprite.visible = !this.shieldSprite.visible;
 
         if (this.isActive) {
             setTimeout(() => {
@@ -83,14 +95,18 @@ export class PowerUpShield extends BasePowerUp {
 
     private createShieldGraphics(player: Player) {
         const graphics = new Phaser.Graphics(player.sprite.game);
-
-        graphics.body.setCircle(this.radius);
-        graphics.body.collides([player.sprite.body.data.shapes[0].collisionMask]);
-
         graphics.beginFill(0x428cf4, 0.5);
-        graphics.drawCircle(player.sprite.position.x, player.sprite.position.y, this.radius);
+        graphics.drawCircle(0, 0, this.radius);
         graphics.endFill();
-        player.sprite.addChild(graphics);
+
+        const shieldSprite = graphics.game.add.sprite(0, 0, graphics.generateTexture());
+        graphics.game.physics.p2.enable(shieldSprite);
+
+        shieldSprite.body.setCircle(this.radius);
+        shieldSprite.body.collides(player.sprite.body.collidesWith);
+
+        player.sprite.addChild(shieldSprite);
+        this.shieldSprite = shieldSprite;
     }
 }
 

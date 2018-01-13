@@ -3,11 +3,10 @@ import * as Phaser from 'phaser-ce';
 
 export class Bullet {
     static BulletRadius = 3;
-    static BulletLifeTime = 0.9;
+    static BulletLifeTime = 900;
     static BulletSpeed = 1200;
 
     shape: p2.Circle;
-    dieTime: number;
     sprite: Phaser.Sprite;
 
     constructor(game: Phaser.Game, angle: number, position: WebKitPoint, velocity: WebKitPoint, worldTime: number) {
@@ -28,13 +27,12 @@ export class Bullet {
         sprite.body.setCollisionGroup(Utils.MASKS.BULLET);
         sprite.body.collides([Utils.MASKS.ASTEROID, Utils.MASKS.POWER_UP]);
 
-        this.dieTime = worldTime + Bullet.BulletLifeTime;
         this.sprite = sprite;
 
         setTimeout(() => {
             if (this.sprite.renderable) {
                 this.sprite.destroy();
             }
-        }, this.dieTime);
+        }, Bullet.BulletLifeTime);
     }
 }
