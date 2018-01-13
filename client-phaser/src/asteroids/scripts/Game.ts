@@ -4,6 +4,8 @@ import { KeyMapping } from './KeyMapping';
 import { Bullet } from './Bullet';
 import { Asteroid } from './Asteroid';
 import { eventEmitter, Events } from './Events';
+import { Point } from 'phaser-ce';
+import { BasePowerUp, PowerUpShield, PowerUpShootSpeed } from './PowerUps';
 
 export class AsteroidsGame {
     protected game: Phaser.Game;
@@ -50,18 +52,18 @@ export class AsteroidsGame {
             this.game.world.removeChild(bulletBody.sprite);
 
             if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
-                this.spawnRandomPowerUp(collidedAsteroid.graphics.position);
+                this.spawnRandomPowerUp(asteroidBody.sprite.position);
             }
         });
     }
 
-    private spawnRandomPowerUp(position: number[]) {
+    private spawnRandomPowerUp(position: WebKitPoint) {
         const randomRoll = Math.random();
-        let powerUp: PowerUps.BasePowerUp;
+        let powerUp: BasePowerUp;
         if (randomRoll >= 0.5) {
-            powerUp = new PowerUps.PowerUpShield(position, [0, 0], 1);
+            powerUp = new PowerUpShield(this.game, position, { x: 0, y: 0 }, 1);
         } else {
-            powerUp = new PowerUps.PowerUpShootSpeed(position, [0, 0], 1);
+            powerUp = new PowerUpShootSpeed(this.game, position, { x: 0, y: 0 }, 1);
         }
         this.powerUps.push(powerUp);
     }
