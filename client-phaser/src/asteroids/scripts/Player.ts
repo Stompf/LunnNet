@@ -2,7 +2,6 @@ import * as Phaser from 'phaser-ce';
 import { Utils } from './Utils';
 
 export class Player {
-    visible: boolean;
     allowCollision: boolean;
     hasShield: boolean;
     reloadTime = 0.2;
@@ -13,8 +12,6 @@ export class Player {
     sprite: Phaser.Sprite;
 
     constructor(game: Phaser.Game) {
-        this.visible = true;
-
         const sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;

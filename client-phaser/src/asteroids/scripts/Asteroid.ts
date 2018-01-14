@@ -17,7 +17,7 @@ export class Asteroid {
 
     private fillColor = 0xbfbfbf;
     private strokeColor = 0x6d6d6d;
-    private strokeWidth = 1;
+    private strokeWidth = 4;
 
     constructor(
         game: Phaser.Game,
@@ -38,7 +38,7 @@ export class Asteroid {
         sprite.body.addPolygon({}, verticals);
 
         sprite.body.setCollisionGroup(Utils.MASKS.ASTEROID);
-        sprite.body.collides([Utils.MASKS.ASTEROID, Utils.MASKS.BULLET, Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP]);
+        sprite.body.collides([game.physics.p2.everythingCollisionGroup, Utils.MASKS.ASTEROID, Utils.MASKS.BULLET, Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP]);
         sprite.body.mass = 10 / (level + 1);
         sprite.body.velocity.x = velocity.x;
         sprite.body.velocity.y = velocity.y;
@@ -46,10 +46,14 @@ export class Asteroid {
         sprite.body.damping = 0;
         sprite.body.angularDamping = 0;
 
-        sprite.body.createGroupCallback(Utils.MASKS.BULLET, (thisBody: Phaser.Physics.P2.Body, impactedBody: Phaser.Physics.P2.Body) => {
+        sprite.body.createGroupCallback(Utils.MASKS.BULLET, (asteroidBody: Phaser.Physics.P2.Body, impactedBody: Phaser.Physics.P2.Body) => {
             this.explode();
-            eventEmitter.emit(Events.AsteroidDestroyed, thisBody, impactedBody);
+            eventEmitter.emit(Events.AsteroidDestroyed, asteroidBody, impactedBody);
             this.sprite.destroy();
+        }, this);
+
+        sprite.body.createGroupCallback(Utils.MASKS.PLAYER, () => {
+            eventEmitter.emit(Events.AsteroidPlayerHit);
         }, this);
 
         this.sprite = sprite;

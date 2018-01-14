@@ -26,9 +26,13 @@ export class BasePowerUp {
 
         sprite.body.setRectangle(sprite.width, sprite.height);
         sprite.body.setCollisionGroup(Utils.MASKS.POWER_UP);
-        sprite.body.collides([Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP, Utils.MASKS.BULLET, Utils.MASKS.ASTEROID]);
+        sprite.body.collides([game.physics.p2.everythingCollisionGroup, Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP, Utils.MASKS.BULLET, Utils.MASKS.ASTEROID]);
 
         sprite.body.createGroupCallback(Utils.MASKS.PLAYER, (thisBody: Phaser.Physics.P2.Body, playerBody: Phaser.Physics.P2.Body) => {
+            if ((playerBody.sprite.data as Player).hasShield) {
+                return;
+            }
+
             this.activate(playerBody.sprite.data);
             eventEmitter.emit(Events.PowerUpActivated, this);
         }, this);
@@ -103,7 +107,9 @@ export class PowerUpShield extends BasePowerUp {
         graphics.game.physics.p2.enable(shieldSprite);
 
         shieldSprite.body.setCircle(this.radius);
+        shieldSprite.body.setCollisionGroup(shieldSprite.game.physics.p2.everythingCollisionGroup);
         shieldSprite.body.collides(player.sprite.body.collidesWith);
+        shieldSprite.body.static = true;
 
         player.sprite.addChild(shieldSprite);
         this.shieldSprite = shieldSprite;

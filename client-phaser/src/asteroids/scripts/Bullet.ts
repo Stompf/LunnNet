@@ -27,6 +27,7 @@ export class Bullet {
         sprite.body.setCollisionGroup(Utils.MASKS.BULLET);
         sprite.body.collides([Utils.MASKS.ASTEROID, Utils.MASKS.POWER_UP]);
 
+        sprite.data = this;
         this.sprite = sprite;
 
         setTimeout(() => {

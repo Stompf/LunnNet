@@ -5,6 +5,7 @@ import { Bullet } from './Bullet';
 import { Asteroid } from './Asteroid';
 import { eventEmitter, Events } from './Events';
 import { BasePowerUp, PowerUpShield, PowerUpShootSpeed } from './PowerUps';
+import { Utils } from './Utils';
 
 export class AsteroidsGame {
     protected game: Phaser.Game;
@@ -15,13 +16,22 @@ export class AsteroidsGame {
     private player: Player;
     private INVULNERABLE = false;
     private SPAWN_ASTEROIDS = true;
+    private readonly MAX_PLAYER_VELOCITY = 40;
+    private readonly MAX_PHYSICS_VELOCITY = 20;
+    private readonly PLAYER_RESPAWN_TIME = 1000;
+
     private currentLevel = 1;
     private powerUps: BasePowerUp[] = [];
+    private readonly asteroidSpawnTimer = 14000;
+    private asteroidSpawnReference: number;
 
     private keyLeft = 0;
     private keyRight = 0;
     private keyUp = 0;
     private keyShoot = 0;
+
+    private pointsText: Phaser.Text;
+    private livesText: Phaser.Text;
 
     constructor(canvasId: string) {
         this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
@@ -41,11 +51,37 @@ export class AsteroidsGame {
 
     protected create = () => {
         this.initPixi();
+        this.listenToEvents();
+        this.addHUD();
+
+        this.startNewGame();
+    }
+
+    private startNewGame() {
         this.player = new Player(this.game);
         this.addAsteroids();
-        this.listenToEvents();
 
-        this.game.add.text(0, 0, 'Test', { backgroundColor: 'white' });
+        this.asteroidSpawnReference = window.setInterval(() => {
+            if (!this.game.paused) {
+                this.asteroidTick();
+            }
+        }, this.asteroidSpawnTimer);
+    }
+
+    private addHUD() {
+        const pointsText = this.game.add.text(0, 0, 'Points: ', { fill: '#FFFFFF', fontSize: 12 });
+        pointsText.anchor.setTo(0, 0);
+
+        const livesText = this.game.add.text(0, pointsText.height, 'Lives: ', { fill: '#FFFFFF', fontSize: 12 });
+        livesText.anchor.setTo(0, 0);
+
+        this.pointsText = pointsText;
+        this.livesText = livesText;
+    }
+
+    private updateHUD() {
+        this.pointsText.setText('Points: ' + this.player.points);
+        this.livesText.setText('Lives: ' + this.player.lives);
     }
 
     private listenToEvents() {
@@ -67,6 +103,54 @@ export class AsteroidsGame {
                 this.powerUps.splice(index, 1);
             }
         });
+
+        eventEmitter.on(Events.AsteroidPlayerHit, () => {
+            if (!this.player.sprite.visible || !this.player.allowCollision) {
+                return;
+            }
+
+            this.player.lives--;
+            this.player.sprite.visible = false;
+            if (this.player.lives > 0) {
+                setTimeout(() => {
+                    this.respawnPlayer();
+                }, this.PLAYER_RESPAWN_TIME);
+            } else {
+                window.clearInterval(this.asteroidSpawnReference);
+                this.showGameOver();
+            }
+        });
+    }
+
+    private showGameOver() {
+        const group = this.game.add.group();
+
+        const background = new Phaser.Graphics(this.game);
+        background.beginFill(0xFF0000);
+        background.drawRect(0, 0, this.game.width / 2, this.game.height / 2);
+        background.endFill();
+
+        const backgroundSprite = this.game.add.sprite(0, 0, background.generateTexture());
+
+        group.add(backgroundSprite);
+
+        group.position.set(this.game.width / 2, this.game.height / 2);
+    }
+
+    private respawnPlayer() {
+        // Add ship again
+        this.player.sprite.body.force[0] = 0;
+        this.player.sprite.body.force[1] = 0;
+        this.player.sprite.body.velocity[0] = 0;
+        this.player.sprite.body.velocity[1] = 0;
+        this.player.sprite.body.angularVelocity = 0;
+        this.player.sprite.body.angle = 0;
+        this.player.sprite.visible = true;
+
+        // Spawn with shield
+        const shield = new PowerUpShield(this.game, { x: this.player.sprite.body.x, y: this.player.sprite.body.y },
+            this.player.sprite.body.velocity, this.player.sprite.body.angularVelocity);
+        shield.activate(this.player);
     }
 
     private spawnRandomPowerUp(position: WebKitPoint) {
@@ -83,6 +167,7 @@ export class AsteroidsGame {
     protected update = () => {
         this.updateKeys();
         this.updatePhysics();
+        this.updateHUD();
     }
 
     protected initPixi() {
@@ -97,21 +182,22 @@ export class AsteroidsGame {
     }
 
     private updatePhysics() {
-        this.player.allowCollision = !this.INVULNERABLE && !this.player.hasShield;
+        this.player.allowCollision = this.player.sprite.visible && !this.INVULNERABLE && !this.player.hasShield;
 
         // Thrust: add some force in the ship direction
-        this.player.sprite.body.applyImpulseLocal([0, this.keyUp], 0, 0);
+        this.player.sprite.body.applyImpulseLocal([0, this.keyUp / 2], 0, 0);
 
         // Set turn velocity of ship
         this.player.sprite.body.angularVelocity = (this.keyRight - this.keyLeft) * this.player.turnSpeed;
 
-        if (this.keyShoot && this.player.visible && this.game.physics.p2.world.time - this.player.lastShootTime > this.player.reloadTime) {
+        if (this.keyShoot && this.player.sprite.visible && this.game.physics.p2.world.time - this.player.lastShootTime > this.player.reloadTime) {
             this.shoot();
         }
 
         // Warp all bodies
-        this.game.world.children.forEach(child => {
-            if ((child as Phaser.Sprite).body != null) {
+        this.game.world.children.forEach((child: Phaser.Sprite) => {
+            if (child.body != null && !(child.data instanceof Bullet)) {
+                Utils.constrainVelocity(child.body.sprite, child.body.sprite === this.player.sprite ? this.MAX_PLAYER_VELOCITY : this.MAX_PHYSICS_VELOCITY);
                 this.warp(child as Phaser.Sprite);
             }
         });
@@ -181,5 +267,9 @@ export class AsteroidsGame {
         this.keyRight = this.game.input.keyboard.isDown(KeyMapping.PlayerMapping.right) ? 1 : 0;
         this.keyLeft = this.game.input.keyboard.isDown(KeyMapping.PlayerMapping.left) ? 1 : 0;
         this.keyShoot = this.game.input.keyboard.isDown(KeyMapping.PlayerMapping.fire) ? 1 : 0;
+    }
+
+    private asteroidTick = () => {
+        this.addAsteroids();
     }
 }
