@@ -33,6 +33,8 @@ export class AsteroidsGame {
     private pointsText: Phaser.Text;
     private livesText: Phaser.Text;
 
+    private gameOverGroup: Phaser.Group;
+
     constructor(canvasId: string) {
         this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
     }
@@ -49,15 +51,30 @@ export class AsteroidsGame {
         this.game.load.image('background', process.env.PUBLIC_URL + '/assets/games/asteroids/Backgrounds/space.jpg');
     }
 
-    protected create = () => {
+    private create = () => {
         this.initPixi();
-        this.listenToEvents();
+        this.addBackground();
         this.addHUD();
+        this.listenToEvents();
 
         this.startNewGame();
     }
 
+    private update = () => {
+        this.updateKeys();
+        this.updatePhysics();
+        this.updateHUD();
+    }
+
+    private addBackground() {
+        const background = this.game.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
+        background.anchor.set(0, 0);
+    }
+
     private startNewGame() {
+        this.game.input.onDown.removeAll();
+        this.game.world.remove(this.gameOverGroup);
+
         this.player = new Player(this.game);
         this.addAsteroids();
 
@@ -87,7 +104,6 @@ export class AsteroidsGame {
     private listenToEvents() {
         eventEmitter.on(Events.AsteroidDestroyed, (asteroidBody: Phaser.Physics.P2.Body, bulletBody: Phaser.Physics.P2.Body) => {
             this.player.points += 10;
-            // this.updatePoints();
 
             // Remove bullet
             this.game.world.removeChild(bulletBody.sprite);
@@ -126,15 +142,110 @@ export class AsteroidsGame {
         const group = this.game.add.group();
 
         const background = new Phaser.Graphics(this.game);
-        background.beginFill(0xFF0000);
+        background.beginFill(0x000000);
         background.drawRect(0, 0, this.game.width / 2, this.game.height / 2);
         background.endFill();
 
         const backgroundSprite = this.game.add.sprite(0, 0, background.generateTexture());
 
         group.add(backgroundSprite);
-
         group.position.set(this.game.width / 2, this.game.height / 2);
+
+        const gameOverText = this.game.add.text(0, -backgroundSprite.height / 2, 'GAME OVER', { fill: '#FFFFFF', fontSize: 30 });
+        gameOverText.anchor.y = 0;
+        group.add(gameOverText);
+
+        const scoreText = this.game.add.text(0, 0, 'Final score: ' + this.player.points, { fill: '#FFFFFF', fontSize: 20 });
+        group.add(scoreText);
+
+        const buttonGraphics = new Phaser.Graphics(this.game);
+        buttonGraphics.lineStyle(5, 0xFFFFFF);
+        buttonGraphics.drawRect(0, 0, 125, 40);
+
+        const playAgainText = this.game.add.text(0, background.height / 2 - 20, 'Click to play again', { fill: '#FFFFFF', fontSize: 20 });
+        playAgainText.inputEnabled = true;
+        playAgainText.input.useHandCursor = true;
+        playAgainText.events.onInputDown.add(this.startNewGame, this);
+        group.add(playAgainText);
+
+        this.game.input.onDown.add(this.startNewGame, this);
+
+        // const tryAgainButton = this.game.add.sprite(0, background.height / 2 - buttonGraphics.height / 2, buttonGraphics.generateTexture());
+        // tryAgainButton.inputEnabled = true;
+        // tryAgainButton.events.onInputDown.add(this.startNewGame, this);
+        // tryAgainButton.input.useHandCursor = true;
+
+        // group.add(tryAgainButton);
+
+        //     const backgroundHeight = 4;
+        //     const backgroundWidth = 7;
+        //     const background = new PIXI.Graphics();
+        //     background.beginFill(0x000000);
+        //     background.drawRoundedRect(-backgroundWidth / 2, -backgroundHeight / 2, backgroundWidth, backgroundHeight, 0.5);
+        //     gameOverContainer.addChild(background);
+
+        //     const textStyle = new PIXI.TextStyle({
+        //         fill: 0xFFFFFF,
+        //         fontSize: 30
+        //     });
+        //     const gameOverText = new PIXI.Text('GAME OVER', textStyle);
+        //     gameOverText.anchor.x = 0.5;
+        //     gameOverText.anchor.y = 0.5;
+        //     gameOverText.scale.x = 1 / this.app.stage.scale.x;
+        //     gameOverText.scale.y = 1 / this.app.stage.scale.y;
+        //     gameOverText.position.x = 0;
+        //     gameOverText.position.y = backgroundHeight / 2 - gameOverText.height;
+        //     gameOverContainer.addChild(gameOverText);
+
+        //     const scoreStyle = new PIXI.TextStyle({
+        //         fill: 0xFFFFFF,
+        //         fontSize: 20
+        //     });
+        //     const scoreText = new PIXI.Text('Final score: ' + this.player.points, scoreStyle);
+        //     scoreText.anchor.x = 0.5;
+        //     scoreText.anchor.y = 0.5;
+        //     scoreText.scale.x = 1 / this.app.stage.scale.x;
+        //     scoreText.scale.y = 1 / this.app.stage.scale.y;
+        //     scoreText.position.x = 0;
+        //     scoreText.position.y = 0;
+        //     gameOverContainer.addChild(scoreText);
+
+        //     const buttonWidth = 2.5;
+        //     const buttonHeight = 0.7;
+        //     const button = new PIXI.Graphics();
+        //     button.interactive = true;
+        //     button.buttonMode = true;
+        //     button.cursor = 'pointer';
+        //     button.lineStyle(0.05, 0xFFFFFF);
+        //     const tryAgainButtonHitArea = new PIXI.Rectangle(-buttonWidth / 2, -gameOverText.position.y,
+        //         buttonWidth, buttonHeight);
+        //     button.hitArea = tryAgainButtonHitArea;
+
+        //     button.moveTo(tryAgainButtonHitArea.x, tryAgainButtonHitArea.y);
+        //     button.lineTo(tryAgainButtonHitArea.x, tryAgainButtonHitArea.y + tryAgainButtonHitArea.height);
+        //     button.lineTo(tryAgainButtonHitArea.x + tryAgainButtonHitArea.width, tryAgainButtonHitArea.y + tryAgainButtonHitArea.height);
+        //     button.lineTo(tryAgainButtonHitArea.x + tryAgainButtonHitArea.width, tryAgainButtonHitArea.y);
+        //     button.lineTo(tryAgainButtonHitArea.x, tryAgainButtonHitArea.y);
+
+        //     button.on('mousedown', () => { this.initAsteroids(); }, false);
+
+        //     const playAgainText = new PIXI.Text('Play Again');
+        //     playAgainText.style.fill = 0xFFFFFF;
+        //     playAgainText.style.fontSize = 20;
+        //     playAgainText.scale.x = 1 / this.app.stage.scale.x;
+        //     playAgainText.scale.y = 1 / this.app.stage.scale.y;
+        //     playAgainText.anchor.x = 0.5;
+        //     playAgainText.anchor.y = 0.5;
+        //     playAgainText.position.y = tryAgainButtonHitArea.y + tryAgainButtonHitArea.height / 2;
+
+        //     button.addChild(playAgainText);
+
+        //     gameOverContainer.addChild(button);
+
+        //     this.gameOverContainer = gameOverContainer;
+
+        this.gameOverGroup = group;
+        this.game.world.bringToTop(group);
     }
 
     private respawnPlayer() {
@@ -164,13 +275,7 @@ export class AsteroidsGame {
         this.powerUps.push(powerUp);
     }
 
-    protected update = () => {
-        this.updateKeys();
-        this.updatePhysics();
-        this.updateHUD();
-    }
-
-    protected initPixi() {
+    private initPixi() {
         PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
 
         this.game.stage.backgroundColor = 0x000000;
