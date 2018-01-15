@@ -22,8 +22,8 @@ export class AsteroidsGame {
 
     private currentLevel = 1;
     private powerUps: BasePowerUp[] = [];
-    private readonly asteroidSpawnTimer = 14000;
-    private asteroidSpawnReference: number;
+    private readonly asteroidSpawnDelay = 14000;
+    private asteroidSpawnTimer: Phaser.Timer;
 
     private keyLeft = 0;
     private keyRight = 0;
@@ -56,6 +56,7 @@ export class AsteroidsGame {
         this.addBackground();
         this.addHUD();
         this.listenToEvents();
+        this.createTimers();
 
         this.startNewGame();
     }
@@ -71,27 +72,25 @@ export class AsteroidsGame {
         background.anchor.set(0, 0);
     }
 
+    private createTimers() {
+        this.asteroidSpawnTimer = this.game.time.create(false);
+        this.asteroidSpawnTimer.loop(this.asteroidSpawnDelay, () => { this.asteroidTick(); }, this);
+    }
+
     private startNewGame() {
-        this.game.input.onDown.remove(this.startNewGame, this);
+        this.game.input.onDown.remove(this.removeAllObjects, this);
         this.game.world.remove(this.gameOverGroup);
-        this.removeAllObjects();
 
         this.player = new Player(this.game);
         this.addAsteroids();
 
-        this.asteroidSpawnReference = window.setInterval(() => {
-            if (!this.game.paused) {
-                this.asteroidTick();
-            }
-        }, this.asteroidSpawnTimer);
+        this.asteroidSpawnTimer.start();
     }
 
     private removeAllObjects() {
-        this.game.world.children.forEach((child: Phaser.Sprite) => {
-            if (child.data && (child.data instanceof Bullet) || (child.data instanceof Asteroid) || (child.data instanceof BasePowerUp)) {
-                this.game.world.remove(child);
-            }
-        });
+        this.game.world.removeChildren();
+        this.game.physics.p2.clear();
+        this.create();
     }
 
     private addHUD() {
@@ -115,11 +114,16 @@ export class AsteroidsGame {
             this.player.points += 10;
 
             // Remove bullet
+            this.game.physics.p2.removeBodyNextStep(bulletBody);
             this.game.world.removeChild(bulletBody.sprite);
+
+            (asteroidBody.sprite.data as Asteroid).explode();
 
             if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
                 this.spawnRandomPowerUp(asteroidBody.sprite.position);
             }
+            this.game.physics.p2.removeBodyNextStep(asteroidBody);
+            this.game.world.removeChild(asteroidBody.sprite);
         });
 
         eventEmitter.on(Events.PowerUpActivated, (powerUp: BasePowerUp) => {
@@ -137,9 +141,9 @@ export class AsteroidsGame {
             this.player.lives--;
             this.player.sprite.visible = false;
             if (this.player.lives > 0) {
-                setTimeout(() => {
-                    this.respawnPlayer();
-                }, this.PLAYER_RESPAWN_TIME);
+                const timer = this.game.time.create();
+                timer.add(this.PLAYER_RESPAWN_TIME, () => { this.respawnPlayer(); }, this);
+                timer.start();
             } else {
                 this.showGameOver();
             }
@@ -147,7 +151,7 @@ export class AsteroidsGame {
     }
 
     private showGameOver() {
-        window.clearInterval(this.asteroidSpawnReference);
+        this.asteroidSpawnTimer.stop();
 
         const group = this.game.add.group();
 
@@ -175,10 +179,10 @@ export class AsteroidsGame {
         const playAgainText = this.game.add.text(0, background.height / 2 - 20, 'Click to play again', { fill: '#FFFFFF', fontSize: 20 });
         playAgainText.inputEnabled = true;
         playAgainText.input.useHandCursor = true;
-        playAgainText.events.onInputDown.add(this.startNewGame, this);
+        playAgainText.events.onInputDown.add(this.removeAllObjects, this);
         group.add(playAgainText);
 
-        this.game.input.onDown.add(this.startNewGame, this);
+        this.game.input.onDown.add(this.removeAllObjects, this);
 
         this.gameOverGroup = group;
         this.game.world.bringToTop(group);

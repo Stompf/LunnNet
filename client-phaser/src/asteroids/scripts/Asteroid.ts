@@ -47,9 +47,7 @@ export class Asteroid {
         sprite.body.angularDamping = 0;
 
         sprite.body.createGroupCallback(Utils.MASKS.BULLET, (asteroidBody: Phaser.Physics.P2.Body, impactedBody: Phaser.Physics.P2.Body) => {
-            this.explode();
             eventEmitter.emit(Events.AsteroidDestroyed, asteroidBody, impactedBody);
-            this.sprite.destroy();
         }, this);
 
         sprite.body.createGroupCallback(Utils.MASKS.PLAYER, () => {

@@ -30,10 +30,13 @@ export class Bullet {
         sprite.data = this;
         this.sprite = sprite;
 
-        setTimeout(() => {
+        const timer = game.time.create();
+        timer.add(Bullet.BulletLifeTime, () => {
             if (this.sprite.renderable) {
                 this.sprite.destroy();
             }
-        }, Bullet.BulletLifeTime);
+        }, this);
+
+        timer.start();
     }
 }
