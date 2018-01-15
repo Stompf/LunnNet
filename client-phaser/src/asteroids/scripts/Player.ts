@@ -24,8 +24,8 @@ export class Player {
         sprite.body.setRectangle(sprite.width, sprite.height);
         sprite.body.setCollisionGroup(Utils.MASKS.PLAYER);
         sprite.body.collides([Utils.MASKS.ASTEROID, Utils.MASKS.POWER_UP]);
-        sprite.data = this;
 
+        sprite.data = this;
         this.sprite = sprite;
     }
 }

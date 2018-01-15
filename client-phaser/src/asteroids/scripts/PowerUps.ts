@@ -59,9 +59,11 @@ export class PowerUpShield extends BasePowerUp {
     private warningMs = 2000;
     private radius = 80;
     private shieldSprite: Phaser.Sprite;
+    private timer: Phaser.Timer;
 
     constructor(game: Phaser.Game, position: WebKitPoint, velocity: WebKitPoint, angularVelocity: number) {
         super(game, 'powerUp_shield', position, velocity, angularVelocity);
+        this.timer = game.time.create();
     }
 
     activate(player: Player) {
@@ -70,13 +72,9 @@ export class PowerUpShield extends BasePowerUp {
         this.createShieldGraphics(player);
         player.hasShield = true;
 
-        setTimeout(() => {
-            this.warn();
-        }, this.durationMs - this.warningMs);
-
-        setTimeout(() => {
-            this.deactivate(player);
-        }, this.durationMs);
+        this.timer.add(this.durationMs, () => { this.deactivate(player); }, this);
+        this.timer.add(this.durationMs - this.warningMs, this.warn, this);
+        this.timer.start();
 
         super.activate(player);
     }
@@ -119,17 +117,17 @@ export class PowerUpShield extends BasePowerUp {
 export class PowerUpShootSpeed extends BasePowerUp {
     private shootSpeedIncrease = 0.5;
     private durationMs = 5000;
+    private timer: Phaser.Timer;
 
     constructor(game: Phaser.Game, position: WebKitPoint, velocity: WebKitPoint, angularVelocity: number) {
         super(game, 'powerUp_shootSpeed', position, velocity, angularVelocity);
+        this.timer = game.time.create();
     }
 
     activate(player: Player) {
         player.reloadTime -= this.shootSpeedIncrease;
-
-        setTimeout(() => {
-            this.deactivate(player);
-        }, this.durationMs);
+        this.timer.add(this.durationMs, () => { this.deactivate(player); }, this);
+        this.timer.start();
 
         super.activate(player);
     }

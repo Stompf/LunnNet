@@ -56,6 +56,7 @@ export class Asteroid {
             eventEmitter.emit(Events.AsteroidPlayerHit);
         }, this);
 
+        sprite.data = this;
         this.sprite = sprite;
     }
 
