@@ -28,7 +28,7 @@ export class BasePowerUp {
         sprite.body.setCollisionGroup(Utils.MASKS.POWER_UP);
         sprite.body.collides([game.physics.p2.everythingCollisionGroup, Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP, Utils.MASKS.BULLET, Utils.MASKS.ASTEROID]);
 
-        sprite.body.createGroupCallback(Utils.MASKS.PLAYER, (thisBody: Phaser.Physics.P2.Body, playerBody: Phaser.Physics.P2.Body) => {
+        sprite.body.createGroupCallback(Utils.MASKS.PLAYER, (_thisBody: Phaser.Physics.P2.Body, playerBody: Phaser.Physics.P2.Body) => {
             if ((playerBody.sprite.data as Player).hasShield) {
                 return;
             }

@@ -9,7 +9,7 @@ export class Bullet {
     shape: p2.Circle;
     sprite: Phaser.Sprite;
 
-    constructor(game: Phaser.Game, angle: number, position: WebKitPoint, velocity: WebKitPoint, worldTime: number) {
+    constructor(game: Phaser.Game, angle: number, position: WebKitPoint, velocity: WebKitPoint) {
         const graphics = new Phaser.Graphics(game);
         graphics.beginFill(0xffffff);
         graphics.arc(0, 0, Bullet.BulletRadius, 0, 2 * Math.PI, false);

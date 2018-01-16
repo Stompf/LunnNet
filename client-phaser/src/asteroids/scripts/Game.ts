@@ -247,10 +247,11 @@ export class AsteroidsGame {
         }
 
         // Warp all bodies
-        this.game.world.children.forEach((child: Phaser.Sprite) => {
-            if (child.body != null && !(child.data instanceof Bullet)) {
-                Utils.constrainVelocity(child.body.sprite, child.body.sprite === this.player.sprite ? this.MAX_PLAYER_VELOCITY : this.MAX_PHYSICS_VELOCITY);
-                this.warp(child as Phaser.Sprite);
+        this.game.world.children.forEach(child => {
+            const sprite = child as Phaser.Sprite;
+            if (sprite.body != null && !(sprite.data instanceof Bullet)) {
+                Utils.constrainVelocity(sprite, sprite === this.player.sprite ? this.MAX_PLAYER_VELOCITY : this.MAX_PHYSICS_VELOCITY);
+                this.warp(sprite);
             }
         });
     }
@@ -262,8 +263,7 @@ export class AsteroidsGame {
             this.game,
             angle,
             { x: this.player.sprite.body.x, y: this.player.sprite.body.y },
-            this.player.sprite.body.velocity,
-            this.game.physics.p2.world.time);
+            this.player.sprite.body.velocity);
 
         // Keep track of the last time we shot
         this.player.lastShootTime = this.game.physics.p2.world.time;
