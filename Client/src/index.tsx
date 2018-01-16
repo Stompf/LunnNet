@@ -5,7 +5,7 @@ import * as ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import { HashRouter, Switch, Link, Route } from 'react-router-dom';
-import Asteroids from './asteroids/Asteroids';
+import Asteroids from './asteroids/asteroids';
 
 import AirHockey from './air-hockey/air-hockey';
 

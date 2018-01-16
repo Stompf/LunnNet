@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { RouteComponentProps } from 'react-router-dom';
-import { BaseGame, NetworkGame } from './game';
+import { BaseGame, NetworkGame } from './scripts/game';
 
 class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     private _currentGame: BaseGame;

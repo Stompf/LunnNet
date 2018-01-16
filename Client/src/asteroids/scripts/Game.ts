@@ -1,11 +1,11 @@
 import * as Phaser from 'phaser-ce';
-import { Player } from './Player';
-import { KeyMapping } from './KeyMapping';
-import { Bullet } from './Bullet';
-import { Asteroid } from './Asteroid';
-import { eventEmitter, Events } from './Events';
-import { BasePowerUp, PowerUpShield, PowerUpShootSpeed } from './PowerUps';
-import { Utils } from './Utils';
+import { Player } from './player';
+import { KeyMapping } from './key-mapping';
+import { Bullet } from './bullet';
+import { Asteroid } from './asteroid';
+import { eventEmitter, Events } from './events';
+import { BasePowerUp, PowerUpShield, PowerUpShootSpeed } from './power-ups';
+import { Utils } from './utils';
 
 export class AsteroidsGame {
     protected game: Phaser.Game;

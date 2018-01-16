@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser-ce';
-import { Utils } from './Utils';
-import { eventEmitter, Events } from './Events';
+import { Utils } from './utils';
+import { eventEmitter, Events } from './events';
 
 export class Asteroid {
 

@@ -1,7 +1,7 @@
-import { Utils } from './Utils';
+import { Utils } from './utils';
 import * as Phaser from 'phaser-ce';
-import { Player } from './Player';
-import { Events, eventEmitter } from './Events';
+import { Player } from './player';
+import { Events, eventEmitter } from './events';
 
 export class BasePowerUp {
 

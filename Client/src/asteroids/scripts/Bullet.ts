@@ -1,4 +1,4 @@
-import { Utils } from './Utils';
+import { Utils } from './utils';
 import * as Phaser from 'phaser-ce';
 
 export class Bullet {

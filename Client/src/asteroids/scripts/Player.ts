@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser-ce';
-import { Utils } from './Utils';
+import { Utils } from './utils';
 
 export class Player {
     allowCollision: boolean;
