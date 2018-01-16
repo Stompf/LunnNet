@@ -46,7 +46,7 @@ export class BaseGame {
     }
 
     private preload = () => {
-        // Assets
+        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     }
 
     protected initPixi() {

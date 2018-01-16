@@ -44,6 +44,8 @@ export class AsteroidsGame {
     }
 
     private preload = () => {
+        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+
         this.game.load.image('player', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/playerShip1_blue.png');
         this.game.load.image('ufo', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/ufoRed.png');
         this.game.load.image('powerUp_shootSpeed', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png');
@@ -111,11 +113,16 @@ export class AsteroidsGame {
 
     private listenToEvents() {
         eventEmitter.on(Events.AsteroidDestroyed, (asteroidBody: Phaser.Physics.P2.Body, bulletBody: Phaser.Physics.P2.Body) => {
+            // Check if bullet or ship is already destroyed
+            if (bulletBody.sprite == null || asteroidBody.sprite == null) {
+                return;
+            }
+
             this.player.points += 10;
 
             // Remove bullet
             this.game.physics.p2.removeBodyNextStep(bulletBody);
-            this.game.world.removeChild(bulletBody.sprite);
+            bulletBody.sprite.destroy();
 
             (asteroidBody.sprite.data as Asteroid).explode();
 
@@ -123,7 +130,7 @@ export class AsteroidsGame {
                 this.spawnRandomPowerUp(asteroidBody.sprite.position);
             }
             this.game.physics.p2.removeBodyNextStep(asteroidBody);
-            this.game.world.removeChild(asteroidBody.sprite);
+            asteroidBody.sprite.destroy();
         });
 
         eventEmitter.on(Events.PowerUpActivated, (powerUp: BasePowerUp) => {
