@@ -4,7 +4,7 @@ import { Team, TeamSide } from './team';
 
 export class Player {
     readonly RADIUS = 60;
-    private SPEED = 600;
+    private SPEED = 700;
 
     private sprite: Phaser.Sprite;
     private keyMapping: KeyMapping.Mapping | null | undefined;
