@@ -6,7 +6,7 @@ export class Player {
     hasShield: boolean;
     reloadTime = 0.2;
     turnSpeed = 4;
-    lives = 1;
+    lives = 3;
     points = 0;
     lastShootTime = 0;
     sprite: Phaser.Sprite;
