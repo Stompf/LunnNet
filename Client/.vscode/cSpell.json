@@ -6,11 +6,19 @@
     "language": "en",
     // words - list of words to be always considered correct
     "words": [
-        "PIXI",
-        "Lunn",
-        "ngtools",
+        "\"eofline\": false,",
         "codelyzer",
+        "eofline",
+        "forin",
+        "Lunn",
+        "multiline",
+        "ngtools",
+        "nospace",
+        "PIXI",
+        "quotemark",
         "respawn",
+        "SPACEBAR",
+        "Unmount",
         "vsicons"
     ],
     // flagWords - list of words to be always considered incorrect

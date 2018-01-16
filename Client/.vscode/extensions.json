@@ -3,13 +3,12 @@
 	// for the documentation about the extensions.json format
 	"recommendations": [
 		// Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
-		"Angular.ng-template",
-		"formulahendry.auto-close-tag",
 		"streetsidesoftware.code-spell-checker",
 		"msjsdiag.debugger-for-chrome",
 		"christian-kohler.path-intellisense",
 		"eg2.tslint",
 		"robertohuertasm.vscode-icons",
-		"eamodio.gitlens"
+		"eamodio.gitlens",
+		"CoenraadS.bracket-pair-colorizer"
 	]
 }

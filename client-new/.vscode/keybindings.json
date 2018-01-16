@@ -1,7 +1,0 @@
-[
-    {
-        "key": "ctrl+r",
-        "command": "workbench.action.debug.restart",
-        "when": "inDebugMode"
-    }
-]
