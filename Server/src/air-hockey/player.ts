@@ -1,7 +1,7 @@
-import { NetworkObject } from './networkObject';
+import { NetworkObject } from './network-object';
 import * as p2 from 'p2';
-import { Inputs } from 'src/airHockey/inputs';
-import { Team, TeamSide } from 'src/airHockey/team';
+import { Inputs } from './inputs';
+import { Team, TeamSide } from './team';
 
 export class Player extends NetworkObject {
     readonly DIAMETER = 60;

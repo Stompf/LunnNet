@@ -1,5 +1,5 @@
 import { MultiDictionary } from 'typescript-collections';
-import { AirHockey } from './airHockey/main';
+import { AirHockey } from './air-hockey/main';
 
 export class MatchMaking {
 

@@ -1,4 +1,4 @@
-import { NetworkObject } from './networkObject';
+import { NetworkObject } from './network-object';
 import * as p2 from 'p2';
 
 export class Ball extends NetworkObject {

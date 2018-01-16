@@ -1,7 +1,7 @@
 import { Player } from './player';
 import { Ball } from './ball';
 import * as p2 from 'p2';
-import { TeamSide, Team } from 'src/airHockey/team';
+import { TeamSide, Team } from './team';
 
 export class AirHockey {
     private readonly SCORE_DELAY_MS = 2000;
@@ -83,7 +83,7 @@ export class AirHockey {
 
         this.player1.onUpdate();
         this.player2.onUpdate();
-    };
+    }
 
     private score(team: Team) {
         this.ball.resetVelocity();
@@ -178,16 +178,16 @@ export class AirHockey {
             height: goalNetSize + goalNetSize * 2
         });
         const offset = goalWidth / 2 + goalNetSize / 2;
-        back.position = [x - (team.TeamSide === TeamSide.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2]
+        back.position = [x - (team.TeamSide === TeamSide.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2];
 
         top.type = p2.Body.STATIC;
         back.type = p2.Body.STATIC;
         bottom.type = p2.Body.STATIC;
 
-        return <LunnNet.Utils.Rectangle>{
+        return <LunnNet.Utils.Rectangle> {
             width: goalWidth,
             height: goalHeight,
             position: [x, this.TOP_OFFSET + this.totalAreaHeight() / 2]
-        }
+        };
     }
 }
