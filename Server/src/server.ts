@@ -16,11 +16,11 @@ io.serveClient(false);
 io.attach(httpServer);
 
 io.on('connection', socket => {
-    winston.log('info', 'a user connected: ' + socket.id);
+    winston.info('a user connected: ' + socket.id);
     currentConnections.setValue(socket.id, socket);
 
     socket.on('QueueMatchMaking', (request: LunnNet.Network.QueueMatchMaking) => {
-        winston.log('info', 'user: ' + socket.id + ' - queued: ' + request.game);
+        winston.info('user: ' + socket.id + ' - queued: ' + request.game);
         matchMaking.addToQueue(socket, request.game);
     });
 
@@ -29,12 +29,12 @@ io.on('connection', socket => {
     });
 
     socket.on('disconnect', () => {
-        winston.log('info', 'a user disconnected: ' + socket.id);
+        winston.info('a user disconnected: ' + socket.id);
         matchMaking.removeFromQueue(socket);
         currentConnections.remove(socket.id);
     });
 });
 
 httpServer.listen(port, () => {
-    winston.log('info', 'listening on *:' + port);
+    winston.info('listening on *:' + port);
 });

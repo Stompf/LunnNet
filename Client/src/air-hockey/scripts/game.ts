@@ -257,7 +257,7 @@ export class NetworkGame extends BaseGame {
     }
 
     private queue() {
-        this.socket.emit('QueueMatchMaking', { game: LunnNet.Game.AirHockey } as LunnNet.Network.QueueMatchMaking);
+        this.socket.emit('QueueMatchMaking', { game: 'AirHockey' } as LunnNet.Network.QueueMatchMaking);
         this.appendTextareaLine('Looking for game...');
     }
 

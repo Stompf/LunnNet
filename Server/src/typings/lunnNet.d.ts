@@ -1,8 +1,5 @@
 declare namespace LunnNet {
-    const enum Game {
-        AirHockey,
-        PhysicsNetwork
-    }
+    type Game = 'AirHockey' | 'PhysicsNetwork';
 
     namespace Network {
         interface QueueMatchMaking {
@@ -13,7 +10,9 @@ declare namespace LunnNet {
     }
 
     namespace PhysicsNetwork {
+        interface GameFound { }
 
+        interface ServerTick { }
     }
 
     namespace AirHockey {

@@ -1,6 +1,7 @@
 import { MultiDictionary } from 'typescript-collections';
 import { AirHockey } from './air-hockey/main';
 import * as winston from 'winston';
+import { PhysicsNetwork } from './physics-network/main';
 
 export class MatchMaking {
 
@@ -19,15 +20,16 @@ export class MatchMaking {
     removeFromQueue(socket: SocketIO.Socket) {
         this.currentQueue.keys().forEach(game => {
             if (this.currentQueue.remove(game, socket)) {
-                winston.log('info', 'Removed player: ' + socket.id + ' from game: ' + game);
+                winston.info('Removed player: ' + socket.id + ' from game: ' + game);
             }
         });
     }
 
     handleQueueChange(game: LunnNet.Game) {
+        const array = this.currentQueue.getValue(game);
+
         switch (game) {
-            case LunnNet.Game.AirHockey:
-                const array = this.currentQueue.getValue(game);
+            case 'AirHockey':
                 while (array.length >= 2) {
                     const playerOne = array.shift() as SocketIO.Socket;
                     const playerTwo = array.shift() as SocketIO.Socket;
@@ -37,6 +39,18 @@ export class MatchMaking {
 
                     const airHockey = new AirHockey(playerOne, playerTwo);
                     airHockey.sendStartGame();
+                }
+                break;
+            case 'PhysicsNetwork':
+                while (array.length >= 2) {
+                    const playerOne = array.shift() as SocketIO.Socket;
+                    const playerTwo = array.shift() as SocketIO.Socket;
+
+                    this.currentQueue.remove(game, playerOne);
+                    this.currentQueue.remove(game, playerTwo);
+
+                    const physicsNetwork = new PhysicsNetwork(playerOne, playerTwo);
+                    physicsNetwork.sendStartGame();
                 }
                 break;
             default:

@@ -6,7 +6,7 @@ import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import { HashRouter, Switch, Link, Route } from 'react-router-dom';
 import Asteroids from './asteroids/asteroids';
-
+import PhysicsNetwork from './physics-network/physics-network';
 import AirHockey from './air-hockey/air-hockey';
 
 (window as any).PIXI = require('phaser-ce/build/custom/pixi');
@@ -17,7 +17,8 @@ const Header = () => (
   <header>
     <nav>
       <span><Link to="/">AirHockey</Link></span> |
-      <span><Link to="/asteroids"> Asteroids</Link></span>
+      <span> <Link to="/asteroids">Asteroids</Link></span> |
+      <span> <Link to="/physics-network">Physics network</Link></span>
     </nav>
   </header>
 );
@@ -27,6 +28,7 @@ const Main = () => (
     <Switch>
       <Route exact={true} path="/" component={AirHockey} />
       <Route path="/asteroids" component={Asteroids} />
+      <Route path="/physics-network" component={PhysicsNetwork} />
     </Switch>
   </main>
 );

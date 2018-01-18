@@ -46,7 +46,7 @@ export class AirHockey {
     }
 
     sendStartGame() {
-        winston.log('info', 'AirHockey, starting game with players: ' + this.player1.id + ' : ' + this.player2.id);
+        winston.info('AirHockey, starting game with players: ' + this.player1.id + ' : ' + this.player2.id);
         this.player1.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
         this.player2.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
     }
@@ -58,11 +58,11 @@ export class AirHockey {
 
     private initSockets(player: Player) {
         player.socket.on('ClientReady', (_data: LunnNet.AirHockey.ClientReady) => {
-            winston.log('info', 'AirHockey - player is ready: ' + player.id);
+            winston.info('AirHockey - player is ready: ' + player.id);
             player.isReady = true;
 
             if (this.player1.isReady && this.player2.isReady) {
-                winston.log('info', 'AirHockey - both players ready! Starting game!');
+                winston.info('AirHockey - both players ready! Starting game!');
                 this.startNewGame();
             }
         });
