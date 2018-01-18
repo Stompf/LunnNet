@@ -2,6 +2,7 @@ import { Player } from './player';
 import { Ball } from './ball';
 import * as p2 from 'p2';
 import { TeamSide, Team } from './team';
+import * as winston from 'winston';
 
 export class AirHockey {
     private readonly SCORE_DELAY_MS = 2000;
@@ -40,10 +41,12 @@ export class AirHockey {
 
         this.initSockets(this.player1);
         this.initSockets(this.player2);
+
+        this.update();
     }
 
     sendStartGame() {
-        console.log('AirHockey, starting game with players: ' + this.player1.id + ' : ' + this.player2.id);
+        winston.log('info', 'AirHockey, starting game with players: ' + this.player1.id + ' : ' + this.player2.id);
         this.player1.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
         this.player2.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
     }
@@ -55,11 +58,11 @@ export class AirHockey {
 
     private initSockets(player: Player) {
         player.socket.on('ClientReady', (_data: LunnNet.AirHockey.ClientReady) => {
-            console.log('AirHockey - player is ready: ' + player.id);
+            winston.log('info', 'AirHockey - player is ready: ' + player.id);
             player.isReady = true;
 
             if (this.player1.isReady && this.player2.isReady) {
-                console.log('AirHockey - both players ready! Starting game!');
+                winston.log('info', 'AirHockey - both players ready! Starting game!');
                 this.startNewGame();
             }
         });
@@ -68,6 +71,10 @@ export class AirHockey {
     private update = () => {
         if (this.paused) {
             return;
+        }
+
+        if (this.tick > Number.MAX_VALUE) {
+            this.tick = 0;
         }
 
         this.tick++;
@@ -184,10 +191,10 @@ export class AirHockey {
         back.type = p2.Body.STATIC;
         bottom.type = p2.Body.STATIC;
 
-        return <LunnNet.Utils.Rectangle> {
+        return {
             width: goalWidth,
             height: goalHeight,
             position: [x, this.TOP_OFFSET + this.totalAreaHeight() / 2]
-        };
+        } as LunnNet.Utils.Rectangle;
     }
 }

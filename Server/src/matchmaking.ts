@@ -1,5 +1,6 @@
 import { MultiDictionary } from 'typescript-collections';
 import { AirHockey } from './air-hockey/main';
+import * as winston from 'winston';
 
 export class MatchMaking {
 
@@ -18,7 +19,7 @@ export class MatchMaking {
     removeFromQueue(socket: SocketIO.Socket) {
         this.currentQueue.keys().forEach(game => {
             if (this.currentQueue.remove(game, socket)) {
-                console.log('Removed player: ' + socket.id + ' from game: ' + game);
+                winston.log('info', 'Removed player: ' + socket.id + ' from game: ' + game);
             }
         });
     }

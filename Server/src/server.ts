@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as socketIO from 'socket.io';
 import * as http from 'http';
+import * as winston from 'winston';
 import { Dictionary } from 'typescript-collections';
 import { MatchMaking } from './matchmaking';
 
@@ -15,11 +16,11 @@ io.serveClient(false);
 io.attach(httpServer);
 
 io.on('connection', socket => {
-    console.log('a user connected: ' + socket.id);
+    winston.log('info', 'a user connected: ' + socket.id);
     currentConnections.setValue(socket.id, socket);
 
     socket.on('QueueMatchMaking', (request: LunnNet.Network.QueueMatchMaking) => {
-        console.log('user: ' + socket.id + ' - queued: ' + request.game);
+        winston.log('info', 'user: ' + socket.id + ' - queued: ' + request.game);
         matchMaking.addToQueue(socket, request.game);
     });
 
@@ -28,12 +29,12 @@ io.on('connection', socket => {
     });
 
     socket.on('disconnect', () => {
-        console.log('a user disconnected: ' + socket.id);
+        winston.log('info', 'a user disconnected: ' + socket.id);
         matchMaking.removeFromQueue(socket);
         currentConnections.remove(socket.id);
     });
 });
 
 httpServer.listen(port, () => {
-    console.log('listening on *:' + port);
+    winston.log('info', 'listening on *:' + port);
 });

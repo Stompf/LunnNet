@@ -1,6 +1,7 @@
 declare namespace LunnNet {
     const enum Game {
-        AirHockey
+        AirHockey,
+        PhysicsNetwork
     }
 
     namespace Network {
@@ -9,6 +10,10 @@ declare namespace LunnNet {
         }
 
         interface RemoveFromMatchMaking { }
+    }
+
+    namespace PhysicsNetwork {
+
     }
 
     namespace AirHockey {
