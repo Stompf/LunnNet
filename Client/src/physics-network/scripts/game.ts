@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser-ce';
 import * as socketIO from 'socket.io-client';
+import { Player } from './player';
 // import { KeyMapping } from './key-mapping';
 
 export class PhysicsNetworkGame {
@@ -8,8 +9,10 @@ export class PhysicsNetworkGame {
     private socket: SocketIOClient.Socket;
     private serverIP = 'http://localhost:4444';
 
+    private players: Player[];
+
     constructor(canvasId: string) {
-        this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
+        this.game = new Phaser.Game(1200, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
     }
 
     destroy() {
@@ -26,9 +29,6 @@ export class PhysicsNetworkGame {
         this.game.stage.backgroundColor = 0xFFFFFF;
         this.game.renderer.view.style.border = '1px solid black';
         this.game.physics.startSystem(Phaser.Physics.P2JS);
-        this.game.physics.p2.world.gravity = [0, 0];
-        this.game.physics.p2.restitution = 1;
-
     }
 
     protected create = () => {
@@ -47,9 +47,9 @@ export class PhysicsNetworkGame {
             this.queue();
         });
 
-        this.socket.on('GameFound', (_data: LunnNet.PhysicsNetwork.GameFound) => {
+        this.socket.on('GameFound', (data: LunnNet.PhysicsNetwork.GameFound) => {
             console.info('game found');
-            this.initNewNetworkGame();
+            this.initNewNetworkGame(data);
         });
 
         this.socket.on('disconnect', () => {
@@ -61,9 +61,18 @@ export class PhysicsNetworkGame {
         });
     }
 
-    private initNewNetworkGame() {
+    private initNewNetworkGame(data: LunnNet.PhysicsNetwork.GameFound) {
+        this.players = [];
+        this.game.physics.p2.world.gravity = data.physicsOptions.gravity;
+        this.game.physics.p2.restitution = data.physicsOptions.restitution;
+        this.game.width = data.gameSize.width;
+        this.game.height = data.gameSize.height;
         this.game.world.removeChildren();
         this.game.physics.p2.clear();
+
+        data.players.forEach(player => {
+            this.players.push(new Player(this.game, this.socket.id === player.id, player));
+        });
     }
 
     private queue() {

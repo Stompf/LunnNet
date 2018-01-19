@@ -9,12 +9,6 @@ declare namespace LunnNet {
         interface RemoveFromMatchMaking { }
     }
 
-    namespace PhysicsNetwork {
-        interface GameFound { }
-
-        interface ServerTick { }
-    }
-
     namespace AirHockey {
         interface GameFound { }
 
@@ -32,6 +26,11 @@ declare namespace LunnNet {
             width: number;
             height: number;
             position: number[];
+        }
+
+        interface Size {
+            width: number;
+            height: number;
         }
     }
 }
