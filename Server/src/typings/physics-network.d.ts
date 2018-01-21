@@ -5,15 +5,16 @@ declare namespace LunnNet {
             restitution: number;
         }
 
-        interface NetworkPlayer {
+        interface UpdateNetworkPlayer {
             id: string;
             position: WebKitPoint;
         }
 
-        interface NewNetworkPlayer extends NetworkPlayer {
+        interface NewNetworkPlayer {
+            id: string;
+            position: WebKitPoint;
             diameter: number;
             color: number;
-            body: p2.Body;
         }
 
         interface GameFound {
@@ -22,6 +23,9 @@ declare namespace LunnNet {
             players: NewNetworkPlayer[];
         }
 
-        interface ServerTick { }
+        interface ServerTick {
+            tick: number;
+            players: UpdateNetworkPlayer[];
+        }
     }
 }

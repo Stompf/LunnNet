@@ -4,7 +4,7 @@ export class Player {
     socket: SocketIO.Socket;
     body: p2.Body;
 
-    readonly diameter = 10;
+    readonly diameter = 60;
     readonly color: number;
 
     constructor(world: p2.World, socket: SocketIO.Socket, color: number, startPosition: WebKitPoint) {
@@ -22,11 +22,17 @@ export class Player {
 
     toNewNetworkPlayer(): LunnNet.PhysicsNetwork.NewNetworkPlayer {
         return {
-            body: this.body,
             color: this.color,
             id: this.socket.id,
             position: { x: this.body.position[0], y: this.body.position[1] },
             diameter: this.diameter
+        };
+    }
+
+    toUpdateNetworkPlayerPlayer(): LunnNet.PhysicsNetwork.UpdateNetworkPlayer {
+        return {
+            id: this.socket.id,
+            position: { x: this.body.interpolatedPosition[0], y: this.body.interpolatedPosition[1] }
         };
     }
 }
