@@ -87,6 +87,7 @@ export class Player {
         sprite.body.setCircle(options.diameter / 2);
         sprite.body.mass = 10;
         sprite.body.collideWorldBounds = true;
+        sprite.body.static = true;
 
         return sprite;
     }

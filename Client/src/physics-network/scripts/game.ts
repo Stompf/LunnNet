@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser-ce';
 import * as socketIO from 'socket.io-client';
 import { Player } from './player';
+import { Ball } from './ball';
 // import { KeyMapping } from './key-mapping';
 
 export class PhysicsNetworkGame {
@@ -10,8 +11,11 @@ export class PhysicsNetworkGame {
     private serverIP = 'http://localhost:4444';
 
     private players: Player[];
+    private ball: Ball;
     private networkGameStarted = false;
     private latestNetworkTick = 0;
+
+    private connectStatusText: Phaser.Text;
 
     constructor(canvasId: string) {
         this.game = new Phaser.Game(1200, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
@@ -28,15 +32,15 @@ export class PhysicsNetworkGame {
     protected initPixi() {
         PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
 
+        this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.stage.backgroundColor = 0xFFFFFF;
         this.game.renderer.view.style.border = '1px solid black';
-        this.game.world.setBounds(0, 0, this.game.width, this.game.height);
-        this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.stage.disableVisibilityChange = true;
     }
 
     protected create = () => {
         this.initPixi();
+        this.initTexts();
         this.connect();
     }
 
@@ -44,6 +48,8 @@ export class PhysicsNetworkGame {
         if (!this.networkGameStarted) {
             return;
         }
+
+        this.ball.onUpdate();
 
         this.players.forEach(player => {
             player.onLocalUpdate(this.game);
@@ -54,20 +60,31 @@ export class PhysicsNetworkGame {
         });
     }
 
+    private initTexts() {
+        this.connectStatusText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'Connecting...');
+        this.connectStatusText.anchor.set(0.5, 0.5);
+    }
+
     private connect() {
+        this.connectStatusText.visible = true;
         this.socket = socketIO(this.serverIP);
         this.socket.on('connect', () => {
-            console.info('connected to server');
+            this.connectStatusText.setText('Connected');
             this.queue();
         });
 
         this.socket.on('GameFound', (data: LunnNet.PhysicsNetwork.GameFound) => {
-            console.info('game found');
+            this.connectStatusText.setText('Game found');
             this.initNewNetworkGame(data);
         });
 
         this.socket.on('disconnect', () => {
-            console.info('disconnected');
+            this.game.world.removeChildren();
+            this.game.physics.p2.clear();
+
+            this.initTexts();
+            this.connectStatusText.visible = true;
+            this.connectStatusText.setText('Disconnected');
             this.networkGameStarted = false;
         });
 
@@ -88,6 +105,7 @@ export class PhysicsNetworkGame {
     }
 
     private initNewNetworkGame(data: LunnNet.PhysicsNetwork.GameFound) {
+        this.connectStatusText.visible = false;
         this.latestNetworkTick = 0;
         this.players = [];
         this.game.physics.p2.world.gravity = data.physicsOptions.gravity;
@@ -97,15 +115,21 @@ export class PhysicsNetworkGame {
         this.game.world.removeChildren();
         this.game.physics.p2.clear();
 
+        this.game.world.setBounds(0, 0, this.game.width, this.game.height);
+
         data.players.forEach(player => {
             this.players.push(new Player(this.game, this.socket.id === player.id, player));
         });
+
+        this.ball = new Ball(this.game, data.ball);
+
+
 
         this.networkGameStarted = true;
     }
 
     private queue() {
         this.socket.emit('QueueMatchMaking', { game: 'PhysicsNetwork' } as LunnNet.Network.QueueMatchMaking);
-        console.info('Looking for game...');
+        this.connectStatusText.setText('Looking for game...');
     }
 }

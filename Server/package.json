@@ -6,7 +6,7 @@
     "private": true,
     "scripts": {
         "start": "npm run watch-ts",
-        "watch-ts": "tsc -w",
+        "watch-ts": "tsc -w --pretty",
         "serve": "node dist/server.js",
         "debug-serve": "nodemon --inspect dist/server.js"
     },

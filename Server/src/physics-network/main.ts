@@ -22,12 +22,11 @@ export class PhysicsNetwork {
         this.world.defaultContactMaterial.restitution = 1;
         this.addWorldBounds(this.world);
 
-        this.player1 = new Player(this.world, player1Socket, 0xFF0000, { x: this.GameSize.width / 2, y: this.GameSize.height / 2 });
+        this.player1 = new Player(this.world, player1Socket, 0xFF0000, { x: this.GameSize.width / 1.25 - this.player1.DIAMETER, y: this.GameSize.height / 2 });
         this.player2 = new Player(this.world, player2Socket, 0x0000FF, { x: this.GameSize.width / 4, y: this.GameSize.height / 2 });
 
         this.listenToEvents(player1Socket);
         this.listenToEvents(player2Socket);
-
     }
 
     sendStartGame() {
@@ -40,7 +39,12 @@ export class PhysicsNetwork {
                 this.player1.toNewNetworkPlayer(),
                 this.player2.toNewNetworkPlayer()
             ],
-            gameSize: this.GameSize
+            gameSize: this.GameSize,
+            ball: {
+                color: 0x000000,
+                diameter: 30,
+                mass: 0.1
+            }
         };
 
         winston.info(`PhysicsNetwork - starting game with players: ${this.player1.socket.id} : ${this.player2.socket.id}.`);
@@ -69,6 +73,8 @@ export class PhysicsNetwork {
             ]
         };
 
+        // winston.info(`heartbeat: ${serverTick.players[0].velocity}`);
+
         this.player1.socket.emit('ServerTick', serverTick);
         this.player2.socket.emit('ServerTick', serverTick);
     }
@@ -84,7 +90,7 @@ export class PhysicsNetwork {
 
         const player = this.player1.socket.id === data.id ? this.player1 : this.player2;
 
-        winston.info(`handleOnPlayerUpdate: ${player.socket.id} : ${data.position}`);
+        // winston.info(`handleOnPlayerUpdate: ${player.socket.id} : ${data.velocity}`);
 
         player.body.position = [data.position.x, data.position.y];
     }

@@ -17,15 +17,26 @@ declare namespace LunnNet {
             color: number;
         }
 
+        interface BallOptions {
+            diameter: number;
+            mass: number;
+            color: number;
+        }
+
         interface GameFound {
             gameSize: Utils.Size;
             physicsOptions: PhysicOptions;
             players: NewNetworkPlayer[];
+            ball: BallOptions;
         }
 
         interface ServerTick {
             tick: number;
             players: UpdateNetworkPlayer[];
+        }
+
+        interface BallUpdate {
+
         }
     }
 }
