@@ -123,8 +123,6 @@ export class PhysicsNetworkGame {
 
         this.ball = new Ball(this.game, data.ball);
 
-
-
         this.networkGameStarted = true;
     }
 
