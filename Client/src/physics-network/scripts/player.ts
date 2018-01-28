@@ -86,8 +86,6 @@ export class Player {
         game.physics.p2.enable(sprite);
         sprite.body.setCircle(options.diameter / 2);
         sprite.body.mass = 10;
-        sprite.body.collideWorldBounds = true;
-        sprite.body.static = true;
 
         return sprite;
     }

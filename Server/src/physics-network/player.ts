@@ -4,14 +4,14 @@ export class Player {
     socket: SocketIO.Socket;
     body: p2.Body;
 
-    readonly DIAMETER = 60;
+    static readonly DIAMETER = 60;
     readonly COLOR: number;
 
     constructor(world: p2.World, socket: SocketIO.Socket, color: number, startPosition: WebKitPoint) {
         this.body = new p2.Body({
             mass: 10
         });
-        this.body.addShape(new p2.Circle({ radius: this.DIAMETER / 2 }));
+        this.body.addShape(new p2.Circle({ radius: Player.DIAMETER / 2 }));
         world.addBody(this.body);
         this.body.position = [startPosition.x, startPosition.y];
         this.body.previousPosition = this.body.position;
@@ -25,7 +25,7 @@ export class Player {
             color: this.COLOR,
             id: this.socket.id,
             position: { x: this.body.position[0], y: this.body.position[1] },
-            diameter: this.DIAMETER
+            diameter: Player.DIAMETER
         };
     }
 

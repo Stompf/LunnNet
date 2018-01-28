@@ -114,7 +114,6 @@ export class PhysicsNetworkGame {
         this.game.height = data.gameSize.height;
         this.game.world.removeChildren();
         this.game.physics.p2.clear();
-
         this.game.world.setBounds(0, 0, this.game.width, this.game.height);
 
         data.players.forEach(player => {

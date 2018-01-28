@@ -4,8 +4,8 @@ import * as p2 from 'p2';
 
 export class PhysicsNetwork {
 
-    private readonly fixedTimeStep = 1 / 60;
-    private readonly maxSubSteps = 10;
+    private readonly FIXED_TIME_STEP = 1 / 60;
+    private readonly MAX_SUB_STEPS = 10;
     private intervalReference: NodeJS.Timer;
     private tick = 0;
     private gameStated: boolean;
@@ -14,7 +14,7 @@ export class PhysicsNetwork {
     private player2: Player;
     private world: p2.World;
 
-    private readonly GameSize: LunnNet.Utils.Size = { width: 1200, height: 600 };
+    private readonly GAME_SIZE: Readonly<LunnNet.Utils.Size> = { width: 1200, height: 600 };
 
     constructor(player1Socket: SocketIO.Socket, player2Socket: SocketIO.Socket) {
         this.gameStated = false;
@@ -22,8 +22,8 @@ export class PhysicsNetwork {
         this.world.defaultContactMaterial.restitution = 1;
         this.addWorldBounds(this.world);
 
-        this.player1 = new Player(this.world, player1Socket, 0xFF0000, { x: this.GameSize.width / 1.25 - this.player1.DIAMETER, y: this.GameSize.height / 2 });
-        this.player2 = new Player(this.world, player2Socket, 0x0000FF, { x: this.GameSize.width / 4, y: this.GameSize.height / 2 });
+        this.player1 = new Player(this.world, player1Socket, 0xFF0000, { x: this.GAME_SIZE.width / 1.25 - Player.DIAMETER, y: this.GAME_SIZE.height / 2 });
+        this.player2 = new Player(this.world, player2Socket, 0x0000FF, { x: this.GAME_SIZE.width / 4, y: this.GAME_SIZE.height / 2 });
 
         this.listenToEvents(player1Socket);
         this.listenToEvents(player2Socket);
@@ -39,7 +39,7 @@ export class PhysicsNetwork {
                 this.player1.toNewNetworkPlayer(),
                 this.player2.toNewNetworkPlayer()
             ],
-            gameSize: this.GameSize,
+            gameSize: this.GAME_SIZE,
             ball: {
                 color: 0x000000,
                 diameter: 30,
@@ -52,7 +52,7 @@ export class PhysicsNetwork {
         this.player1.socket.emit('GameFound', gameFound);
         this.player2.socket.emit('GameFound', gameFound);
 
-        this.intervalReference = setInterval(this.heartbeat, this.fixedTimeStep);
+        this.intervalReference = setInterval(this.heartbeat, this.FIXED_TIME_STEP);
         this.gameStated = true;
     }
 
@@ -63,7 +63,7 @@ export class PhysicsNetwork {
 
     private heartbeat = () => {
         this.tick++;
-        this.world.step(this.fixedTimeStep, this.fixedTimeStep, this.maxSubSteps);
+        this.world.step(this.FIXED_TIME_STEP, this.FIXED_TIME_STEP, this.MAX_SUB_STEPS);
 
         const serverTick: LunnNet.PhysicsNetwork.ServerTick = {
             tick: this.tick,
@@ -104,14 +104,14 @@ export class PhysicsNetwork {
 
         let ceiling = new p2.Body({
             angle: Math.PI,
-            position: [0, this.GameSize.height]
+            position: [0, this.GAME_SIZE.height]
         });
         ceiling.addShape(new p2.Plane());
         world.addBody(ceiling);
 
         let right = new p2.Body({
             angle: Math.PI / 2,
-            position: [this.GameSize.width, 0]
+            position: [this.GAME_SIZE.width, 0]
         });
         right.addShape(new p2.Plane());
         world.addBody(right);
