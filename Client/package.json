@@ -10,25 +10,25 @@
         "lodash": "^4.17.4",
         "phaser-ce": "^2.10.0",
         "react": "^16.2.0",
-        "react-bootstrap": "^0.32.0",
+        "react-bootstrap": "^0.32.1",
         "react-dom": "^16.2.0",
         "react-router-dom": "^4.2.2",
-        "react-scripts-ts": "^2.12.0",
+        "react-scripts-ts": "^2.13.0",
         "socket.io-client": "^2.0.4"
     },
     "devDependencies": {
         "@types/event-emitter": "^0.3.2",
-        "@types/jest": "^22.0.1",
-        "@types/jquery": "^3.2.18",
-        "@types/lodash": "^4.14.93",
-        "@types/node": "^9.3.0",
-        "@types/react": "^16.0.34",
+        "@types/jest": "^22.1.1",
+        "@types/jquery": "^3.3.0",
+        "@types/lodash": "^4.14.100",
+        "@types/node": "^9.4.0",
+        "@types/react": "^16.0.36",
         "@types/react-dom": "^16.0.3",
         "@types/react-router-dom": "^4.2.3",
         "@types/socket.io-client": "^1.4.32",
         "tslint": "^5.9.1",
         "tslint-react": "^3.4.0",
-        "typescript": "^2.6.2"
+        "typescript": "^2.7.1"
     },
     "scripts": {
         "start": "react-scripts-ts start",
