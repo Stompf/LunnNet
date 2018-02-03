@@ -34,6 +34,7 @@
         "start": "react-scripts-ts start",
         "build": "react-scripts-ts build",
         "test": "react-scripts-ts test --env=jsdom",
+        "build-watch": "tsc --watch --pretty",
         "eject": "react-scripts-ts eject"
     }
 }

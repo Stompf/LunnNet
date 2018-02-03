@@ -2,8 +2,8 @@ import * as Phaser from 'phaser-ce';
 import { Utils } from './utils';
 
 export class Player {
-    allowCollision: boolean;
-    hasShield: boolean;
+    allowCollision: boolean = true;
+    hasShield: boolean = false;
     reloadTime = 0.2;
     turnSpeed = 4;
     lives = 3;

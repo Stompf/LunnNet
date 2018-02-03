@@ -15,16 +15,16 @@ export class BaseGame {
     private readonly DEBUG_BODIES = false;
     private readonly TOP_OFFSET = 75;
 
-    protected teamLeft: Team;
-    protected teamRight: Team;
-    protected player1: Player;
-    protected player2: Player;
-    protected ball: Ball;
+    protected teamLeft!: Team;
+    protected teamRight!: Team;
+    protected player1!: Player;
+    protected player2!: Player;
+    protected ball!: Ball;
 
-    private goal1: Phaser.Sprite;
-    private goal2: Phaser.Sprite;
+    private goal1!: Phaser.Sprite;
+    private goal2!: Phaser.Sprite;
 
-    protected scoreText: Phaser.Text;
+    protected scoreText!: Phaser.Text;
 
     constructor(canvasId: string) {
         this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
@@ -182,7 +182,7 @@ export class BaseGame {
 }
 
 export class NetworkGame extends BaseGame {
-    private socket: SocketIOClient.Socket;
+    private socket!: SocketIOClient.Socket;
     private serverIP = 'http://localhost:4444';
     private gameFound = false;
     private currentTick = 0;

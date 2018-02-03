@@ -6,7 +6,7 @@ export class Bullet {
     static BulletLifeTime = 900;
     static BulletSpeed = 1200;
 
-    shape: p2.Circle;
+    shape!: p2.Circle;
     sprite: Phaser.Sprite;
 
     constructor(game: Phaser.Game, angle: number, position: WebKitPoint, velocity: WebKitPoint) {

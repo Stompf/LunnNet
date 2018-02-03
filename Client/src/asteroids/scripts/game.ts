@@ -13,7 +13,7 @@ export class AsteroidsGame {
     private readonly powerUpShieldPercent = 1;
     private readonly maxPowerUpsOnScreen = 2;
 
-    private player: Player;
+    private player!: Player;
     private INVULNERABLE = false;
     private SPAWN_ASTEROIDS = true;
     private readonly MAX_PLAYER_VELOCITY = 40;
@@ -23,17 +23,17 @@ export class AsteroidsGame {
     private currentLevel = 1;
     private powerUps: BasePowerUp[] = [];
     private readonly asteroidSpawnDelay = 14000;
-    private asteroidSpawnTimer: Phaser.Timer;
+    private asteroidSpawnTimer!: Phaser.Timer;
 
     private keyLeft = 0;
     private keyRight = 0;
     private keyUp = 0;
     private keyShoot = 0;
 
-    private pointsText: Phaser.Text;
-    private livesText: Phaser.Text;
+    private pointsText!: Phaser.Text;
+    private livesText!: Phaser.Text;
 
-    private gameOverGroup: Phaser.Group;
+    private gameOverGroup!: Phaser.Group;
 
     constructor(canvasId: string) {
         this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });

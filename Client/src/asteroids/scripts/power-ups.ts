@@ -6,7 +6,7 @@ import { Events, eventEmitter } from './events';
 export class BasePowerUp {
 
     sprite: Phaser.Sprite;
-    isActive: boolean;
+    isActive: boolean = false;
 
     constructor(game: Phaser.Game, spriteName: string, position: WebKitPoint, velocity: WebKitPoint, angularVelocity: number) {
         const sprite = game.add.sprite(position.x, position.y, spriteName);
@@ -58,7 +58,7 @@ export class PowerUpShield extends BasePowerUp {
     private durationMs = 7000;
     private warningMs = 2000;
     private radius = 80;
-    private shieldSprite: Phaser.Sprite;
+    private shieldSprite!: Phaser.Sprite;
     private timer: Phaser.Timer;
 
     constructor(game: Phaser.Game, position: WebKitPoint, velocity: WebKitPoint, angularVelocity: number) {

@@ -7,16 +7,16 @@ import { Ball } from './ball';
 export class PhysicsNetworkGame {
 
     protected game: Phaser.Game;
-    private socket: SocketIOClient.Socket;
+    private socket!: SocketIOClient.Socket;
     private serverIP = 'http://localhost:4444';
 
-    private players: Player[];
-    private ball: Ball;
+    private players!: Player[];
+    private ball!: Ball;
     private networkGameStarted = false;
     private latestNetworkTick = 0;
     private ballNetworkTick = 0;
 
-    private connectStatusText: Phaser.Text;
+    private connectStatusText!: Phaser.Text;
 
     constructor(canvasId: string) {
         this.game = new Phaser.Game(1200, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });

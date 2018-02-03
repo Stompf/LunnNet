@@ -6,8 +6,8 @@ export const enum TeamSide {
 export class Team {
 
     private _teamSide: TeamSide;
-    private _score: number;
-    private _color: number;
+    private _score!: number;
+    private _color!: number;
 
     get TeamSide() {
         return this._teamSide;
