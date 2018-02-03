@@ -10,9 +10,9 @@ export class Player extends NetworkObject {
 
     id: string;
     socket: SocketIO.Socket;
-    isReady: boolean;
+    isReady: boolean = false;
 
-    input: Inputs;
+    input: Inputs | undefined;
     team: Team;
 
     constructor(world: p2.World, socket: SocketIO.Socket, team: Team, gameWidth: number) {
@@ -29,6 +29,10 @@ export class Player extends NetworkObject {
     }
 
     onUpdate(): void {
+        if (!this.input) {
+            return;
+        }
+
         const input = [0, 0];
 
         if (this.input.isDown('up')) {

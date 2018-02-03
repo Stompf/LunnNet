@@ -5,7 +5,7 @@ export const enum TeamSide {
 
 export class Team {
     private teamSide: TeamSide;
-    private score: number;
+    private score: number = 0;
 
     get TeamSide() {
         return this.teamSide;

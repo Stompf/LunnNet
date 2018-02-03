@@ -8,9 +8,7 @@ export interface Mapping {
 
 
 export class Inputs {
-    currentInput: Mapping;
-
-    constructor() {
+    constructor(public currentInput: Mapping) {
         this.resetInput();
     }
 

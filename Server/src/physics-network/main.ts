@@ -7,7 +7,7 @@ export class PhysicsNetwork {
 
     private readonly FIXED_TIME_STEP = 1 / 60;
     private readonly MAX_SUB_STEPS = 10;
-    private intervalReference: NodeJS.Timer;
+    private intervalReference: NodeJS.Timer | undefined;
     private tick = 0;
     private ballTick = 0;
     private gameStated: boolean;
@@ -63,7 +63,7 @@ export class PhysicsNetwork {
 
     stopGame = () => {
         this.gameStated = false;
-        clearInterval(this.intervalReference);
+        clearInterval(this.intervalReference!);
     }
 
     private heartbeat = () => {

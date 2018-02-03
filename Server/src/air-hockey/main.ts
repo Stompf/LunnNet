@@ -15,8 +15,8 @@ export class AirHockey {
     private teamRight: Team;
 
     private ball: Ball;
-    private goal1: LunnNet.Utils.Rectangle;
-    private goal2: LunnNet.Utils.Rectangle;
+    private goal1: LunnNet.Utils.Rectangle | undefined;
+    private goal2: LunnNet.Utils.Rectangle | undefined;
     private tick = 0;
     private paused = false;
 
@@ -69,7 +69,7 @@ export class AirHockey {
     }
 
     private update = () => {
-        if (this.paused) {
+        if (this.paused || !this.goal1 || !this.goal2) {
             return;
         }
 
