@@ -9,6 +9,8 @@ export class Player {
     private SPEED = 700;
     readonly isLocalPlayer: boolean;
 
+    private input: number[] = [0, 0];
+
     constructor(game: Phaser.Game, isLocalPlayer: boolean, options: LunnNet.PhysicsNetwork.NewNetworkPlayer) {
         this.id = options.id;
         this.sprite = this.createSprite(game, options);
@@ -17,9 +19,9 @@ export class Player {
     }
 
     onNetworkUpdate(data: LunnNet.PhysicsNetwork.UpdateNetworkPlayer) {
-        if (this.isLocalPlayer) {
-            return;
-        }
+        // if (this.isLocalPlayer) {
+        //     return;
+        // }
 
         // console.log(`Update: ${data.angularForce} : ${data.angularVelocity} :
         // ${data.force[0]} : ${data.force[1]} : ${data.velocity[0]} : ${data.velocity[1]}`);
@@ -40,19 +42,19 @@ export class Player {
             return;
         }
 
-        let input = [0, 0];
+        this.input = [0, 0];
 
         if (game.input.keyboard.isDown(KeyMapping.PlayerMapping.up)) {
-            input[1] += this.SPEED;
+            this.input[1] -= this.SPEED;
         }
         if (game.input.keyboard.isDown(KeyMapping.PlayerMapping.down)) {
-            input[1] -= this.SPEED;
+            this.input[1] += this.SPEED;
         }
         if (game.input.keyboard.isDown(KeyMapping.PlayerMapping.left)) {
-            input[0] -= this.SPEED;
+            this.input[0] -= this.SPEED;
         }
         if (game.input.keyboard.isDown(KeyMapping.PlayerMapping.right)) {
-            input[0] += this.SPEED;
+            this.input[0] += this.SPEED;
         }
         // if (game.input.keyboard.isDown(KeyMapping.PlayerMapping.left)
         //     && (this.team.TeamSide !== TeamSide.Right || this.sprite.body.x > (game.width / 2 + this.RADIUS / 2))) {
@@ -63,17 +65,17 @@ export class Player {
         //     input[0] += this.SPEED;
         // }
 
-        this.sprite.body.moveUp(input[1]);
-        this.sprite.body.moveRight(input[0]);
+        // this.sprite.body.moveUp(input[1]);
+        // this.sprite.body.moveRight(input[0]);
     }
 
-    toUpdateNetworkPlayer(): LunnNet.PhysicsNetwork.UpdateNetworkPlayer {
+    toUpdateNetworkPlayer(): LunnNet.PhysicsNetwork.UpdateFromClient {
         // console.log(`Update: ${this.sprite.body.angularForce} : ${this.sprite.body.angularVelocity} :
         // ${this.sprite.body.force.x} : ${this.sprite.body.force.y} : ${this.sprite.body.velocity.x} : ${this.sprite.body.velocity.y}`);
 
         return {
-            id: this.id,
-            position: { x: this.sprite.body.x, y: this.sprite.body.y }
+            velocityHorizontal: this.input[0],
+            velocityVertical: this.input[1]
         };
     }
 

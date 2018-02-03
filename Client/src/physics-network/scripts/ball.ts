@@ -9,6 +9,16 @@ export class Ball {
         this.sprite = this.createSprite(game, options);
     }
 
+    onNetworkUpdate(data: LunnNet.PhysicsNetwork.BallUpdate) {
+        this.sprite.body.setZeroVelocity();
+
+        this.sprite.body.angularVelocity = data.angularVelocity;
+        this.sprite.body.x = data.position.x;
+        this.sprite.body.y = data.position.y;
+        this.sprite.body.velocity.x = data.velocity[0];
+        this.sprite.body.velocity.y = data.velocity[1];
+    }
+
     onUpdate() {
         this.constrainVelocity(this.sprite, this.MAX_VELOCITY);
     }

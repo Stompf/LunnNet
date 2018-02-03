@@ -10,6 +10,11 @@ declare namespace LunnNet {
             position: WebKitPoint;
         }
 
+        interface UpdateFromClient {
+            velocityHorizontal: number;
+            velocityVertical: number;
+        }
+
         interface NewNetworkPlayer {
             id: string;
             position: WebKitPoint;
@@ -36,7 +41,10 @@ declare namespace LunnNet {
         }
 
         interface BallUpdate {
-
+            tick: number;
+            velocity: number[];
+            angularVelocity: number;
+            position: WebKitPoint;
         }
     }
 }

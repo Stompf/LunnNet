@@ -7,6 +7,8 @@ export class Player {
     static readonly DIAMETER = 60;
     readonly COLOR: number;
 
+    private SPEED = 700;
+
     constructor(world: p2.World, socket: SocketIO.Socket, color: number, startPosition: WebKitPoint) {
         this.body = new p2.Body({
             mass: 10
@@ -15,7 +17,7 @@ export class Player {
         world.addBody(this.body);
         this.body.position = [startPosition.x, startPosition.y];
         this.body.previousPosition = this.body.position;
-        this.body.type = p2.Body.STATIC;
+        //  this.body.type = p2.Body.STATIC;
         this.socket = socket;
         this.COLOR = color;
     }
@@ -34,5 +36,25 @@ export class Player {
             id: this.socket.id,
             position: { x: this.body.interpolatedPosition[0], y: this.body.interpolatedPosition[1] }
         };
+    }
+
+    moveUp(input: number) {
+        if (input === 0) {
+            this.body.velocity[1] = 0;
+        } else {
+            this.body.velocity[1] = this.pxmi(input > 0 ? -this.SPEED : this.SPEED);
+        }
+    }
+
+    moveRight(input: number) {
+        if (input === 0) {
+            this.body.velocity[0] = 0;
+        } else {
+            this.body.velocity[0] = this.pxmi(input > 0 ? -this.SPEED : this.SPEED);
+        }
+    }
+
+    private pxmi(v: number) {
+        return v * -0.05;
     }
 }

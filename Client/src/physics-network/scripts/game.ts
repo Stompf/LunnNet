@@ -14,6 +14,7 @@ export class PhysicsNetworkGame {
     private ball: Ball;
     private networkGameStarted = false;
     private latestNetworkTick = 0;
+    private ballNetworkTick = 0;
 
     private connectStatusText: Phaser.Text;
 
@@ -55,7 +56,7 @@ export class PhysicsNetworkGame {
             player.onLocalUpdate(this.game);
 
             if (player.isLocalPlayer) {
-                this.socket.emit('PlayerUpdate', player.toUpdateNetworkPlayer());
+                this.socket.emit('UpdateFromClient', player.toUpdateNetworkPlayer());
             }
         });
     }
@@ -101,6 +102,13 @@ export class PhysicsNetworkGame {
             });
 
             this.latestNetworkTick = data.tick;
+        });
+
+        this.socket.on('BallUpdate', (data: LunnNet.PhysicsNetwork.BallUpdate) => {
+            if (this.ballNetworkTick > data.tick) {
+                return;
+            }
+            this.ball.onNetworkUpdate(data);
         });
     }
 

@@ -1,6 +1,7 @@
 import { Player } from './player';
 import * as winston from 'winston';
 import * as p2 from 'p2';
+import { Ball } from './ball';
 
 export class PhysicsNetwork {
 
@@ -8,11 +9,13 @@ export class PhysicsNetwork {
     private readonly MAX_SUB_STEPS = 10;
     private intervalReference: NodeJS.Timer;
     private tick = 0;
+    private ballTick = 0;
     private gameStated: boolean;
 
     private player1: Player;
     private player2: Player;
     private world: p2.World;
+    private ball: Ball;
 
     private readonly GAME_SIZE: Readonly<LunnNet.Utils.Size> = { width: 1200, height: 600 };
 
@@ -24,9 +27,11 @@ export class PhysicsNetwork {
 
         this.player1 = new Player(this.world, player1Socket, 0xFF0000, { x: this.GAME_SIZE.width / 1.25 - Player.DIAMETER, y: this.GAME_SIZE.height / 2 });
         this.player2 = new Player(this.world, player2Socket, 0x0000FF, { x: this.GAME_SIZE.width / 4, y: this.GAME_SIZE.height / 2 });
+        this.ball = new Ball(this.world, { x: this.GAME_SIZE.width / 2, y: this.GAME_SIZE.height / 2 });
 
         this.listenToEvents(player1Socket);
         this.listenToEvents(player2Socket);
+        this.onBeginContact();
     }
 
     sendStartGame() {
@@ -41,9 +46,9 @@ export class PhysicsNetwork {
             ],
             gameSize: this.GAME_SIZE,
             ball: {
-                color: 0x000000,
-                diameter: 30,
-                mass: 0.1
+                color: Ball.COLOR,
+                diameter: Ball.DIAMETER,
+                mass: Ball.MASS
             }
         };
 
@@ -56,15 +61,16 @@ export class PhysicsNetwork {
         this.gameStated = true;
     }
 
-    stopGame() {
+    stopGame = () => {
         this.gameStated = false;
         clearInterval(this.intervalReference);
     }
 
     private heartbeat = () => {
         this.tick++;
-        this.world.step(this.FIXED_TIME_STEP, this.FIXED_TIME_STEP, this.MAX_SUB_STEPS);
+        this.ball.onUpdate();
 
+        this.world.step(this.FIXED_TIME_STEP, this.FIXED_TIME_STEP, this.MAX_SUB_STEPS);
         const serverTick: LunnNet.PhysicsNetwork.ServerTick = {
             tick: this.tick,
             players: [
@@ -79,20 +85,42 @@ export class PhysicsNetwork {
         this.player2.socket.emit('ServerTick', serverTick);
     }
 
-    private listenToEvents(socket: SocketIO.Socket) {
-        socket.on('PlayerUpdate', this.handleOnPlayerUpdate);
+    private onBeginContact() {
+        // this.world.on('beginContact', () => {
+        //     winston.info(`beginContact: ${this.ball.body.velocity[0]} : ${this.ball.body.velocity[1]}`);
+        // }, this);
+
+        // this.world.on('impact', () => {
+        //     winston.info(`impact: ${this.ball.body.velocity[0]} : ${this.ball.body.velocity[1]}`);
+        // }, this);
+
+        this.world.on('endContact', () => {
+            winston.info(`endContact: ${this.ball.body.velocity[0]} : ${this.ball.body.velocity[1]} : ${this.ball.body.angularVelocity} `);
+
+            this.ballTick++;
+            const ballUpdate = this.ball.toBallUpdate(this.ballTick);
+
+            this.player1.socket.emit('BallUpdate', ballUpdate);
+            this.player2.socket.emit('BallUpdate', ballUpdate);
+        }, this);
     }
 
-    private handleOnPlayerUpdate = (data: LunnNet.PhysicsNetwork.UpdateNetworkPlayer) => {
+    private listenToEvents(socket: SocketIO.Socket) {
+        socket.on('UpdateFromClient', (data: LunnNet.PhysicsNetwork.UpdateFromClient) => { this.handleOnPlayerUpdate(socket.id, data); });
+        socket.on('disconnect', this.stopGame);
+    }
+
+    private handleOnPlayerUpdate = (id: string, data: LunnNet.PhysicsNetwork.UpdateFromClient) => {
         if (!this.gameStated) {
             return;
         }
 
-        const player = this.player1.socket.id === data.id ? this.player1 : this.player2;
+        const player = this.player1.socket.id === id ? this.player1 : this.player2;
 
-        // winston.info(`handleOnPlayerUpdate: ${player.socket.id} : ${data.velocity}`);
+        player.moveRight(data.velocityHorizontal);
+        player.moveUp(data.velocityVertical);
 
-        player.body.position = [data.position.x, data.position.y];
+        // winston.info(`handleOnPlayerUpdate: ${player.socket.id} : ${data.velocityHorizontal}`);
     }
 
     private addWorldBounds(world: p2.World) {
