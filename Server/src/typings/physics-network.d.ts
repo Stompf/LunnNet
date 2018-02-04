@@ -38,10 +38,10 @@ declare namespace LunnNet {
         interface ServerTick {
             tick: number;
             players: UpdateNetworkPlayer[];
+            ballUpdate: BallUpdate;
         }
 
         interface BallUpdate {
-            tick: number;
             velocity: number[];
             angularVelocity: number;
             position: WebKitPoint;

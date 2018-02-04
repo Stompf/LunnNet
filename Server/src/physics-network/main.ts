@@ -6,10 +6,9 @@ import { Ball } from './ball';
 export class PhysicsNetwork {
 
     private readonly FIXED_TIME_STEP = 1 / 60;
-    private readonly MAX_SUB_STEPS = 10;
+    private readonly MAX_SUB_STEPS = 5;
     private intervalReference: NodeJS.Timer | undefined;
     private tick = 0;
-    private ballTick = 0;
     private gameStated: boolean;
 
     private player1: Player;
@@ -23,6 +22,7 @@ export class PhysicsNetwork {
         this.gameStated = false;
         this.world = new p2.World({ gravity: [0, 0] });
         this.world.defaultContactMaterial.restitution = 1;
+        this.world.defaultContactMaterial.friction = 0;
         this.addWorldBounds(this.world);
 
         this.player1 = new Player(this.world, player1Socket, 0xFF0000, { x: this.GAME_SIZE.width / 1.25 - Player.DIAMETER, y: this.GAME_SIZE.height / 2 });
@@ -76,7 +76,8 @@ export class PhysicsNetwork {
             players: [
                 this.player1.toUpdateNetworkPlayerPlayer(),
                 this.player2.toUpdateNetworkPlayerPlayer()
-            ]
+            ],
+            ballUpdate: this.ball.toBallUpdate()
         };
 
         // winston.info(`heartbeat: ${serverTick.players[0].velocity}`);
@@ -94,15 +95,15 @@ export class PhysicsNetwork {
         //     winston.info(`impact: ${this.ball.body.velocity[0]} : ${this.ball.body.velocity[1]}`);
         // }, this);
 
-        this.world.on('endContact', () => {
-            winston.info(`endContact: ${this.ball.body.velocity[0]} : ${this.ball.body.velocity[1]} : ${this.ball.body.angularVelocity} `);
+        // this.world.on('endContact', () => {
+        //     winston.info(`endContact: ${this.ball.body.velocity[0]} : ${this.ball.body.velocity[1]} : ${this.ball.body.angularVelocity} `);
 
-            this.ballTick++;
-            const ballUpdate = this.ball.toBallUpdate(this.ballTick);
+        //     this.ballTick++;
+        //     const ballUpdate = this.ball.toBallUpdate(this.ballTick);
 
-            this.player1.socket.emit('BallUpdate', ballUpdate);
-            this.player2.socket.emit('BallUpdate', ballUpdate);
-        }, this);
+        //     this.player1.socket.emit('BallUpdate', ballUpdate);
+        //     this.player2.socket.emit('BallUpdate', ballUpdate);
+        // }, this);
     }
 
     private listenToEvents(socket: SocketIO.Socket) {

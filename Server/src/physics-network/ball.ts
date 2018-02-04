@@ -1,4 +1,5 @@
 import * as p2 from 'p2';
+import * as winston from 'winston';
 
 export class Ball {
 
@@ -13,10 +14,12 @@ export class Ball {
         this.body = new p2.Body({
             mass: Ball.MASS
         });
-        this.body.addShape(new p2.Circle({ radius: Ball.DIAMETER / 2 }));
+        const circle = new p2.Circle({ radius: Ball.DIAMETER / 2 });
+        this.body.addShape(circle);
+        this.body.damping = 0;
+
         this.body.position = [position.x, position.y];
         this.body.previousPosition = this.body.position;
-
         world.addBody(this.body);
     }
 
@@ -24,9 +27,8 @@ export class Ball {
         this.constrainVelocity(this.body, this.MAX_VELOCITY);
     }
 
-    toBallUpdate(tick: number): LunnNet.PhysicsNetwork.BallUpdate {
+    toBallUpdate(): LunnNet.PhysicsNetwork.BallUpdate {
         return {
-            tick: tick,
             angularVelocity: this.body.angularVelocity,
             position: { x: this.body.interpolatedPosition[0], y: this.body.interpolatedPosition[1] },
             velocity: this.body.velocity
@@ -52,6 +54,7 @@ export class Ball {
 
             body.velocity[0] = vx;
             body.velocity[1] = vy;
+            winston.info('constrainVelocity');
         }
     }
 }

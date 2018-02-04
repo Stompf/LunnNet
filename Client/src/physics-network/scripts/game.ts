@@ -6,6 +6,8 @@ import { Ball } from './ball';
 
 export class PhysicsNetworkGame {
 
+    private readonly RECEIVE_BALL_UPDATES = true;
+
     protected game: Phaser.Game;
     private socket!: SocketIOClient.Socket;
     private serverIP = 'http://localhost:4444';
@@ -14,7 +16,6 @@ export class PhysicsNetworkGame {
     private ball!: Ball;
     private networkGameStarted = false;
     private latestNetworkTick = 0;
-    private ballNetworkTick = 0;
 
     private connectStatusText!: Phaser.Text;
 
@@ -101,15 +102,19 @@ export class PhysicsNetworkGame {
                 }
             });
 
+            if (this.RECEIVE_BALL_UPDATES) {
+                this.ball.onNetworkUpdate(data.ballUpdate);
+            }
+
             this.latestNetworkTick = data.tick;
         });
 
-        this.socket.on('BallUpdate', (data: LunnNet.PhysicsNetwork.BallUpdate) => {
-            if (this.ballNetworkTick > data.tick) {
-                return;
-            }
-            this.ball.onNetworkUpdate(data);
-        });
+        // this.socket.on('BallUpdate', (data: LunnNet.PhysicsNetwork.BallUpdate) => {
+        //     if (this.ballNetworkTick > data.tick) {
+        //         return;
+        //     }
+
+        // });
     }
 
     private initNewNetworkGame(data: LunnNet.PhysicsNetwork.GameFound) {
@@ -118,6 +123,7 @@ export class PhysicsNetworkGame {
         this.players = [];
         this.game.physics.p2.world.gravity = data.physicsOptions.gravity;
         this.game.physics.p2.restitution = data.physicsOptions.restitution;
+        this.game.physics.p2.world.defaultContactMaterial.friction = 0;
         this.game.width = data.gameSize.width;
         this.game.height = data.gameSize.height;
         this.game.world.removeChildren();
