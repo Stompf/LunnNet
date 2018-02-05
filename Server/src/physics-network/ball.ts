@@ -1,5 +1,4 @@
 import * as p2 from 'p2';
-import * as winston from 'winston';
 
 export class Ball {
 
