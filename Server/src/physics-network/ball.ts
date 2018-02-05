@@ -54,7 +54,6 @@ export class Ball {
 
             body.velocity[0] = vx;
             body.velocity[1] = vy;
-            winston.info('constrainVelocity');
         }
     }
 }
