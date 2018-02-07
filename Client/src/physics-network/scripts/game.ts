@@ -11,7 +11,7 @@ export class PhysicsNetworkGame {
     protected game: Phaser.Game;
     private socket!: SocketIOClient.Socket;
     private serverIP = process.env.NODE_ENV === 'production'
-        ? 'https://home.lunne.nu:4444'
+        ? 'https://home.lunne.nu'
         : 'http://localhost:4444';
 
     private players!: Player[];
