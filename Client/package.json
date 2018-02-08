@@ -20,7 +20,7 @@
         "@types/event-emitter": "^0.3.2",
         "@types/jest": "^22.1.1",
         "@types/jquery": "^3.3.0",
-        "@types/lodash": "^4.14.100",
+        "@types/lodash": "^4.14.102",
         "@types/node": "^9.4.0",
         "@types/react": "^16.0.36",
         "@types/react-dom": "^16.0.3",
