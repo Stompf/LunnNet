@@ -26,6 +26,9 @@ export class PhysicsNetworkGame {
     }
 
     destroy() {
+        if (this.socket) {
+            this.socket.close();
+        }
         this.game.destroy();
     }
 
@@ -49,7 +52,7 @@ export class PhysicsNetworkGame {
     }
 
     protected update = () => {
-        if (!this.networkGameStarted) {
+        if (!this.socket || !this.networkGameStarted) {
             return;
         }
 

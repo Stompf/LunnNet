@@ -3,7 +3,7 @@ import { Player } from './player';
 import { KeyMapping } from './key-mapping';
 import { Bullet } from './bullet';
 import { Asteroid } from './asteroid';
-import { eventEmitter, Events } from './events';
+import { Events, resetEmitter, eventEmitter } from './events';
 import { BasePowerUp, PowerUpShield, PowerUpShootSpeed } from './power-ups';
 import { Utils } from './utils';
 
@@ -40,6 +40,7 @@ export class AsteroidsGame {
     }
 
     destroy() {
+        resetEmitter();
         this.game.destroy();
     }
 

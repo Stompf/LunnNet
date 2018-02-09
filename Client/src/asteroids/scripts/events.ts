@@ -1,6 +1,10 @@
 import * as ee from 'event-emitter';
 
-export const eventEmitter = ee({});
+export let eventEmitter = ee({});
+
+export function resetEmitter() {
+    eventEmitter = ee({});
+}
 
 export const enum Events {
     AsteroidDestroyed = 'AsteroidDestroyed',
