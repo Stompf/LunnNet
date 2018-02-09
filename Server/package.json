@@ -6,6 +6,7 @@
     "private": true,
     "scripts": {
         "start": "npm run watch-ts",
+        "build": "tsc --pretty",
         "watch-ts": "tsc -w --pretty",
         "serve": "cross-env NODE_ENV=production ts-node src/server.ts",
         "debug-serve": "nodemon -e ts -w ./src -x npm run watch:debug-serve",
