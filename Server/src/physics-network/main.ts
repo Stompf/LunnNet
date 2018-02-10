@@ -3,7 +3,9 @@ import * as winston from 'winston';
 import * as p2 from 'p2';
 import { Ball } from './ball';
 
-export class PhysicsNetwork {
+export class PhysicsNetwork implements LunnNet.NetworkGame {
+
+    readonly GAME_NAME = 'PhysicsNetwork';
 
     private readonly FIXED_TIME_STEP = 1 / 60;
     private readonly MAX_SUB_STEPS = 5;
@@ -11,8 +13,7 @@ export class PhysicsNetwork {
     private tick = 0;
     private gameStated: boolean;
 
-    private player1: Player;
-    private player2: Player;
+    private players: Player[];
     private world: p2.World;
     private ball: Ball;
 
@@ -25,8 +26,25 @@ export class PhysicsNetwork {
         this.world.defaultContactMaterial.friction = 0;
         this.addWorldBounds(this.world);
 
-        this.player1 = new Player(this.world, player1Socket, 0xFF0000, { x: this.GAME_SIZE.width / 1.25 - Player.DIAMETER, y: this.GAME_SIZE.height / 2 });
-        this.player2 = new Player(this.world, player2Socket, 0x0000FF, { x: this.GAME_SIZE.width / 4, y: this.GAME_SIZE.height / 2 });
+        const player1 = new Player(
+            this.world,
+            player1Socket,
+            0xFF0000,
+            {
+                x: this.GAME_SIZE.width / 1.25 - Player.DIAMETER,
+                y: this.GAME_SIZE.height / 2
+            }
+        );
+        const player2 = new Player(
+            this.world,
+            player2Socket,
+            0x0000FF,
+            {
+                x: this.GAME_SIZE.width / 4,
+                y: this.GAME_SIZE.height / 2
+            }
+        );
+        this.players = [player1, player2];
         this.ball = new Ball(this.world, { x: this.GAME_SIZE.width / 2, y: this.GAME_SIZE.height / 2 });
 
         this.listenToEvents(player1Socket);
@@ -40,10 +58,7 @@ export class PhysicsNetwork {
                 gravity: this.world.gravity,
                 restitution: this.world.defaultContactMaterial.restitution
             },
-            players: [
-                this.player1.toNewNetworkPlayer(),
-                this.player2.toNewNetworkPlayer()
-            ],
+            players: this.players.map(p => p.toNewNetworkPlayer()),
             gameSize: this.GAME_SIZE,
             ball: {
                 color: Ball.COLOR,
@@ -52,10 +67,9 @@ export class PhysicsNetwork {
             }
         };
 
-        winston.info(`PhysicsNetwork - starting game with players: ${this.player1.socket.id} : ${this.player2.socket.id}.`);
+        winston.info(`${this.GAME_NAME} - starting game with players: ${this.players.map(p => p.socket.id).join(' : ')}.`);
 
-        this.player1.socket.emit('GameFound', gameFound);
-        this.player2.socket.emit('GameFound', gameFound);
+        this.emitToPlayers('GameFound', gameFound);
 
         this.intervalReference = setInterval(this.heartbeat, this.FIXED_TIME_STEP);
         this.gameStated = true;
@@ -63,7 +77,25 @@ export class PhysicsNetwork {
 
     stopGame = () => {
         this.gameStated = false;
-        clearInterval(this.intervalReference!);
+
+        if (this.intervalReference) {
+            clearInterval(this.intervalReference);
+        }
+
+        this.players.forEach(p => {
+            if (p.socket.connected) {
+                p.socket.disconnect(true);
+            }
+        });
+        this.canBeRemoved = true;
+    }
+
+    private emitToPlayers(event: string, data?: any) {
+        this.players.forEach(p => {
+            if (p.socket.connected) {
+                p.socket.emit(event, data);
+            }
+        });
     }
 
     private heartbeat = () => {
@@ -73,17 +105,13 @@ export class PhysicsNetwork {
         this.world.step(this.FIXED_TIME_STEP, this.FIXED_TIME_STEP, this.MAX_SUB_STEPS);
         const serverTick: LunnNet.PhysicsNetwork.ServerTick = {
             tick: this.tick,
-            players: [
-                this.player1.toUpdateNetworkPlayerPlayer(),
-                this.player2.toUpdateNetworkPlayerPlayer()
-            ],
+            players: this.players.map(p => p.toUpdateNetworkPlayerPlayer()),
             ballUpdate: this.ball.toBallUpdate()
         };
 
         // winston.info(`heartbeat: ${serverTick.players[0].velocity}`);
 
-        this.player1.socket.emit('ServerTick', serverTick);
-        this.player2.socket.emit('ServerTick', serverTick);
+        this.emitToPlayers('ServerTick', serverTick);
     }
 
     private onBeginContact() {
@@ -116,7 +144,11 @@ export class PhysicsNetwork {
             return;
         }
 
-        const player = this.player1.socket.id === id ? this.player1 : this.player2;
+        const player = this.players.find(p => p.socket.id === id);
+        if (!player) {
+            winston.info(`${this.GAME_NAME} - handleOnPlayerUpdate - got info about player not in game.`);
+            return;
+        }
 
         player.moveRight(data.velocityHorizontal);
         player.moveUp(data.velocityVertical);

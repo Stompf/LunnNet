@@ -93,6 +93,7 @@ export class PhysicsNetworkGame {
             this.connectStatusText.visible = true;
             this.connectStatusText.setText('Disconnected');
             this.networkGameStarted = false;
+            this.connect();
         });
 
         this.socket.on('ServerTick', (data: LunnNet.PhysicsNetwork.ServerTick) => {

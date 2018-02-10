@@ -1,6 +1,10 @@
 declare namespace LunnNet {
     type Game = 'AirHockey' | 'PhysicsNetwork';
 
+    interface NetworkGame {
+        readonly GAME_NAME: string;
+    }
+
     namespace Network {
         interface QueueMatchMaking {
             game: Game;
