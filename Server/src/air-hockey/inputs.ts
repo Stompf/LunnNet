@@ -6,7 +6,6 @@ export interface Mapping {
     fire: number;
 }
 
-
 export class Inputs {
     constructor(public currentInput: Mapping) {
         this.resetInput();
