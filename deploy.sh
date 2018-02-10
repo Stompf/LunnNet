@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Starting deploy of LunnNet..."
+echo "INFO: Starting deploy of LunnNet..."
 
 force=0
 client=0
@@ -9,15 +9,15 @@ changed=0
 while getopts fcs opt; do
     case $opt in
         f)
-	echo "Force flag set" 
+	echo "INFO: Force flag set" 
 	force=1
         ;;
 		c)
-	echo "Client flag set" 
+	echo "INFO: Client flag set" 
 	client=1
         ;;
 		s)
-	echo "Server flag set" 
+	echo "INFO: Server flag set" 
 	server=1
         ;;
     esac
@@ -33,24 +33,23 @@ if [ $changed = 1 ] || [ $force = 1 ]; then
 	git pull 
 
 	if [ $client == 1 ]; then
-		echo "Installing Client..."
+		echo "INFO: Installing Client..."
 		cd Client
 		rm -rf build
 		npm install --no-save
 		npm run build
-		npm prune --production
-		echo "Client installed"
+		cd ..
+		echo "INFO: Client installed"
 	fi
 
 	if [ $server == 1 ]; then
-		echo "Installing Server..."
-		cd ../Server
+		echo "INFO: Installing Server..."
+		cd Server
 		rm -rf dist
 		npm install --no-save
 		npm run build
-		npm prune --production
 		pm2 startOrReload process.yml
-		echo "Server installed"
+		echo "INFO: Server installed"
 	fi
 
 	echo "Deploy finished"
