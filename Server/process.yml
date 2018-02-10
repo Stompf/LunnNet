@@ -1,6 +1,5 @@
 apps:
   - script: ./dist/server.js
     name: 'lunnet'
-    watch: true
     env:
       NODE_ENV: production
