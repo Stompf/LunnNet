@@ -12,27 +12,27 @@ while getopts fcs opt; do
 	echo "INFO: Force flag set" 
 	force=1
         ;;
-		c)
+        c)
 	echo "INFO: Client flag set" 
 	client=1
         ;;
-		s)
+        s)
 	echo "INFO: Server flag set" 
 	server=1
         ;;
     esac
 done
 
-if [ $client == 0 ] && [ $server == 0 ]; then
+if [ $client -eq 0 ] && [ $server -eq 0 ]; then
 	client=1
 	server=1
 fi
 
 git remote update && git status -uno | grep -q 'Your branch is behind' && changed=1
-if [ $changed = 1 ] || [ $force = 1 ]; then
+if [ $changed -eq 1 ] || [ $force -eq 1 ]; then
 	git pull 
 
-	if [ $client == 1 ]; then
+	if [ $client -eq 1 ]; then
 		echo "INFO: Installing Client..."
 		cd Client
 		rm -rf build
@@ -42,7 +42,7 @@ if [ $changed = 1 ] || [ $force = 1 ]; then
 		echo "INFO: Client installed"
 	fi
 
-	if [ $server == 1 ]; then
+	if [ $server -eq 1 ]; then
 		echo "INFO: Installing Server..."
 		cd Server
 		rm -rf dist
