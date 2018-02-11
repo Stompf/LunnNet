@@ -87,7 +87,6 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
                 p.socket.disconnect(true);
             }
         });
-        this.canBeRemoved = true;
     }
 
     private emitToPlayers(event: string, data?: any) {
