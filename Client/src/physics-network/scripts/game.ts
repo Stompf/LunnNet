@@ -48,7 +48,10 @@ export class PhysicsNetworkGame {
     protected create = () => {
         this.initPixi();
         this.initTexts();
-        this.connect();
+
+        setTimeout(() => {
+            this.connect();
+        }, 250);
     }
 
     protected update = () => {
@@ -78,6 +81,10 @@ export class PhysicsNetworkGame {
     }
 
     private initSocket = () => {
+        if (this.socket) {
+            this.socket.close();
+        }
+
         this.socket = socketIO(this.serverIP);
         this.socket.on('connect', () => {
             this.connectStatusText.setText('Connected');
