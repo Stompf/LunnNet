@@ -14,7 +14,7 @@
             "name": "Attach to Process",
             "type": "node",
             "request": "attach",
-            "port": 5858,
+            "port": 9229,
             "restart": true,
             "smartStep": true,
             "outFiles": [

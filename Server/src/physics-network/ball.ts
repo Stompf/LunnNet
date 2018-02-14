@@ -9,21 +9,23 @@ export class Ball {
     static readonly COLOR = 0x000000;
     private readonly MAX_VELOCITY = 70;
 
-    constructor(world: p2.World, position: WebKitPoint) {
+    constructor(world: p2.World) {
         this.body = new p2.Body({
             mass: Ball.MASS
         });
         const circle = new p2.Circle({ radius: Ball.DIAMETER / 2 });
         this.body.addShape(circle);
         this.body.damping = 0;
-
-        this.body.position = [position.x, position.y];
-        this.body.previousPosition = this.body.position;
         world.addBody(this.body);
     }
 
     onUpdate() {
         this.constrainVelocity(this.body, this.MAX_VELOCITY);
+    }
+
+    setPosition(position: WebKitPoint) {
+        this.body.position = [position.x, position.y];
+        this.body.previousPosition = this.body.position;
     }
 
     toBallUpdate(): LunnNet.PhysicsNetwork.BallUpdate {
@@ -32,6 +34,10 @@ export class Ball {
             position: { x: this.body.interpolatedPosition[0], y: this.body.interpolatedPosition[1] },
             velocity: this.body.velocity
         };
+    }
+
+    resetVelocity(velocityX?: number) {
+        this.body.velocity = [velocityX ? velocityX : 0, 0];
     }
 
     private constrainVelocity(body: p2.Body, maxVelocity: number) {

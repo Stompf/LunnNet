@@ -48,7 +48,10 @@ export class PhysicsNetworkGame {
     protected create = () => {
         this.initPixi();
         this.initTexts();
-        this.connect();
+
+        setTimeout(() => {
+            this.connect();
+        }, 250);
     }
 
     protected update = () => {
@@ -74,6 +77,14 @@ export class PhysicsNetworkGame {
 
     private connect() {
         this.connectStatusText.visible = true;
+        this.initSocket();
+    }
+
+    private initSocket = () => {
+        if (this.socket) {
+            this.socket.close();
+        }
+
         this.socket = socketIO(this.serverIP);
         this.socket.on('connect', () => {
             this.connectStatusText.setText('Connected');
@@ -141,8 +152,25 @@ export class PhysicsNetworkGame {
         });
 
         this.ball = new Ball(this.game, data.ball);
+        data.goals.forEach(g => this.drawGoals(g));
 
         this.networkGameStarted = true;
+    }
+
+    private drawGoals(goalOptions: LunnNet.PhysicsNetwork.GoalOptions) {
+        this.drawPositionWithBox(goalOptions.top, 0xD7D7D7);
+        this.drawPositionWithBox(goalOptions.back, 0xD7D7D7);
+        this.drawPositionWithBox(goalOptions.bottom, 0xD7D7D7);
+        this.drawPositionWithBox(goalOptions.goal, 0x000000);
+    }
+
+    private drawPositionWithBox(pBox: LunnNet.PhysicsNetwork.PositionWithBox, color: number) {
+        const texture = new Phaser.Graphics(this.game);
+        texture.beginFill(color);
+        texture.drawRect(0, 0, pBox.width, pBox.height);
+        const sprite = this.game.add.sprite(pBox.x, pBox.y, texture.generateTexture());
+        this.game.physics.p2.enable(sprite);
+        sprite.body.static = true;
     }
 
     private queue() {

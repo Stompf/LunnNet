@@ -1,25 +1,30 @@
 import * as p2 from 'p2';
+import { Team } from './team';
 
 export class Player {
     socket: SocketIO.Socket;
     body: p2.Body;
+    team: Team;
 
     static readonly DIAMETER = 60;
     readonly COLOR: number;
 
     private SPEED = 700;
 
-    constructor(world: p2.World, socket: SocketIO.Socket, color: number, startPosition: WebKitPoint) {
+    constructor(world: p2.World, socket: SocketIO.Socket, color: number, team: Team) {
         this.body = new p2.Body({
             mass: 10
         });
         this.body.addShape(new p2.Circle({ radius: Player.DIAMETER / 2 }));
         world.addBody(this.body);
-        this.body.position = [startPosition.x, startPosition.y];
-        this.body.previousPosition = this.body.position;
-        //  this.body.type = p2.Body.STATIC;
         this.socket = socket;
         this.COLOR = color;
+        this.team = team;
+    }
+
+    setPosition(position: WebKitPoint) {
+        this.body.position = [position.x, position.y];
+        this.body.previousPosition = this.body.position;
     }
 
     toNewNetworkPlayer(): LunnNet.PhysicsNetwork.NewNetworkPlayer {

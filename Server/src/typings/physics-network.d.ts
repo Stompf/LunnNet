@@ -33,6 +33,7 @@ declare namespace LunnNet {
             physicsOptions: PhysicOptions;
             players: NewNetworkPlayer[];
             ball: BallOptions;
+            goals: GoalOptions[];
         }
 
         interface ServerTick {
@@ -45,6 +46,20 @@ declare namespace LunnNet {
             velocity: number[];
             angularVelocity: number;
             position: WebKitPoint;
+        }
+
+        interface GoalOptions {
+            top: PositionWithBox;
+            bottom: PositionWithBox;
+            back: PositionWithBox;
+            goal: PositionWithBox;
+        }
+
+        interface PositionWithBox {
+            x: number;
+            y: number;
+            height: number;
+            width: number;
         }
     }
 }
