@@ -126,6 +126,10 @@ export class PhysicsNetworkGame {
             this.latestNetworkTick = data.tick;
         });
 
+        this.socket.on('NewGoal', (data: LunnNet.PhysicsNetwork.NewGoal) => {
+            // TODO
+        });
+
         // this.socket.on('BallUpdate', (data: LunnNet.PhysicsNetwork.BallUpdate) => {
         //     if (this.ballNetworkTick > data.tick) {
         //         return;

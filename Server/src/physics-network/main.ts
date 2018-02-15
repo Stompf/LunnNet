@@ -185,6 +185,13 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
                 winston.info(`${team.TeamSide} GOAL!`);
                 team.addScore();
 
+                const newGoal: LunnNet.PhysicsNetwork.NewGoal = {
+                    teamThatScored: team.TeamSide === TeamSide.Left ? 'left' : 'right',
+                    teamLeftScore: this.teamLeft.Score,
+                    teamRightScore: this.teamRight.Score
+                };
+                this.emitToPlayers('NewGoal', newGoal);
+
                 setTimeout(() => {
                     this.resetPositions(team!);
                     this.paused = false;
