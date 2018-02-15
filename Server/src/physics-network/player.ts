@@ -23,6 +23,7 @@ export class Player {
     }
 
     setPosition(position: WebKitPoint) {
+        this.body.velocity = [0, 0];
         this.body.position = [position.x, position.y];
         this.body.previousPosition = this.body.position;
     }

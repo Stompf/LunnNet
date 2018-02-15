@@ -11,9 +11,11 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
     private readonly FIXED_TIME_STEP = 1 / 60;
     private readonly MAX_SUB_STEPS = 5;
     private readonly BALL_INIT_VELOCITY = 10;
+    private readonly SCORE_DELAY_MS = 2000;
     private intervalReference: NodeJS.Timer | undefined;
     private tick = 0;
     private gameStated: boolean;
+    private paused = false;
 
     private players: Player[];
     private world: p2.World;
@@ -116,7 +118,7 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
 
         if (scoreTeam) {
             this.ball.resetVelocity(
-                scoreTeam === this.teamLeft
+                scoreTeam === this.teamRight
                     ? -(this.BALL_INIT_VELOCITY)
                     : this.BALL_INIT_VELOCITY
             );
@@ -152,9 +154,12 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
 
     private heartbeat = () => {
         this.tick++;
-        this.ball.onUpdate();
 
-        this.world.step(this.FIXED_TIME_STEP, this.FIXED_TIME_STEP, this.MAX_SUB_STEPS);
+        if (!this.paused) {
+            this.ball.onUpdate();
+            this.world.step(this.FIXED_TIME_STEP, this.FIXED_TIME_STEP, this.MAX_SUB_STEPS);
+        }
+
         const serverTick: LunnNet.PhysicsNetwork.ServerTick = {
             tick: this.tick,
             players: this.players.map(p => p.toUpdateNetworkPlayerPlayer()),
@@ -176,9 +181,14 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
             }
 
             if (team != null && (evt.bodyA === this.ball.body || evt.bodyB === this.ball.body)) {
+                this.paused = true;
                 winston.info(`${team.TeamSide} GOAL!`);
                 team.addScore();
-                this.resetPositions(team);
+
+                setTimeout(() => {
+                    this.resetPositions(team!);
+                    this.paused = false;
+                }, this.SCORE_DELAY_MS);
             }
         }, this);
 
