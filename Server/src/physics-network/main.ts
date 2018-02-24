@@ -119,8 +119,8 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
         if (scoreTeam) {
             this.ball.resetVelocity(
                 scoreTeam === this.teamRight
-                    ? -(this.BALL_INIT_VELOCITY)
-                    : this.BALL_INIT_VELOCITY
+                    ? this.BALL_INIT_VELOCITY
+                    : -(this.BALL_INIT_VELOCITY)
             );
         }
     }

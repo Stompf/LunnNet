@@ -70,6 +70,14 @@ export class PhysicsNetworkGame {
         });
     }
 
+    private drawStage() {
+        const middleLine = new Phaser.Graphics(this.game);
+        middleLine.beginFill(0xD3D3D3);
+        middleLine.drawRect(0, 0, 5, this.game.height);
+        const middleSprite = this.game.add.sprite(this.game.width / 2, 0, middleLine.generateTexture());
+        middleSprite.anchor.y = 0;
+    }
+
     private initTexts() {
         this.connectStatusText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'Connecting...');
         this.connectStatusText.anchor.set(0.5, 0.5);
@@ -151,6 +159,7 @@ export class PhysicsNetworkGame {
         this.game.physics.p2.clear();
         this.game.world.setBounds(0, 0, this.game.width, this.game.height);
 
+        this.drawStage();
         data.players.forEach(player => {
             this.players.push(new Player(this.game, this.socket.id === player.id, player));
         });
