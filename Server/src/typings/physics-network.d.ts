@@ -28,6 +28,7 @@ declare namespace LunnNet {
             position: WebKitPoint;
             diameter: number;
             color: number;
+            mass: number;
         }
 
         interface BallOptions {

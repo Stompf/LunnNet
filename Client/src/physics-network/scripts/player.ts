@@ -87,7 +87,7 @@ export class Player {
         const sprite = game.add.sprite(options.position.x, options.position.y, graphics.generateTexture());
         game.physics.p2.enable(sprite);
         sprite.body.setCircle(options.diameter / 2);
-        sprite.body.mass = 10;
+        sprite.body.mass = options.mass;
 
         return sprite;
     }

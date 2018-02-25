@@ -7,13 +7,14 @@ export class Player {
     team: Team;
 
     static readonly DIAMETER = 60;
+    static readonly MASS = 10;
     readonly COLOR: number;
 
     private SPEED = 700;
 
     constructor(world: p2.World, socket: SocketIO.Socket, color: number, team: Team) {
         this.body = new p2.Body({
-            mass: 10
+            mass: Player.MASS
         });
         this.body.addShape(new p2.Circle({ radius: Player.DIAMETER / 2 }));
         world.addBody(this.body);
@@ -33,7 +34,8 @@ export class Player {
             color: this.COLOR,
             id: this.socket.id,
             position: { x: this.body.position[0], y: this.body.position[1] },
-            diameter: Player.DIAMETER
+            diameter: Player.DIAMETER,
+            mass: Player.MASS
         };
     }
 
