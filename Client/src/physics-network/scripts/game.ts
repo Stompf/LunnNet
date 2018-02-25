@@ -26,10 +26,11 @@ export class PhysicsNetworkGame {
     }
 
     destroy() {
+        this.game.destroy();
+
         if (this.socket) {
             this.socket.close();
         }
-        this.game.destroy();
     }
 
     private preload = () => {
@@ -105,6 +106,10 @@ export class PhysicsNetworkGame {
         });
 
         this.socket.on('disconnect', () => {
+            if (this.game.stage == null) {
+                return;
+            }
+
             this.game.world.removeChildren();
             this.game.physics.p2.clear();
 

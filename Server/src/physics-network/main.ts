@@ -85,6 +85,8 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
     }
 
     stopGame = () => {
+        winston.info(`${this.GAME_NAME} - stopping game with players: ${this.players.map(p => p.socket.id).join(' : ')}.`);
+
         this.gameStated = false;
 
         if (this.intervalReference) {
