@@ -8,9 +8,9 @@ export class Player {
 
     static readonly DIAMETER = 60;
     static readonly MASS = 10;
-    readonly COLOR: number;
+    static readonly SPEED = 700;
 
-    private SPEED = 700;
+    readonly COLOR: number;
 
     constructor(world: p2.World, socket: SocketIO.Socket, color: number, team: Team) {
         this.body = new p2.Body({
@@ -35,7 +35,8 @@ export class Player {
             id: this.socket.id,
             position: { x: this.body.position[0], y: this.body.position[1] },
             diameter: Player.DIAMETER,
-            mass: Player.MASS
+            mass: Player.MASS,
+            speed: Player.SPEED
         };
     }
 
@@ -50,7 +51,11 @@ export class Player {
         if (input === 0) {
             this.body.velocity[1] = 0;
         } else {
-            this.body.velocity[1] = this.pxmi(input > 0 ? -this.SPEED : this.SPEED);
+            this.body.velocity[1] = this.pxmi(
+                input > 0
+                    ? -Player.SPEED
+                    : Player.SPEED
+            );
         }
     }
 
@@ -58,7 +63,11 @@ export class Player {
         if (input === 0) {
             this.body.velocity[0] = 0;
         } else {
-            this.body.velocity[0] = this.pxmi(input > 0 ? -this.SPEED : this.SPEED);
+            this.body.velocity[0] = this.pxmi(
+                input > 0
+                    ? -Player.SPEED
+                    : Player.SPEED
+            );
         }
     }
 

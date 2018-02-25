@@ -29,6 +29,7 @@ declare namespace LunnNet {
             diameter: number;
             color: number;
             mass: number;
+            speed: number;
         }
 
         interface BallOptions {

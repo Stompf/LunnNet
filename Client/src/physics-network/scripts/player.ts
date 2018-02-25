@@ -89,6 +89,8 @@ export class Player {
         sprite.body.setCircle(options.diameter / 2);
         sprite.body.mass = options.mass;
 
+        this.SPEED = options.speed;
+
         return sprite;
     }
 }
