@@ -2,6 +2,7 @@ import * as Phaser from 'phaser-ce';
 import * as socketIO from 'socket.io-client';
 import { Player } from './player';
 import { Ball } from './ball';
+import { Team, TeamSide } from './team';
 // import { KeyMapping } from './key-mapping';
 
 export class PhysicsNetworkGame {
@@ -18,11 +19,17 @@ export class PhysicsNetworkGame {
     private ball!: Ball;
     private networkGameStarted = false;
     private latestNetworkTick = 0;
+    private teamLeft: Team;
+    private teamRight: Team;
 
     private connectStatusText!: Phaser.Text;
+    private scoreText!: Phaser.Text;
+    private newGoalText!: Phaser.Text;
 
     constructor(canvasId: string) {
         this.game = new Phaser.Game(1200, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
+        this.teamLeft = new Team(TeamSide.Left);
+        this.teamRight = new Team(TeamSide.Right);
     }
 
     destroy() {
@@ -77,6 +84,10 @@ export class PhysicsNetworkGame {
         middleLine.drawRect(0, 0, 5, this.game.height);
         const middleSprite = this.game.add.sprite(this.game.width / 2, 0, middleLine.generateTexture());
         middleSprite.anchor.y = 0;
+
+        this.scoreText = this.game.add.text(this.game.width / 2, 15, this.teamLeft.score + ' - ' + this.teamRight.score);
+        this.newGoalText = this.game.add.text(this.game.width / 2, this.game.height / 2, 'Goal!', { fontSize: 100 });
+        this.newGoalText.visible = false;
     }
 
     private initTexts() {
@@ -139,8 +150,16 @@ export class PhysicsNetworkGame {
             this.latestNetworkTick = data.tick;
         });
 
-        this.socket.on('NewGoal', (_data: LunnNet.PhysicsNetwork.NewGoal) => {
-            // TODO
+        this.socket.on('NewGoal', (data: LunnNet.PhysicsNetwork.NewGoal) => {
+            this.teamLeft.score = data.teamLeftScore;
+            this.teamRight.score = data.teamRightScore;
+            this.scoreText.setText(this.teamLeft.score + ' - ' + this.teamRight.score, true);
+            this.newGoalText.visible = true;
+            this.newGoalText.bringToTop();
+
+            setTimeout(() => {
+                this.newGoalText.visible = false;
+            }, data.timeout);
         });
 
         // this.socket.on('BallUpdate', (data: LunnNet.PhysicsNetwork.BallUpdate) => {
@@ -152,17 +171,13 @@ export class PhysicsNetworkGame {
     }
 
     private initNewNetworkGame(data: LunnNet.PhysicsNetwork.GameFound) {
+        this.clear();
         this.connectStatusText.visible = false;
-        this.latestNetworkTick = 0;
-        this.players = [];
         this.game.physics.p2.world.gravity = data.physicsOptions.gravity;
         this.game.physics.p2.restitution = data.physicsOptions.restitution;
         this.game.physics.p2.world.defaultContactMaterial.friction = 0;
         this.game.width = data.gameSize.width;
         this.game.height = data.gameSize.height;
-        this.game.world.removeChildren();
-        this.game.physics.p2.clear();
-        this.game.world.setBounds(0, 0, this.game.width, this.game.height);
 
         this.drawStage();
         data.players.forEach(player => {
@@ -173,6 +188,16 @@ export class PhysicsNetworkGame {
         data.goals.forEach(g => this.drawGoals(g));
 
         this.networkGameStarted = true;
+    }
+
+    private clear() {
+        this.latestNetworkTick = 0;
+        this.players = [];
+        this.game.world.removeChildren();
+        this.game.physics.p2.clear();
+        this.game.world.setBounds(0, 0, this.game.width, this.game.height);
+        this.teamLeft.resetScore();
+        this.teamRight.resetScore();
     }
 
     private drawGoals(goalOptions: LunnNet.PhysicsNetwork.GoalOptions) {

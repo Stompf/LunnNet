@@ -1,6 +1,6 @@
 declare namespace LunnNet {
     namespace PhysicsNetwork {
-        type Team = 'left' | 'right';
+        type TeamType = 'left' | 'right';
 
         interface PhysicOptions {
             gravity: number[];
@@ -18,9 +18,10 @@ declare namespace LunnNet {
         }
 
         interface NewGoal {
-            teamThatScored: Team;
+            teamThatScored: TeamType;
             teamLeftScore: number;
             teamRightScore: number;
+            timeout: number;
         }
 
         interface NewNetworkPlayer {

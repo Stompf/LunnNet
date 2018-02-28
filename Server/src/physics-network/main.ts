@@ -177,9 +177,9 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
         world.on('beginContact', (evt: typeof world.beginContactEvent) => {
             let team: Team | null = null;
             if (evt.bodyA === this.goals[0].goal || evt.bodyB === this.goals[0].goal) {
-                team = this.teamLeft;
-            } else if (evt.bodyA === this.goals[1].goal || evt.bodyB === this.goals[1].goal) {
                 team = this.teamRight;
+            } else if (evt.bodyA === this.goals[1].goal || evt.bodyB === this.goals[1].goal) {
+                team = this.teamLeft;
             }
 
             if (team != null && (evt.bodyA === this.ball.body || evt.bodyB === this.ball.body)) {
@@ -190,7 +190,8 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
                 const newGoal: LunnNet.PhysicsNetwork.NewGoal = {
                     teamThatScored: team.TeamSide === TeamSide.Left ? 'left' : 'right',
                     teamLeftScore: this.teamLeft.Score,
-                    teamRightScore: this.teamRight.Score
+                    teamRightScore: this.teamRight.Score,
+                    timeout: this.SCORE_DELAY_MS
                 };
                 this.emitToPlayers('NewGoal', newGoal);
 
