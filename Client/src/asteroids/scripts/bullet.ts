@@ -31,11 +31,15 @@ export class Bullet {
         this.sprite = sprite;
 
         const timer = game.time.create();
-        timer.add(Bullet.BulletLifeTime, () => {
-            if (this.sprite.renderable) {
-                this.sprite.destroy();
-            }
-        }, this);
+        timer.add(
+            Bullet.BulletLifeTime,
+            () => {
+                if (this.sprite.renderable) {
+                    this.sprite.destroy();
+                }
+            },
+            this
+        );
 
         timer.start();
     }

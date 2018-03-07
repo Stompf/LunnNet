@@ -55,6 +55,10 @@
     ],
     "emmet.showExpandedAbbreviation": "never",
     "cSpell.words": [
-        "SPACEBAR"
+        "SPACEBAR",
+        "onstatechange",
+        "onupdatefound",
+        "precached",
+        "renderable"
     ]
 }

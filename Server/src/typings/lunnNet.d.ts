@@ -10,13 +10,13 @@ declare namespace LunnNet {
             game: Game;
         }
 
-        interface RemoveFromMatchMaking { }
+        interface RemoveFromMatchMaking {}
     }
 
     namespace AirHockey {
-        interface GameFound { }
+        interface GameFound {}
 
-        interface ClientReady { }
+        interface ClientReady {}
 
         interface ServerTick {
             tick: number;

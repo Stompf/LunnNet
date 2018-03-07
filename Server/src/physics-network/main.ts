@@ -5,7 +5,6 @@ import { Ball } from './ball';
 import { Team, TeamSide } from './team';
 
 export class PhysicsNetwork implements LunnNet.NetworkGame {
-
     readonly GAME_NAME = 'PhysicsNetwork';
 
     private readonly FIXED_TIME_STEP = 1 / 60;
@@ -35,18 +34,8 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
         this.world.defaultContactMaterial.friction = 0;
         this.addWorldBounds(this.world);
 
-        const player1 = new Player(
-            this.world,
-            player1Socket,
-            0xFF0000,
-            this.teamRight
-        );
-        const player2 = new Player(
-            this.world,
-            player2Socket,
-            0x0000FF,
-            this.teamLeft
-        );
+        const player1 = new Player(this.world, player1Socket, 0xff0000, this.teamRight);
+        const player2 = new Player(this.world, player2Socket, 0x0000ff, this.teamLeft);
         this.players = [player1, player2];
         this.ball = new Ball(this.world);
         this.resetPositions();
@@ -76,7 +65,11 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
             goals: this.goals.map(this.mapToGoalOptions)
         };
 
-        winston.info(`${this.GAME_NAME} - starting game with players: ${this.players.map(p => p.socket.id).join(' : ')}.`);
+        winston.info(
+            `${this.GAME_NAME} - starting game with players: ${this.players
+                .map(p => p.socket.id)
+                .join(' : ')}.`
+        );
 
         this.emitToPlayers('GameFound', gameFound);
 
@@ -85,7 +78,11 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
     }
 
     stopGame = () => {
-        winston.info(`${this.GAME_NAME} - stopping game with players: ${this.players.map(p => p.socket.id).join(' : ')}.`);
+        winston.info(
+            `${this.GAME_NAME} - stopping game with players: ${this.players
+                .map(p => p.socket.id)
+                .join(' : ')}.`
+        );
 
         this.gameStated = false;
 
@@ -100,7 +97,7 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
                 p.socket.disconnect(true);
             }
         });
-    }
+    };
 
     private resetPositions(scoreTeam?: Team) {
         this.players[0].setPosition({
@@ -120,9 +117,7 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
 
         if (scoreTeam) {
             this.ball.resetVelocity(
-                scoreTeam === this.teamRight
-                    ? this.BALL_INIT_VELOCITY
-                    : -(this.BALL_INIT_VELOCITY)
+                scoreTeam === this.teamRight ? this.BALL_INIT_VELOCITY : -this.BALL_INIT_VELOCITY
             );
         }
     }
@@ -134,10 +129,10 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
             goal: this.mapToPositionWithBox(goal.goal),
             top: this.mapToPositionWithBox(goal.top)
         };
-    }
+    };
 
     private mapToPositionWithBox(body: p2.Body): LunnNet.PhysicsNetwork.PositionWithBox {
-        const box = (body.shapes[0] as p2.Box);
+        const box = body.shapes[0] as p2.Box;
         return {
             height: box.height,
             width: box.width,
@@ -171,36 +166,43 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
         // winston.info(`heartbeat: ${serverTick.players[0].velocity}`);
 
         this.emitToPlayers('ServerTick', serverTick);
-    }
+    };
 
     private onBeginContact(world: p2.World) {
-        world.on('beginContact', (evt: typeof world.beginContactEvent) => {
-            let team: Team | null = null;
-            if (evt.bodyA === this.goals[0].goal || evt.bodyB === this.goals[0].goal) {
-                team = this.teamRight;
-            } else if (evt.bodyA === this.goals[1].goal || evt.bodyB === this.goals[1].goal) {
-                team = this.teamLeft;
-            }
+        world.on(
+            'beginContact',
+            (evt: typeof world.beginContactEvent) => {
+                let team: Team | null = null;
+                if (evt.bodyA === this.goals[0].goal || evt.bodyB === this.goals[0].goal) {
+                    team = this.teamRight;
+                } else if (evt.bodyA === this.goals[1].goal || evt.bodyB === this.goals[1].goal) {
+                    team = this.teamLeft;
+                }
 
-            if (team != null && (evt.bodyA === this.ball.body || evt.bodyB === this.ball.body)) {
-                this.paused = true;
-                winston.info(`${team.TeamSide} GOAL!`);
-                team.addScore();
+                if (
+                    team != null &&
+                    (evt.bodyA === this.ball.body || evt.bodyB === this.ball.body)
+                ) {
+                    this.paused = true;
+                    winston.info(`${team.TeamSide} GOAL!`);
+                    team.addScore();
 
-                const newGoal: LunnNet.PhysicsNetwork.NewGoal = {
-                    teamThatScored: team.TeamSide === TeamSide.Left ? 'left' : 'right',
-                    teamLeftScore: this.teamLeft.Score,
-                    teamRightScore: this.teamRight.Score,
-                    timeout: this.SCORE_DELAY_MS
-                };
-                this.emitToPlayers('NewGoal', newGoal);
+                    const newGoal: LunnNet.PhysicsNetwork.NewGoal = {
+                        teamThatScored: team.TeamSide === TeamSide.Left ? 'left' : 'right',
+                        teamLeftScore: this.teamLeft.Score,
+                        teamRightScore: this.teamRight.Score,
+                        timeout: this.SCORE_DELAY_MS
+                    };
+                    this.emitToPlayers('NewGoal', newGoal);
 
-                setTimeout(() => {
-                    this.resetPositions(team!);
-                    this.paused = false;
-                }, this.SCORE_DELAY_MS);
-            }
-        }, this);
+                    setTimeout(() => {
+                        this.resetPositions(team!);
+                        this.paused = false;
+                    }, this.SCORE_DELAY_MS);
+                }
+            },
+            this
+        );
 
         // this.world.on('impact', () => {
         //     winston.info(`impact: ${this.ball.body.velocity[0]} : ${this.ball.body.velocity[1]}`);
@@ -218,7 +220,9 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
     }
 
     private listenToEvents(socket: SocketIO.Socket) {
-        socket.on('UpdateFromClient', (data: LunnNet.PhysicsNetwork.UpdateFromClient) => { this.handleOnPlayerUpdate(socket.id, data); });
+        socket.on('UpdateFromClient', (data: LunnNet.PhysicsNetwork.UpdateFromClient) => {
+            this.handleOnPlayerUpdate(socket.id, data);
+        });
         socket.on('disconnect', this.stopGame);
     }
 
@@ -229,7 +233,9 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
 
         const player = this.players.find(p => p.socket.id === id);
         if (!player) {
-            winston.info(`${this.GAME_NAME} - handleOnPlayerUpdate - got info about player not in game.`);
+            winston.info(
+                `${this.GAME_NAME} - handleOnPlayerUpdate - got info about player not in game.`
+            );
             return;
         }
 
@@ -237,7 +243,7 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
         player.moveUp(data.velocityVertical);
 
         // winston.info(`handleOnPlayerUpdate: ${player.socket.id} : ${data.velocityHorizontal}`);
-    }
+    };
 
     private addWorldBounds(world: p2.World) {
         let floor = new p2.Body({
@@ -261,7 +267,7 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
         world.addBody(right);
 
         let left = new p2.Body({
-            angle: (3 * Math.PI) / 2,
+            angle: 3 * Math.PI / 2,
             position: [0, 0]
         });
         left.addShape(new p2.Plane());
@@ -279,26 +285,35 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
         }
 
         const top = new p2.Body();
-        top.addShape(new p2.Box({
-            height: goalNetSize,
-            width: goalWidth
-        }));
+        top.addShape(
+            new p2.Box({
+                height: goalNetSize,
+                width: goalWidth
+            })
+        );
         top.position = [x, this.GAME_SIZE.height / 2 - goalHeight / 2 - goalNetSize / 2];
 
         const bottom = new p2.Body();
-        bottom.addShape(new p2.Box({
-            height: goalNetSize,
-            width: goalWidth
-        }));
+        bottom.addShape(
+            new p2.Box({
+                height: goalNetSize,
+                width: goalWidth
+            })
+        );
         bottom.position = [x, this.GAME_SIZE.height / 2 + goalHeight / 2 + goalNetSize / 2];
 
         const back = new p2.Body();
-        back.addShape(new p2.Box({
-            height: goalHeight + goalNetSize * 2,
-            width: goalNetSize
-        }));
+        back.addShape(
+            new p2.Box({
+                height: goalHeight + goalNetSize * 2,
+                width: goalNetSize
+            })
+        );
         const offset = goalWidth / 2 + goalNetSize / 2;
-        back.position = [x - (team.TeamSide === TeamSide.Left ? offset : -offset), this.GAME_SIZE.height / 2];
+        back.position = [
+            x - (team.TeamSide === TeamSide.Left ? offset : -offset),
+            this.GAME_SIZE.height / 2
+        ];
 
         this.world.addBody(top);
         this.world.addBody(bottom);
@@ -309,10 +324,12 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
         back.type = p2.Body.STATIC;
 
         const goal = new p2.Body();
-        goal.addShape(new p2.Box({
-            height: goalHeight,
-            width: goalWidth
-        }));
+        goal.addShape(
+            new p2.Box({
+                height: goalHeight,
+                width: goalWidth
+            })
+        );
         goal.position = [x, this.GAME_SIZE.height / 2, this.GAME_SIZE.height / 22];
         goal.type = p2.Body.STATIC;
         this.world.addBody(goal);
@@ -324,7 +341,6 @@ export class PhysicsNetwork implements LunnNet.NetworkGame {
             goal: goal
         };
     }
-
 }
 
 interface Goal {

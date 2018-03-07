@@ -6,15 +6,17 @@
     "language": "en",
     // words - list of words to be always considered correct
     "words": [
-        "PIXI",
+        "classpath",
+        "codelyzer",
+        "libpeerconnection",
         "Lunn",
         "ngtools",
-        "codelyzer",
+        "PIXI",
+        "prettierrc",
+        "pxmi",
         "respawn",
-        "vsicons",
-        "classpath",
-        "libpeerconnection",
-        "testem"
+        "testem",
+        "vsicons"
     ],
     // flagWords - list of words to be always considered incorrect
     // This is useful for offensive words and common spelling errors.

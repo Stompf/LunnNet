@@ -18,9 +18,9 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
     }
 
     componentDidMount() {
-        this._currentGame = this.NETWORK_GAME ?
-            new NetworkGame(this.CANVAS_ID) :
-            new BaseGame(this.CANVAS_ID);
+        this._currentGame = this.NETWORK_GAME
+            ? new NetworkGame(this.CANVAS_ID)
+            : new BaseGame(this.CANVAS_ID);
     }
 
     componentWillUnmount() {
@@ -28,7 +28,6 @@ class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
             this._currentGame.destroy();
         }
     }
-
 }
 
 export default AirHockey;

@@ -4,14 +4,13 @@ export const enum TeamSide {
 }
 
 export class Team {
-
     score: number = 0;
 
     get TeamSide() {
         return this.teamSide;
     }
 
-    constructor(private teamSide: TeamSide) { }
+    constructor(private teamSide: TeamSide) {}
 
     resetScore() {
         this.score = 0;

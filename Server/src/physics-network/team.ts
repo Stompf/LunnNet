@@ -4,7 +4,6 @@ export const enum TeamSide {
 }
 
 export class Team {
-
     private score: number = 0;
     private color: number;
 
@@ -22,9 +21,7 @@ export class Team {
 
     constructor(private teamSide: TeamSide) {
         this.resetScore();
-        this.color = this.teamSide === TeamSide.Left
-            ? 0xFF0000
-            : 0x0000FF;
+        this.color = this.teamSide === TeamSide.Left ? 0xff0000 : 0x0000ff;
     }
 
     resetScore() {

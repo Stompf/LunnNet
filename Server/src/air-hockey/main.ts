@@ -46,7 +46,9 @@ export class AirHockey {
     }
 
     sendStartGame() {
-        winston.info('AirHockey, starting game with players: ' + this.player1.id + ' : ' + this.player2.id);
+        winston.info(
+            'AirHockey, starting game with players: ' + this.player1.id + ' : ' + this.player2.id
+        );
         this.player1.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
         this.player2.socket.emit('GameFound', {} as LunnNet.AirHockey.GameFound);
     }
@@ -90,7 +92,7 @@ export class AirHockey {
 
         this.player1.onUpdate();
         this.player2.onUpdate();
-    }
+    };
 
     private score(team: Team) {
         this.ball.resetVelocity();
@@ -99,7 +101,9 @@ export class AirHockey {
 
         setTimeout(() => {
             this.setStartPositions();
-            this.ball.resetVelocity(team === this.teamLeft ? -(this.BALL_INIT_VELOCITY) : this.BALL_INIT_VELOCITY);
+            this.ball.resetVelocity(
+                team === this.teamLeft ? -this.BALL_INIT_VELOCITY : this.BALL_INIT_VELOCITY
+            );
             this.paused = false;
         }, this.SCORE_DELAY_MS);
     }
@@ -153,8 +157,12 @@ export class AirHockey {
     }
 
     private pointInsideRect(x: number, y: number, rect: LunnNet.Utils.Rectangle) {
-        return rect.position[0] <= x && x <= rect.position[0] + rect.width &&
-            rect.position[1] <= y && y <= rect.position[1] + rect.height;
+        return (
+            rect.position[0] <= x &&
+            x <= rect.position[0] + rect.width &&
+            rect.position[1] <= y &&
+            y <= rect.position[1] + rect.height
+        );
     }
 
     private drawGoal(team: Team) {
@@ -172,20 +180,29 @@ export class AirHockey {
             width: goalWidth,
             height: goalNetSize
         });
-        top.position = [x, this.TOP_OFFSET + this.totalAreaHeight() / 2 - goalHeight / 2 - goalNetSize / 2];
+        top.position = [
+            x,
+            this.TOP_OFFSET + this.totalAreaHeight() / 2 - goalHeight / 2 - goalNetSize / 2
+        ];
 
         const bottom = new p2.Box({
             width: goalWidth,
             height: goalNetSize
         });
-        bottom.position = [x, this.TOP_OFFSET + this.totalAreaHeight() / 2 + goalHeight / 2 + goalNetSize / 2];
+        bottom.position = [
+            x,
+            this.TOP_OFFSET + this.totalAreaHeight() / 2 + goalHeight / 2 + goalNetSize / 2
+        ];
 
         const back = new p2.Box({
             width: goalNetSize,
             height: goalNetSize + goalNetSize * 2
         });
         const offset = goalWidth / 2 + goalNetSize / 2;
-        back.position = [x - (team.TeamSide === TeamSide.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2];
+        back.position = [
+            x - (team.TeamSide === TeamSide.Left ? offset : -offset),
+            this.TOP_OFFSET + this.totalAreaHeight() / 2
+        ];
 
         top.type = p2.Body.STATIC;
         back.type = p2.Body.STATIC;

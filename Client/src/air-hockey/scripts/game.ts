@@ -7,7 +7,6 @@ import { Player, NetworkPlayer } from './player';
 import { KeyMapping } from './key-mapping';
 
 export class BaseGame {
-
     protected game: Phaser.Game;
 
     private readonly SCORE_DELAY_MS = 2000;
@@ -27,7 +26,11 @@ export class BaseGame {
     protected scoreText!: Phaser.Text;
 
     constructor(canvasId: string) {
-        this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
+        this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, {
+            preload: this.preload,
+            create: this.create,
+            update: this.update
+        });
     }
 
     destroy() {
@@ -47,17 +50,16 @@ export class BaseGame {
 
     private preload = () => {
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    }
+    };
 
     protected initPixi() {
         PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
 
-        this.game.stage.backgroundColor = 0xFFFFFF;
+        this.game.stage.backgroundColor = 0xffffff;
         this.game.renderer.view.style.border = '1px solid black';
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.world.gravity = [0, 0];
         this.game.physics.p2.restitution = 1;
-
     }
 
     protected create = () => {
@@ -77,12 +79,21 @@ export class BaseGame {
         this.ball.setDebug(this.DEBUG_BODIES);
 
         this.resetPositions();
-    }
+    };
 
     private resetPositions() {
-        this.player1.setPosition({ x: this.game.width / 4, y: this.TOP_OFFSET + this.totalAreaHeight() / 2 });
-        this.player2.setPosition({ x: this.game.width / 1.25 - this.player2.RADIUS, y: this.TOP_OFFSET + this.totalAreaHeight() / 2 });
-        this.ball.setPosition({ x: this.game.width / 2, y: this.TOP_OFFSET + this.totalAreaHeight() / 2 });
+        this.player1.setPosition({
+            x: this.game.width / 4,
+            y: this.TOP_OFFSET + this.totalAreaHeight() / 2
+        });
+        this.player2.setPosition({
+            x: this.game.width / 1.25 - this.player2.RADIUS,
+            y: this.TOP_OFFSET + this.totalAreaHeight() / 2
+        });
+        this.ball.setPosition({
+            x: this.game.width / 2,
+            y: this.TOP_OFFSET + this.totalAreaHeight() / 2
+        });
     }
 
     protected drawStage() {
@@ -93,21 +104,34 @@ export class BaseGame {
         const topSprite = this.game.add.sprite(0, this.TOP_OFFSET, topLine.generateTexture());
         this.game.physics.p2.enable(topSprite);
 
-        topSprite.body.setRectangle(this.game.width + 10, this.TOP_OFFSET, this.game.width / 2, -this.TOP_OFFSET / 2);
+        topSprite.body.setRectangle(
+            this.game.width + 10,
+            this.TOP_OFFSET,
+            this.game.width / 2,
+            -this.TOP_OFFSET / 2
+        );
         topSprite.body.static = true;
         topSprite.anchor.x = 0;
         topSprite.body.debug = this.DEBUG_BODIES;
 
         const middleLine = new Phaser.Graphics(this.game);
-        middleLine.beginFill(0xD3D3D3);
+        middleLine.beginFill(0xd3d3d3);
         middleLine.drawRect(0, 0, 5, this.totalAreaHeight());
-        const middleSprite = this.game.add.sprite(this.game.width / 2, this.TOP_OFFSET, middleLine.generateTexture());
+        const middleSprite = this.game.add.sprite(
+            this.game.width / 2,
+            this.TOP_OFFSET,
+            middleLine.generateTexture()
+        );
         middleSprite.anchor.y = 0;
 
         this.goal1 = this.drawGoal(this.teamLeft);
         this.goal2 = this.drawGoal(this.teamRight);
 
-        this.scoreText = this.game.add.text(this.game.width / 2, this.TOP_OFFSET / 2, this.teamLeft.Score + ' - ' + this.teamRight.Score);
+        this.scoreText = this.game.add.text(
+            this.game.width / 2,
+            this.TOP_OFFSET / 2,
+            this.teamLeft.Score + ' - ' + this.teamRight.Score
+        );
     }
 
     private drawGoal(team: Team) {
@@ -122,16 +146,28 @@ export class BaseGame {
         }
 
         const topAndBottomGraphics = new Phaser.Graphics(this.game);
-        topAndBottomGraphics.beginFill(0xD3D3D3);
+        topAndBottomGraphics.beginFill(0xd3d3d3);
         topAndBottomGraphics.drawRect(0, 0, goalWidth, goalNetSize);
-        const top = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2 - goalHeight / 2 - goalNetSize / 2, topAndBottomGraphics.generateTexture());
-        const bottom = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2 + goalHeight / 2 + goalNetSize / 2, topAndBottomGraphics.generateTexture());
+        const top = this.game.add.sprite(
+            x,
+            this.TOP_OFFSET + this.totalAreaHeight() / 2 - goalHeight / 2 - goalNetSize / 2,
+            topAndBottomGraphics.generateTexture()
+        );
+        const bottom = this.game.add.sprite(
+            x,
+            this.TOP_OFFSET + this.totalAreaHeight() / 2 + goalHeight / 2 + goalNetSize / 2,
+            topAndBottomGraphics.generateTexture()
+        );
 
         const backGraphics = new Phaser.Graphics(this.game);
-        backGraphics.beginFill(0xD3D3D3);
+        backGraphics.beginFill(0xd3d3d3);
         backGraphics.drawRect(0, 0, goalNetSize, goalHeight + goalNetSize * 2);
         const offset = goalWidth / 2 + goalNetSize / 2;
-        const back = this.game.add.sprite(x - (team.TeamSide === TeamSide.Left ? offset : -offset), this.TOP_OFFSET + this.totalAreaHeight() / 2, backGraphics.generateTexture());
+        const back = this.game.add.sprite(
+            x - (team.TeamSide === TeamSide.Left ? offset : -offset),
+            this.TOP_OFFSET + this.totalAreaHeight() / 2,
+            backGraphics.generateTexture()
+        );
 
         this.game.physics.p2.enable(top);
         this.game.physics.p2.enable(bottom);
@@ -149,7 +185,11 @@ export class BaseGame {
         graphics.beginFill(0x000000);
         graphics.drawRect(0, 0, goalWidth, goalHeight);
 
-        const sprite = this.game.add.sprite(x, this.TOP_OFFSET + this.totalAreaHeight() / 2, graphics.generateTexture());
+        const sprite = this.game.add.sprite(
+            x,
+            this.TOP_OFFSET + this.totalAreaHeight() / 2,
+            graphics.generateTexture()
+        );
         return sprite;
     }
 
@@ -165,7 +205,7 @@ export class BaseGame {
 
         this.player1.onUpdate(this.game);
         this.player2.onUpdate(this.game);
-    }
+    };
 
     private score(team: Team) {
         this.ball.resetVelocity();
@@ -175,7 +215,9 @@ export class BaseGame {
 
         setTimeout(() => {
             this.resetPositions();
-            this.ball.resetVelocity(team === this.teamLeft ? -(this.BALL_INIT_VELOCITY) : this.BALL_INIT_VELOCITY);
+            this.ball.resetVelocity(
+                team === this.teamLeft ? -this.BALL_INIT_VELOCITY : this.BALL_INIT_VELOCITY
+            );
             this.game.paused = false;
         }, this.SCORE_DELAY_MS);
     }
@@ -200,14 +242,14 @@ export class NetworkGame extends BaseGame {
 
     protected create = () => {
         this.initPixi();
-    }
+    };
 
     protected update = () => {
         if (!this.gameFound) {
             return;
         }
         this.player1.onUpdate(this.game);
-    }
+    };
 
     private initNewNetworkGame() {
         this.game.world.removeAll();
@@ -257,7 +299,9 @@ export class NetworkGame extends BaseGame {
     }
 
     private queue() {
-        this.socket.emit('QueueMatchMaking', { game: 'AirHockey' } as LunnNet.Network.QueueMatchMaking);
+        this.socket.emit('QueueMatchMaking', {
+            game: 'AirHockey'
+        } as LunnNet.Network.QueueMatchMaking);
         this.appendTextareaLine('Looking for game...');
     }
 

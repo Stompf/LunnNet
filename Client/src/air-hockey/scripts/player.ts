@@ -53,12 +53,18 @@ export class Player {
         if (game.input.keyboard.isDown(this.keyMapping.down)) {
             input[1] -= this.SPEED;
         }
-        if (game.input.keyboard.isDown(this.keyMapping.left)
-            && (this.team.TeamSide !== TeamSide.Right || this.sprite.body.x > (game.width / 2 + this.RADIUS / 2))) {
+        if (
+            game.input.keyboard.isDown(this.keyMapping.left) &&
+            (this.team.TeamSide !== TeamSide.Right ||
+                this.sprite.body.x > game.width / 2 + this.RADIUS / 2)
+        ) {
             input[0] -= this.SPEED;
         }
-        if (game.input.keyboard.isDown(this.keyMapping.right)
-            && (this.team.TeamSide !== TeamSide.Left || this.sprite.body.x < (game.width / 2 - this.RADIUS / 2))) {
+        if (
+            game.input.keyboard.isDown(this.keyMapping.right) &&
+            (this.team.TeamSide !== TeamSide.Left ||
+                this.sprite.body.x < game.width / 2 - this.RADIUS / 2)
+        ) {
             input[0] += this.SPEED;
         }
 
@@ -68,7 +74,6 @@ export class Player {
 }
 
 export class NetworkPlayer extends Player {
-
     constructor(game: Phaser.Game, team: Team) {
         super(game, team);
     }

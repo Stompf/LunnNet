@@ -4,7 +4,6 @@ import * as winston from 'winston';
 import { PhysicsNetwork } from './physics-network/main';
 
 export class MatchMaking {
-
     private currentQueue: MultiDictionary<LunnNet.Game, SocketIO.Socket>;
 
     constructor() {

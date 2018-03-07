@@ -1,7 +1,6 @@
 import * as p2 from 'p2';
 
 export class Ball {
-
     body: p2.Body;
 
     static readonly DIAMETER = 30;
@@ -31,7 +30,10 @@ export class Ball {
     toBallUpdate(): LunnNet.PhysicsNetwork.BallUpdate {
         return {
             angularVelocity: this.body.angularVelocity,
-            position: { x: this.body.interpolatedPosition[0], y: this.body.interpolatedPosition[1] },
+            position: {
+                x: this.body.interpolatedPosition[0],
+                y: this.body.interpolatedPosition[1]
+            },
             velocity: this.body.velocity
         };
     }

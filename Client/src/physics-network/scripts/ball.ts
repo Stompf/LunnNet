@@ -1,7 +1,6 @@
 import * as Phaser from 'phaser-ce';
 
 export class Ball {
-
     sprite: Phaser.Sprite;
     private readonly MAX_VELOCITY = 70;
 
@@ -27,7 +26,11 @@ export class Ball {
         graphics.beginFill(options.color);
         graphics.drawCircle(0, 0, options.diameter);
 
-        const sprite = game.add.sprite(game.world.centerX, game.world.centerY, graphics.generateTexture());
+        const sprite = game.add.sprite(
+            game.world.centerX,
+            game.world.centerY,
+            graphics.generateTexture()
+        );
         game.physics.p2.enable(sprite);
         sprite.body.setCircle(options.diameter / 2);
         sprite.body.mass = options.mass;

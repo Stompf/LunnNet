@@ -4,11 +4,16 @@ import { Player } from './player';
 import { Events, eventEmitter } from './events';
 
 export class BasePowerUp {
-
     sprite: Phaser.Sprite;
     isActive: boolean = false;
 
-    constructor(game: Phaser.Game, spriteName: string, position: WebKitPoint, velocity: WebKitPoint, angularVelocity: number) {
+    constructor(
+        game: Phaser.Game,
+        spriteName: string,
+        position: WebKitPoint,
+        velocity: WebKitPoint,
+        angularVelocity: number
+    ) {
         const sprite = game.add.sprite(position.x, position.y, spriteName);
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
@@ -26,16 +31,26 @@ export class BasePowerUp {
 
         sprite.body.setRectangle(sprite.width, sprite.height);
         sprite.body.setCollisionGroup(Utils.MASKS.POWER_UP);
-        sprite.body.collides([game.physics.p2.everythingCollisionGroup, Utils.MASKS.PLAYER, Utils.MASKS.POWER_UP, Utils.MASKS.BULLET, Utils.MASKS.ASTEROID]);
+        sprite.body.collides([
+            game.physics.p2.everythingCollisionGroup,
+            Utils.MASKS.PLAYER,
+            Utils.MASKS.POWER_UP,
+            Utils.MASKS.BULLET,
+            Utils.MASKS.ASTEROID
+        ]);
 
-        sprite.body.createGroupCallback(Utils.MASKS.PLAYER, (_thisBody: Phaser.Physics.P2.Body, playerBody: Phaser.Physics.P2.Body) => {
-            if ((playerBody.sprite.data as Player).hasShield) {
-                return;
-            }
+        sprite.body.createGroupCallback(
+            Utils.MASKS.PLAYER,
+            (_thisBody: Phaser.Physics.P2.Body, playerBody: Phaser.Physics.P2.Body) => {
+                if ((playerBody.sprite.data as Player).hasShield) {
+                    return;
+                }
 
-            this.activate(playerBody.sprite.data);
-            eventEmitter.emit(Events.PowerUpActivated, this);
-        }, this);
+                this.activate(playerBody.sprite.data);
+                eventEmitter.emit(Events.PowerUpActivated, this);
+            },
+            this
+        );
 
         sprite.data = this;
 
@@ -61,7 +76,12 @@ export class PowerUpShield extends BasePowerUp {
     private shieldSprite!: Phaser.Sprite;
     private timer: Phaser.Timer;
 
-    constructor(game: Phaser.Game, position: WebKitPoint, velocity: WebKitPoint, angularVelocity: number) {
+    constructor(
+        game: Phaser.Game,
+        position: WebKitPoint,
+        velocity: WebKitPoint,
+        angularVelocity: number
+    ) {
         super(game, 'powerUp_shield', position, velocity, angularVelocity);
         this.timer = game.time.create();
     }
@@ -72,7 +92,13 @@ export class PowerUpShield extends BasePowerUp {
         this.createShieldGraphics(player);
         player.hasShield = true;
 
-        this.timer.add(this.durationMs, () => { this.deactivate(player); }, this);
+        this.timer.add(
+            this.durationMs,
+            () => {
+                this.deactivate(player);
+            },
+            this
+        );
         this.timer.add(this.durationMs - this.warningMs, this.warn, this);
         this.timer.start();
 
@@ -93,7 +119,7 @@ export class PowerUpShield extends BasePowerUp {
                 this.warn();
             }, 200);
         }
-    }
+    };
 
     private createShieldGraphics(player: Player) {
         const graphics = new Phaser.Graphics(player.sprite.game);
@@ -119,14 +145,25 @@ export class PowerUpShootSpeed extends BasePowerUp {
     private durationMs = 5000;
     private timer: Phaser.Timer;
 
-    constructor(game: Phaser.Game, position: WebKitPoint, velocity: WebKitPoint, angularVelocity: number) {
+    constructor(
+        game: Phaser.Game,
+        position: WebKitPoint,
+        velocity: WebKitPoint,
+        angularVelocity: number
+    ) {
         super(game, 'powerUp_shootSpeed', position, velocity, angularVelocity);
         this.timer = game.time.create();
     }
 
     activate(player: Player) {
         player.reloadTime -= this.shootSpeedIncrease;
-        this.timer.add(this.durationMs, () => { this.deactivate(player); }, this);
+        this.timer.add(
+            this.durationMs,
+            () => {
+                this.deactivate(player);
+            },
+            this
+        );
         this.timer.start();
 
         super.activate(player);

@@ -13,37 +13,47 @@ import AirHockey from './air-hockey/air-hockey';
 (window as any).Phaser = require('phaser-ce/build/custom/phaser-split');
 
 const Header = () => (
-  <header>
-    <nav>
-      <span><Link to="/">AirHockey</Link></span> |
-      <span> <Link to="/asteroids">Asteroids</Link></span> |
-      <span> <Link to="/physics-network">Physics network</Link></span>
-    </nav>
-  </header>
+    <header>
+        <nav>
+            <span>
+                <Link to="/">AirHockey</Link>
+            </span>{' '}
+            |
+            <span>
+                {' '}
+                <Link to="/asteroids">Asteroids</Link>
+            </span>{' '}
+            |
+            <span>
+                {' '}
+                <Link to="/physics-network">Physics network</Link>
+            </span>
+        </nav>
+    </header>
 );
 
 const Main = () => (
-  <main>
-    <Switch>
-      <Route exact={true} path="/" component={AirHockey} />
-      <Route path="/asteroids" component={Asteroids} />
-      <Route path="/physics-network" component={PhysicsNetwork} />
-    </Switch>
-  </main>
+    <main>
+        <Switch>
+            <Route exact={true} path="/" component={AirHockey} />
+            <Route path="/asteroids" component={Asteroids} />
+            <Route path="/physics-network" component={PhysicsNetwork} />
+        </Switch>
+    </main>
 );
 
 const App = () => (
-  <div>
-    <Header />
-    <Main />
-  </div>
+    <div>
+        <Header />
+        <Main />
+    </div>
 );
 
 ReactDOM.render(
-  <HashRouter>
-    <App />
-  </HashRouter>,
-  document.getElementById('root') as HTMLElement
+    <HashRouter>
+        <App />
+    </HashRouter>,
+    document.getElementById('root') as HTMLElement
 );
 
 // registerServiceWorker();

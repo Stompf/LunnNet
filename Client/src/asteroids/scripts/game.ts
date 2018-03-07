@@ -36,7 +36,11 @@ export class AsteroidsGame {
     private gameOverGroup!: Phaser.Group;
 
     constructor(canvasId: string) {
-        this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
+        this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, {
+            preload: this.preload,
+            create: this.create,
+            update: this.update
+        });
     }
 
     destroy() {
@@ -47,12 +51,27 @@ export class AsteroidsGame {
     private preload = () => {
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 
-        this.game.load.image('player', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/playerShip1_blue.png');
-        this.game.load.image('ufo', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/ufoRed.png');
-        this.game.load.image('powerUp_shootSpeed', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png');
-        this.game.load.image('powerUp_shield', process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_shield.png');
-        this.game.load.image('background', process.env.PUBLIC_URL + '/assets/games/asteroids/Backgrounds/space.jpg');
-    }
+        this.game.load.image(
+            'player',
+            process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/playerShip1_blue.png'
+        );
+        this.game.load.image(
+            'ufo',
+            process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/ufoRed.png'
+        );
+        this.game.load.image(
+            'powerUp_shootSpeed',
+            process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_bolt.png'
+        );
+        this.game.load.image(
+            'powerUp_shield',
+            process.env.PUBLIC_URL + '/assets/games/asteroids/PNG/Power-ups/powerUpBlue_shield.png'
+        );
+        this.game.load.image(
+            'background',
+            process.env.PUBLIC_URL + '/assets/games/asteroids/Backgrounds/space.jpg'
+        );
+    };
 
     private create = () => {
         this.initPixi();
@@ -62,22 +81,34 @@ export class AsteroidsGame {
         this.createTimers();
 
         this.startNewGame();
-    }
+    };
 
     private update = () => {
         this.updateKeys();
         this.updatePhysics();
         this.updateHUD();
-    }
+    };
 
     private addBackground() {
-        const background = this.game.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
+        const background = this.game.add.tileSprite(
+            0,
+            0,
+            this.game.width,
+            this.game.height,
+            'background'
+        );
         background.anchor.set(0, 0);
     }
 
     private createTimers() {
         this.asteroidSpawnTimer = this.game.time.create(false);
-        this.asteroidSpawnTimer.loop(this.asteroidSpawnDelay, () => { this.asteroidTick(); }, this);
+        this.asteroidSpawnTimer.loop(
+            this.asteroidSpawnDelay,
+            () => {
+                this.asteroidTick();
+            },
+            this
+        );
     }
 
     private startNewGame() {
@@ -97,10 +128,16 @@ export class AsteroidsGame {
     }
 
     private addHUD() {
-        const pointsText = this.game.add.text(0, 0, 'Points: ', { fill: '#FFFFFF', fontSize: 12 });
+        const pointsText = this.game.add.text(0, 0, 'Points: ', {
+            fill: '#FFFFFF',
+            fontSize: 12
+        });
         pointsText.anchor.setTo(0, 0);
 
-        const livesText = this.game.add.text(0, pointsText.height, 'Lives: ', { fill: '#FFFFFF', fontSize: 12 });
+        const livesText = this.game.add.text(0, pointsText.height, 'Lives: ', {
+            fill: '#FFFFFF',
+            fontSize: 12
+        });
         livesText.anchor.setTo(0, 0);
 
         this.pointsText = pointsText;
@@ -113,26 +150,32 @@ export class AsteroidsGame {
     }
 
     private listenToEvents() {
-        eventEmitter.on(Events.AsteroidDestroyed, (asteroidBody: Phaser.Physics.P2.Body, bulletBody: Phaser.Physics.P2.Body) => {
-            // Check if bullet or ship is already destroyed
-            if (bulletBody.sprite == null || asteroidBody.sprite == null) {
-                return;
+        eventEmitter.on(
+            Events.AsteroidDestroyed,
+            (asteroidBody: Phaser.Physics.P2.Body, bulletBody: Phaser.Physics.P2.Body) => {
+                // Check if bullet or ship is already destroyed
+                if (bulletBody.sprite == null || asteroidBody.sprite == null) {
+                    return;
+                }
+
+                this.player.points += 10;
+
+                // Remove bullet
+                this.game.physics.p2.removeBodyNextStep(bulletBody);
+                bulletBody.sprite.destroy();
+
+                (asteroidBody.sprite.data as Asteroid).explode();
+
+                if (
+                    Math.random() <= this.powerUpShieldPercent &&
+                    this.powerUps.length < this.maxPowerUpsOnScreen
+                ) {
+                    this.spawnRandomPowerUp(asteroidBody.sprite.position);
+                }
+                this.game.physics.p2.removeBodyNextStep(asteroidBody);
+                asteroidBody.sprite.destroy();
             }
-
-            this.player.points += 10;
-
-            // Remove bullet
-            this.game.physics.p2.removeBodyNextStep(bulletBody);
-            bulletBody.sprite.destroy();
-
-            (asteroidBody.sprite.data as Asteroid).explode();
-
-            if (Math.random() <= this.powerUpShieldPercent && this.powerUps.length < this.maxPowerUpsOnScreen) {
-                this.spawnRandomPowerUp(asteroidBody.sprite.position);
-            }
-            this.game.physics.p2.removeBodyNextStep(asteroidBody);
-            asteroidBody.sprite.destroy();
-        });
+        );
 
         eventEmitter.on(Events.PowerUpActivated, (powerUp: BasePowerUp) => {
             const index = this.powerUps.indexOf(powerUp);
@@ -150,7 +193,13 @@ export class AsteroidsGame {
             this.player.sprite.visible = false;
             if (this.player.lives > 0) {
                 const timer = this.game.time.create();
-                timer.add(this.PLAYER_RESPAWN_TIME, () => { this.respawnPlayer(); }, this);
+                timer.add(
+                    this.PLAYER_RESPAWN_TIME,
+                    () => {
+                        this.respawnPlayer();
+                    },
+                    this
+                );
                 timer.start();
             } else {
                 this.showGameOver();
@@ -173,18 +222,32 @@ export class AsteroidsGame {
         group.add(backgroundSprite);
         group.position.set(this.game.width / 2, this.game.height / 2);
 
-        const gameOverText = this.game.add.text(0, -backgroundSprite.height / 2, 'GAME OVER', { fill: '#FFFFFF', fontSize: 30 });
+        const gameOverText = this.game.add.text(0, -backgroundSprite.height / 2, 'GAME OVER', {
+            fill: '#FFFFFF',
+            fontSize: 30
+        });
         gameOverText.anchor.y = 0;
         group.add(gameOverText);
 
-        const scoreText = this.game.add.text(0, 0, 'Final score: ' + this.player.points, { fill: '#FFFFFF', fontSize: 20 });
+        const scoreText = this.game.add.text(0, 0, 'Final score: ' + this.player.points, {
+            fill: '#FFFFFF',
+            fontSize: 20
+        });
         group.add(scoreText);
 
         const buttonGraphics = new Phaser.Graphics(this.game);
-        buttonGraphics.lineStyle(5, 0xFFFFFF);
+        buttonGraphics.lineStyle(5, 0xffffff);
         buttonGraphics.drawRect(0, 0, 125, 40);
 
-        const playAgainText = this.game.add.text(0, background.height / 2 - 20, 'Click to play again', { fill: '#FFFFFF', fontSize: 20 });
+        const playAgainText = this.game.add.text(
+            0,
+            background.height / 2 - 20,
+            'Click to play again',
+            {
+                fill: '#FFFFFF',
+                fontSize: 20
+            }
+        );
         playAgainText.inputEnabled = true;
         playAgainText.input.useHandCursor = true;
         playAgainText.events.onInputDown.add(this.removeAllObjects, this);
@@ -207,8 +270,12 @@ export class AsteroidsGame {
         this.player.sprite.visible = true;
 
         // Spawn with shield
-        const shield = new PowerUpShield(this.game, { x: this.player.sprite.body.x, y: this.player.sprite.body.y },
-            this.player.sprite.body.velocity, this.player.sprite.body.angularVelocity);
+        const shield = new PowerUpShield(
+            this.game,
+            { x: this.player.sprite.body.x, y: this.player.sprite.body.y },
+            this.player.sprite.body.velocity,
+            this.player.sprite.body.angularVelocity
+        );
         shield.activate(this.player);
     }
 
@@ -235,15 +302,21 @@ export class AsteroidsGame {
     }
 
     private updatePhysics() {
-        this.player.allowCollision = this.player.sprite.visible && !this.INVULNERABLE && !this.player.hasShield;
+        this.player.allowCollision =
+            this.player.sprite.visible && !this.INVULNERABLE && !this.player.hasShield;
 
         // Thrust: add some force in the ship direction
         this.player.sprite.body.applyImpulseLocal([0, this.keyUp / 2], 0, 0);
 
         // Set turn velocity of ship
-        this.player.sprite.body.angularVelocity = (this.keyRight - this.keyLeft) * this.player.turnSpeed;
+        this.player.sprite.body.angularVelocity =
+            (this.keyRight - this.keyLeft) * this.player.turnSpeed;
 
-        if (this.keyShoot && this.player.sprite.visible && this.game.physics.p2.world.time - this.player.lastShootTime > this.player.reloadTime) {
+        if (
+            this.keyShoot &&
+            this.player.sprite.visible &&
+            this.game.physics.p2.world.time - this.player.lastShootTime > this.player.reloadTime
+        ) {
             this.shoot();
         }
 
@@ -251,7 +324,12 @@ export class AsteroidsGame {
         this.game.world.children.forEach(child => {
             const sprite = child as Phaser.Sprite;
             if (sprite.body != null && !(sprite.data instanceof Bullet)) {
-                Utils.constrainVelocity(sprite, sprite === this.player.sprite ? this.MAX_PLAYER_VELOCITY : this.MAX_PHYSICS_VELOCITY);
+                Utils.constrainVelocity(
+                    sprite,
+                    sprite === this.player.sprite
+                        ? this.MAX_PLAYER_VELOCITY
+                        : this.MAX_PHYSICS_VELOCITY
+                );
                 this.warp(sprite);
             }
         });
@@ -264,7 +342,8 @@ export class AsteroidsGame {
             this.game,
             angle,
             { x: this.player.sprite.body.x, y: this.player.sprite.body.y },
-            this.player.sprite.body.velocity);
+            this.player.sprite.body.velocity
+        );
 
         // Keep track of the last time we shot
         this.player.lastShootTime = this.game.physics.p2.world.time;
@@ -274,10 +353,18 @@ export class AsteroidsGame {
 
     private warp(sprite: Phaser.Sprite) {
         const p = { x: sprite.x, y: sprite.y };
-        if (p.x > this.game.width) { p.x = 0; }
-        if (p.y > this.game.height) { p.y = 0; }
-        if (p.x < 0) { p.x = this.game.width; }
-        if (p.y < 0) { p.y = this.game.height; }
+        if (p.x > this.game.width) {
+            p.x = 0;
+        }
+        if (p.y > this.game.height) {
+            p.y = 0;
+        }
+        if (p.x < 0) {
+            p.x = this.game.width;
+        }
+        if (p.y < 0) {
+            p.y = this.game.height;
+        }
 
         // Set the previous position too, to not mess up the p2 body interpolation
         sprite.body.x = p.x;
@@ -324,5 +411,5 @@ export class AsteroidsGame {
 
     private asteroidTick = () => {
         this.addAsteroids();
-    }
+    };
 }

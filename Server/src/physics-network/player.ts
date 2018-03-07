@@ -51,11 +51,7 @@ export class Player {
         if (input === 0) {
             this.body.velocity[1] = 0;
         } else {
-            this.body.velocity[1] = this.pxmi(
-                input > 0
-                    ? -Player.SPEED
-                    : Player.SPEED
-            );
+            this.body.velocity[1] = this.pxmi(input > 0 ? -Player.SPEED : Player.SPEED);
         }
     }
 
@@ -63,11 +59,7 @@ export class Player {
         if (input === 0) {
             this.body.velocity[0] = 0;
         } else {
-            this.body.velocity[0] = this.pxmi(
-                input > 0
-                    ? -Player.SPEED
-                    : Player.SPEED
-            );
+            this.body.velocity[0] = this.pxmi(input > 0 ? -Player.SPEED : Player.SPEED);
         }
     }
 

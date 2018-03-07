@@ -1,7 +1,6 @@
 import * as Phaser from 'phaser-ce';
 
 export namespace KeyMapping {
-
     export interface Mapping {
         up: number;
         down: number;

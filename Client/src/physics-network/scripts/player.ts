@@ -2,7 +2,6 @@ import * as Phaser from 'phaser-ce';
 import { KeyMapping } from './key-mapping';
 
 export class Player {
-
     id: string;
     sprite: Phaser.Sprite;
 
@@ -11,7 +10,11 @@ export class Player {
 
     private input: number[] = [0, 0];
 
-    constructor(game: Phaser.Game, isLocalPlayer: boolean, options: LunnNet.PhysicsNetwork.NewNetworkPlayer) {
+    constructor(
+        game: Phaser.Game,
+        isLocalPlayer: boolean,
+        options: LunnNet.PhysicsNetwork.NewNetworkPlayer
+    ) {
         this.id = options.id;
         this.sprite = this.createSprite(game, options);
 
@@ -84,7 +87,11 @@ export class Player {
         graphics.beginFill(options.color);
         graphics.drawCircle(0, 0, options.diameter);
 
-        const sprite = game.add.sprite(options.position.x, options.position.y, graphics.generateTexture());
+        const sprite = game.add.sprite(
+            options.position.x,
+            options.position.y,
+            graphics.generateTexture()
+        );
         game.physics.p2.enable(sprite);
         sprite.body.setCircle(options.diameter / 2);
         sprite.body.mass = options.mass;

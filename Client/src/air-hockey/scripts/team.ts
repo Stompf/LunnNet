@@ -4,7 +4,6 @@ export const enum TeamSide {
 }
 
 export class Team {
-
     private _teamSide: TeamSide;
     private _score!: number;
     private _color!: number;
@@ -37,9 +36,9 @@ export class Team {
 
     private setColor() {
         if (this._teamSide === TeamSide.Left) {
-            this._color = 0xFF0000;
+            this._color = 0xff0000;
         } else {
-            this._color = 0x0000FF;
+            this._color = 0x0000ff;
         }
     }
 }

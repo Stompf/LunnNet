@@ -3,13 +3,10 @@ import { RouteComponentProps } from 'react-router-dom';
 import { PhysicsNetworkGame } from './scripts/game';
 
 class PhysicsNetwork extends React.Component<RouteComponentProps<any>, {}> {
-
     private game: PhysicsNetworkGame;
 
     render() {
-        return (
-            <div id="PhysicsNetworkCanvas" />
-        );
+        return <div id="PhysicsNetworkCanvas" />;
     }
 
     componentDidMount() {

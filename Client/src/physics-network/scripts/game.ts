@@ -6,7 +6,6 @@ import { Team, TeamSide } from './team';
 // import { KeyMapping } from './key-mapping';
 
 export class PhysicsNetworkGame {
-
     private readonly RECEIVE_BALL_UPDATES = true;
 
     protected game: Phaser.Game;
@@ -27,7 +26,11 @@ export class PhysicsNetworkGame {
     private newGoalText!: Phaser.Text;
 
     constructor(canvasId: string) {
-        this.game = new Phaser.Game(1200, 600, Phaser.AUTO, canvasId, { preload: this.preload, create: this.create, update: this.update });
+        this.game = new Phaser.Game(1200, 600, Phaser.AUTO, canvasId, {
+            preload: this.preload,
+            create: this.create,
+            update: this.update
+        });
         this.teamLeft = new Team(TeamSide.Left);
         this.teamRight = new Team(TeamSide.Right);
     }
@@ -42,13 +45,13 @@ export class PhysicsNetworkGame {
 
     private preload = () => {
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    }
+    };
 
     protected initPixi() {
         PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
 
         this.game.physics.startSystem(Phaser.Physics.P2JS);
-        this.game.stage.backgroundColor = 0xFFFFFF;
+        this.game.stage.backgroundColor = 0xffffff;
         this.game.renderer.view.style.border = '1px solid black';
         this.game.stage.disableVisibilityChange = true;
     }
@@ -60,7 +63,7 @@ export class PhysicsNetworkGame {
         setTimeout(() => {
             this.connect();
         }, 250);
-    }
+    };
 
     protected update = () => {
         if (!this.socket || !this.networkGameStarted) {
@@ -76,22 +79,36 @@ export class PhysicsNetworkGame {
                 this.socket.emit('UpdateFromClient', player.toUpdateNetworkPlayer());
             }
         });
-    }
+    };
 
     private drawStage() {
         const middleLine = new Phaser.Graphics(this.game);
-        middleLine.beginFill(0xD3D3D3);
+        middleLine.beginFill(0xd3d3d3);
         middleLine.drawRect(0, 0, 5, this.game.height);
-        const middleSprite = this.game.add.sprite(this.game.width / 2, 0, middleLine.generateTexture());
+        const middleSprite = this.game.add.sprite(
+            this.game.width / 2,
+            0,
+            middleLine.generateTexture()
+        );
         middleSprite.anchor.y = 0;
 
-        this.scoreText = this.game.add.text(this.game.width / 2, 15, this.teamLeft.score + ' - ' + this.teamRight.score);
-        this.newGoalText = this.game.add.text(this.game.width / 2, this.game.height / 2, 'Goal!', { fontSize: 100 });
+        this.scoreText = this.game.add.text(
+            this.game.width / 2,
+            15,
+            this.teamLeft.score + ' - ' + this.teamRight.score
+        );
+        this.newGoalText = this.game.add.text(this.game.width / 2, this.game.height / 2, 'Goal!', {
+            fontSize: 100
+        });
         this.newGoalText.visible = false;
     }
 
     private initTexts() {
-        this.connectStatusText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'Connecting...');
+        this.connectStatusText = this.game.add.text(
+            this.game.world.centerX,
+            this.game.world.centerY,
+            'Connecting...'
+        );
         this.connectStatusText.anchor.set(0.5, 0.5);
     }
 
@@ -168,7 +185,7 @@ export class PhysicsNetworkGame {
         //     }
 
         // });
-    }
+    };
 
     private initNewNetworkGame(data: LunnNet.PhysicsNetwork.GameFound) {
         this.clear();
@@ -201,9 +218,9 @@ export class PhysicsNetworkGame {
     }
 
     private drawGoals(goalOptions: LunnNet.PhysicsNetwork.GoalOptions) {
-        this.drawPositionWithBox(goalOptions.top, 0xD7D7D7);
-        this.drawPositionWithBox(goalOptions.back, 0xD7D7D7);
-        this.drawPositionWithBox(goalOptions.bottom, 0xD7D7D7);
+        this.drawPositionWithBox(goalOptions.top, 0xd7d7d7);
+        this.drawPositionWithBox(goalOptions.back, 0xd7d7d7);
+        this.drawPositionWithBox(goalOptions.bottom, 0xd7d7d7);
         this.drawPositionWithBox(goalOptions.goal, 0x000000);
     }
 
@@ -217,7 +234,9 @@ export class PhysicsNetworkGame {
     }
 
     private queue() {
-        this.socket.emit('QueueMatchMaking', { game: 'PhysicsNetwork' } as LunnNet.Network.QueueMatchMaking);
+        this.socket.emit('QueueMatchMaking', {
+            game: 'PhysicsNetwork'
+        } as LunnNet.Network.QueueMatchMaking);
         this.connectStatusText.setText('Looking for game...');
     }
 }

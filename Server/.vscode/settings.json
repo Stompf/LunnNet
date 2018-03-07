@@ -46,5 +46,9 @@
         "razor",
         "vue",
         "liquid"
+    ],
+    "cSpell.words": [
+        "prettierrc",
+        "pxmi"
     ]
 }

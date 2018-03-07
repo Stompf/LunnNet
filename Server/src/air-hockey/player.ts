@@ -41,12 +41,18 @@ export class Player extends NetworkObject {
         if (this.input.isDown('down')) {
             input[1] -= this.SPEED;
         }
-        if (this.input.isDown('left')
-            && (this.team.TeamSide !== TeamSide.Right || this.body.position[0] > (this.gameWidth / 2 + this.DIAMETER / 2))) {
+        if (
+            this.input.isDown('left') &&
+            (this.team.TeamSide !== TeamSide.Right ||
+                this.body.position[0] > this.gameWidth / 2 + this.DIAMETER / 2)
+        ) {
             input[0] -= this.SPEED;
         }
-        if (this.input.isDown('right')
-            && (this.team.TeamSide !== TeamSide.Left || this.body.position[0] < (this.gameWidth / 2 - this.DIAMETER / 2))) {
+        if (
+            this.input.isDown('right') &&
+            (this.team.TeamSide !== TeamSide.Left ||
+                this.body.position[0] < this.gameWidth / 2 - this.DIAMETER / 2)
+        ) {
             input[0] += this.SPEED;
         }
 
