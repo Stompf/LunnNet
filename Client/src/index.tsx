@@ -1,8 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.css';
+import './index.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import registerServiceWorker from './registerServiceWorker';
-import './index.css';
+import { unregister } from './registerServiceWorker';
 import { HashRouter, Switch, Link, Route } from 'react-router-dom';
 import Asteroids from './asteroids/asteroids';
 import PhysicsNetwork from './physics-network/physics-network';
@@ -56,4 +56,5 @@ ReactDOM.render(
     document.getElementById('root') as HTMLElement
 );
 
-// registerServiceWorker();
+// Unregister the service worker
+unregister();
