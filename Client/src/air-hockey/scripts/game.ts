@@ -26,7 +26,7 @@ export class AirHockeyGame {
     private scoreText!: Phaser.Text;
     private newGoalText!: Phaser.Text;
 
-    constructor(canvasId: string) {
+    constructor(canvasId?: string) {
         this.game = new Phaser.Game(1200, 600, Phaser.AUTO, canvasId, {
             preload: this.preload,
             create: this.create,

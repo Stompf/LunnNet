@@ -22,7 +22,7 @@ export class LocalAirHockeyGame {
 
     protected scoreText!: Phaser.Text;
 
-    constructor(canvasId: string) {
+    constructor(canvasId?: string) {
         this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, {
             preload: this.preload,
             create: this.create,
