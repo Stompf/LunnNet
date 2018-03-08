@@ -1,33 +1,54 @@
 import * as React from 'react';
-
 import { RouteComponentProps } from 'react-router-dom';
-import { BaseGame, NetworkGame } from './scripts/game';
+import { AirHockeyGame } from './scripts/game';
+import { LocalAirHockeyGame } from './scripts/localGame';
 
-class AirHockey extends React.Component<RouteComponentProps<any>, {}> {
-    private _currentGame: BaseGame;
-    private readonly CANVAS_ID = 'AirHockeyCanvas';
-    private readonly NETWORK_GAME = false;
+interface AirHockeyState {
+    showMainMenu: boolean;
+}
+
+interface AirHockeyProps extends RouteComponentProps<any> {}
+
+class AirHockey extends React.Component<AirHockeyProps, AirHockeyState> {
+    private game!: AirHockeyGame | LocalAirHockeyGame;
+
+    constructor(props: AirHockeyProps) {
+        super(props);
+        this.state = {
+            showMainMenu: true
+        };
+    }
 
     render() {
+        return this.state.showMainMenu ? this.renderMainMenu() : <div id="AirHockeyCanvas" />;
+    }
+
+    componentWillUnmount() {
+        if (this.game) {
+            this.game.destroy();
+        }
+    }
+
+    private renderMainMenu() {
         return (
             <div>
-                <div id={this.CANVAS_ID} />
-                <textarea id="AirHockeyTextarea" />
+                <button onClick={this.onLocalPlayClick}>Local play</button>
+                <button onClick={this.onNetworkPlayClick}>Network play</button>
             </div>
         );
     }
 
-    componentDidMount() {
-        this._currentGame = this.NETWORK_GAME
-            ? new NetworkGame(this.CANVAS_ID)
-            : new BaseGame(this.CANVAS_ID);
-    }
+    private onLocalPlayClick = () => {
+        this.setState({ showMainMenu: false }, () => {
+            this.game = new LocalAirHockeyGame('AirHockeyCanvas');
+        });
+    };
 
-    componentWillUnmount() {
-        if (this._currentGame) {
-            this._currentGame.destroy();
-        }
-    }
+    private onNetworkPlayClick = () => {
+        this.setState({ showMainMenu: false }, () => {
+            this.game = new AirHockeyGame('AirHockeyCanvas');
+        });
+    };
 }
 
 export default AirHockey;

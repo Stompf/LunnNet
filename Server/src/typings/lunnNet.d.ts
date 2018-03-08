@@ -1,5 +1,5 @@
 declare namespace LunnNet {
-    type Game = 'AirHockey' | 'PhysicsNetwork';
+    type Game = 'AirHockey';
 
     interface NetworkGame {
         readonly GAME_NAME: string;
@@ -11,18 +11,6 @@ declare namespace LunnNet {
         }
 
         interface RemoveFromMatchMaking {}
-    }
-
-    namespace AirHockey {
-        interface GameFound {}
-
-        interface ClientReady {}
-
-        interface ServerTick {
-            tick: number;
-            playerPos: number[];
-            ballPos: number[];
-        }
     }
 
     namespace Utils {

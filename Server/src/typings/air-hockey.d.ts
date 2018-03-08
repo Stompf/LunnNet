@@ -1,5 +1,5 @@
 declare namespace LunnNet {
-    namespace PhysicsNetwork {
+    namespace AirHockey {
         type TeamType = 'left' | 'right';
 
         interface PhysicOptions {

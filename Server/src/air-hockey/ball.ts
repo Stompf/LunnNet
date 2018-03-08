@@ -1,23 +1,41 @@
-import { NetworkObject } from './network-object';
 import * as p2 from 'p2';
 
-export class Ball extends NetworkObject {
-    private readonly DIAMETER = 30;
+export class Ball {
+    body: p2.Body;
+
+    static readonly DIAMETER = 30;
+    static readonly MASS = 0.1;
+    static readonly COLOR = 0x000000;
     private readonly MAX_VELOCITY = 70;
 
     constructor(world: p2.World) {
-        super(world);
-
-        const shape = new p2.Circle({
-            radius: this.DIAMETER / 2
+        this.body = new p2.Body({
+            mass: Ball.MASS
         });
-
-        this.body.mass = 0.1;
-        this.body.addShape(shape);
+        const circle = new p2.Circle({ radius: Ball.DIAMETER / 2 });
+        this.body.addShape(circle);
+        this.body.damping = 0;
+        world.addBody(this.body);
     }
 
     onUpdate() {
         this.constrainVelocity(this.body, this.MAX_VELOCITY);
+    }
+
+    setPosition(position: WebKitPoint) {
+        this.body.position = [position.x, position.y];
+        this.body.previousPosition = this.body.position;
+    }
+
+    toBallUpdate(): LunnNet.AirHockey.BallUpdate {
+        return {
+            angularVelocity: this.body.angularVelocity,
+            position: {
+                x: this.body.interpolatedPosition[0],
+                y: this.body.interpolatedPosition[1]
+            },
+            velocity: this.body.velocity
+        };
     }
 
     resetVelocity(velocityX?: number) {
@@ -25,10 +43,10 @@ export class Ball extends NetworkObject {
     }
 
     private constrainVelocity(body: p2.Body, maxVelocity: number) {
-        let angle = 0;
-        let currVelocitySqr = 0;
-        let vx = 0;
-        let vy = 0;
+        let angle: number;
+        let currVelocitySqr: number;
+        let vx: number;
+        let vy: number;
 
         vx = body.velocity[0];
         vy = body.velocity[1];

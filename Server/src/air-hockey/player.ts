@@ -1,63 +1,66 @@
-import { NetworkObject } from './network-object';
 import * as p2 from 'p2';
-import { Inputs } from './inputs';
-import { Team, TeamSide } from './team';
+import { Team } from './team';
 
-export class Player extends NetworkObject {
-    readonly DIAMETER = 60;
-    private SPEED = 600;
-    private gameWidth: number;
-
-    id: string;
+export class Player {
     socket: SocketIO.Socket;
-    isReady: boolean = false;
-
-    input: Inputs | undefined;
+    body: p2.Body;
     team: Team;
 
-    constructor(world: p2.World, socket: SocketIO.Socket, team: Team, gameWidth: number) {
-        super(world);
-        this.gameWidth = gameWidth;
-        this.team = team;
-        this.id = socket.id;
-        this.socket = socket;
+    static readonly DIAMETER = 60;
+    static readonly MASS = 10;
+    static readonly SPEED = 700;
 
-        const shape = new p2.Circle({
-            radius: this.DIAMETER / 2
+    readonly COLOR: number;
+
+    constructor(world: p2.World, socket: SocketIO.Socket, color: number, team: Team) {
+        this.body = new p2.Body({
+            mass: Player.MASS
         });
-        this.body.addShape(shape);
+        this.body.addShape(new p2.Circle({ radius: Player.DIAMETER / 2 }));
+        world.addBody(this.body);
+        this.socket = socket;
+        this.COLOR = color;
+        this.team = team;
     }
 
-    onUpdate(): void {
-        if (!this.input) {
-            return;
-        }
+    setPosition(position: WebKitPoint) {
+        this.body.velocity = [0, 0];
+        this.body.position = [position.x, position.y];
+        this.body.previousPosition = this.body.position;
+    }
 
-        const input = [0, 0];
+    toNewNetworkPlayer(): LunnNet.AirHockey.NewNetworkPlayer {
+        return {
+            color: this.COLOR,
+            id: this.socket.id,
+            position: { x: this.body.position[0], y: this.body.position[1] },
+            diameter: Player.DIAMETER,
+            mass: Player.MASS,
+            speed: Player.SPEED
+        };
+    }
 
-        if (this.input.isDown('up')) {
-            input[1] += this.SPEED;
-        }
-        if (this.input.isDown('down')) {
-            input[1] -= this.SPEED;
-        }
-        if (
-            this.input.isDown('left') &&
-            (this.team.TeamSide !== TeamSide.Right ||
-                this.body.position[0] > this.gameWidth / 2 + this.DIAMETER / 2)
-        ) {
-            input[0] -= this.SPEED;
-        }
-        if (
-            this.input.isDown('right') &&
-            (this.team.TeamSide !== TeamSide.Left ||
-                this.body.position[0] < this.gameWidth / 2 - this.DIAMETER / 2)
-        ) {
-            input[0] += this.SPEED;
-        }
+    toUpdateNetworkPlayerPlayer(): LunnNet.AirHockey.UpdateNetworkPlayer {
+        return {
+            id: this.socket.id,
+            position: { x: this.body.interpolatedPosition[0], y: this.body.interpolatedPosition[1] }
+        };
+    }
 
-        this.body.velocity[1] = this.pxmi(input[1]);
-        this.body.velocity[0] = this.pxmi(input[0]);
+    moveUp(input: number) {
+        if (input === 0) {
+            this.body.velocity[1] = 0;
+        } else {
+            this.body.velocity[1] = this.pxmi(input > 0 ? -Player.SPEED : Player.SPEED);
+        }
+    }
+
+    moveRight(input: number) {
+        if (input === 0) {
+            this.body.velocity[0] = 0;
+        } else {
+            this.body.velocity[0] = this.pxmi(input > 0 ? -Player.SPEED : Player.SPEED);
+        }
     }
 
     private pxmi(v: number) {
