@@ -9,6 +9,7 @@
 		"eg2.tslint",
 		"robertohuertasm.vscode-icons",
 		"eamodio.gitlens",
-		"CoenraadS.bracket-pair-colorizer"
+		"CoenraadS.bracket-pair-colorizer",
+		"esbenp.prettier-vscode"
 	]
 }
