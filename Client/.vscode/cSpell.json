@@ -10,6 +10,7 @@
         "codelyzer",
         "eofline",
         "forin",
+        "haspopup",
         "Lunn",
         "multiline",
         "ngtools",
