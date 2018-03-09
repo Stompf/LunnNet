@@ -17,7 +17,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true
     },
-    "include": ["../Server/src/typings/**/*.ts", "./src/**/*.ts"],
+    "include": ["../Server/src/typings/**/*.ts", "./src/**/*.ts", "./src/**/*.tsx"],
     "exclude": [
         "node_modules",
         "build",

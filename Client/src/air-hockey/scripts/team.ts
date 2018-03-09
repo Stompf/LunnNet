@@ -4,41 +4,15 @@ export const enum TeamSide {
 }
 
 export class Team {
-    private _teamSide: TeamSide;
-    private _score!: number;
-    private _color!: number;
+    score: number = 0;
 
     get TeamSide() {
-        return this._teamSide;
+        return this.teamSide;
     }
 
-    get Color() {
-        return this._color;
-    }
-
-    get Score() {
-        return this._score;
-    }
-
-    constructor(teamSide: TeamSide) {
-        this._teamSide = teamSide;
-        this.resetScore();
-        this.setColor();
-    }
+    constructor(private teamSide: TeamSide) {}
 
     resetScore() {
-        this._score = 0;
-    }
-
-    addScore() {
-        this._score++;
-    }
-
-    private setColor() {
-        if (this._teamSide === TeamSide.Left) {
-            this._color = 0xff0000;
-        } else {
-            this._color = 0x0000ff;
-        }
+        this.score = 0;
     }
 }

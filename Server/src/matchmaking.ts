@@ -1,7 +1,6 @@
 import { MultiDictionary } from 'typescript-collections';
-import { AirHockey } from './air-hockey/main';
 import * as winston from 'winston';
-import { PhysicsNetwork } from './physics-network/main';
+import { AirHockey } from './air-hockey/main';
 
 export class MatchMaking {
     private currentQueue: MultiDictionary<LunnNet.Game, SocketIO.Socket>;
@@ -40,19 +39,8 @@ export class MatchMaking {
                     airHockey.sendStartGame();
                 }
                 break;
-            case 'PhysicsNetwork':
-                while (array.length >= 2) {
-                    const playerOne = array.shift() as SocketIO.Socket;
-                    const playerTwo = array.shift() as SocketIO.Socket;
-
-                    this.currentQueue.remove(game, playerOne);
-                    this.currentQueue.remove(game, playerTwo);
-
-                    const physicsNetwork = new PhysicsNetwork(playerOne, playerTwo);
-                    physicsNetwork.sendStartGame();
-                }
-                break;
             default:
+                winston.info(`MatchMaking - tried to queue for game: ${game}`);
                 break;
         }
     }

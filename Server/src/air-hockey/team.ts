@@ -4,20 +4,24 @@ export const enum TeamSide {
 }
 
 export class Team {
-    private teamSide: TeamSide;
     private score: number = 0;
+    private color: number;
 
     get TeamSide() {
         return this.teamSide;
+    }
+
+    get Color() {
+        return this.color;
     }
 
     get Score() {
         return this.score;
     }
 
-    constructor(teamSide: TeamSide) {
-        this.teamSide = teamSide;
+    constructor(private teamSide: TeamSide) {
         this.resetScore();
+        this.color = this.teamSide === TeamSide.Left ? 0xff0000 : 0x0000ff;
     }
 
     resetScore() {

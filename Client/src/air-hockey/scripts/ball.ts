@@ -1,40 +1,48 @@
 import * as Phaser from 'phaser-ce';
+import { BaseSprite } from './baseSprite';
 
-export class Ball {
-    private readonly DIAMETER = 30;
+const DEFAULT_BALL_OPTIONS: LunnNet.AirHockey.BallOptions = {
+    mass: 0.1,
+    diameter: 30,
+    color: 0x000000
+};
+
+export class Ball extends BaseSprite {
     private readonly MAX_VELOCITY = 70;
-    private sprite: Phaser.Sprite;
 
-    constructor(game: Phaser.Game) {
-        const graphics = new Phaser.Graphics(game);
-        graphics.beginFill(0x000000);
-        graphics.drawCircle(0, 0, this.DIAMETER);
-        this.sprite = game.add.sprite(0, 0, graphics.generateTexture());
-
-        game.physics.p2.enable(this.sprite);
-        this.sprite.body.setCircle(this.DIAMETER / 2);
-        this.sprite.body.mass = 0.1;
+    constructor(game: Phaser.Game, options?: LunnNet.AirHockey.BallOptions) {
+        super(Ball.createSprite(game, options || DEFAULT_BALL_OPTIONS));
     }
 
-    setPosition(position: WebKitPoint) {
-        this.sprite.body.x = position.x;
-        this.sprite.body.y = position.y;
-    }
+    onNetworkUpdate(data: LunnNet.AirHockey.BallUpdate) {
+        this.sprite.body.setZeroVelocity();
 
-    getPosition() {
-        return { x: this.sprite.body.x, y: this.sprite.body.y };
+        this.sprite.body.angularVelocity = data.angularVelocity;
+        this.sprite.body.x = data.position.x;
+        this.sprite.body.y = data.position.y;
+        this.sprite.data.velocity = data.velocity;
     }
 
     onUpdate() {
         this.constrainVelocity(this.sprite, this.MAX_VELOCITY);
     }
 
-    resetVelocity(velocityX?: number) {
-        this.sprite.body.data.velocity = [velocityX ? velocityX : 0, 0];
-    }
+    static createSprite(game: Phaser.Game, options: LunnNet.AirHockey.BallOptions) {
+        Phaser.Component.Core.skipTypeChecks = true;
 
-    setDebug(debug: boolean) {
-        this.sprite.body.debug = debug;
+        const graphics = new Phaser.Graphics(game);
+        graphics.beginFill(options.color);
+        graphics.drawCircle(0, 0, options.diameter);
+
+        const sprite = game.add.sprite(
+            game.world.centerX,
+            game.world.centerY,
+            graphics.generateTexture()
+        );
+        game.physics.p2.enable(sprite);
+        sprite.body.setCircle(options.diameter / 2);
+        sprite.body.mass = options.mass;
+        return sprite;
     }
 
     private constrainVelocity(sprite: Phaser.Sprite, maxVelocity: number) {
