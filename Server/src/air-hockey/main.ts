@@ -7,11 +7,13 @@ import { Team, TeamSide } from './team';
 export class AirHockey implements LunnNet.NetworkGame {
     readonly GAME_NAME = 'AirHockey';
 
+    private readonly TIME_LIMIT = 10 * 60 * 1000;
     private readonly FIXED_TIME_STEP = 1 / 60;
     private readonly MAX_SUB_STEPS = 5;
     private readonly BALL_INIT_VELOCITY = 10;
     private readonly SCORE_DELAY_MS = 2000;
     private intervalReference: NodeJS.Timer | undefined;
+    private timeLimitReference: NodeJS.Timer | undefined;
     private tick = 0;
     private gameStated: boolean;
     private paused = false;
@@ -75,13 +77,15 @@ export class AirHockey implements LunnNet.NetworkGame {
 
         this.intervalReference = setInterval(this.heartbeat, this.FIXED_TIME_STEP);
         this.gameStated = true;
+
+        this.setTimeLimit();
     }
 
-    stopGame = () => {
+    stopGame = (forced?: boolean) => {
         winston.info(
             `${this.GAME_NAME} - stopping game with players: ${this.players
                 .map(p => p.socket.id)
-                .join(' : ')}.`
+                .join(' : ')}.${forced === true ? ' forced' : ''}`
         );
 
         this.gameStated = false;
@@ -97,7 +101,17 @@ export class AirHockey implements LunnNet.NetworkGame {
                 p.socket.disconnect(true);
             }
         });
+
+        if (this.timeLimitReference) {
+            clearTimeout(this.timeLimitReference);
+        }
     };
+
+    private setTimeLimit() {
+        this.timeLimitReference = setTimeout(() => {
+            this.stopGame(true);
+        }, this.TIME_LIMIT);
+    }
 
     private resetPositions(scoreTeam?: Team) {
         this.players[0].setPosition({
