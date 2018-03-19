@@ -1,8 +1,9 @@
 import * as p2 from 'p2';
 import { Team } from './team';
+import { Socket } from 'socket.io';
 
 export class Player {
-    socket: SocketIO.Socket;
+    socket: Socket;
     body: p2.Body;
     team: Team;
 
@@ -12,7 +13,7 @@ export class Player {
 
     readonly COLOR: number;
 
-    constructor(world: p2.World, socket: SocketIO.Socket, color: number, team: Team) {
+    constructor(world: p2.World, socket: Socket, color: number, team: Team) {
         this.body = new p2.Body({
             mass: Player.MASS
         });

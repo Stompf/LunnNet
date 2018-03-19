@@ -3,6 +3,7 @@ import * as winston from 'winston';
 import * as p2 from 'p2';
 import { Ball } from './ball';
 import { Team, TeamSide } from './team';
+import { Socket } from 'socket.io';
 
 export class AirHockey implements LunnNet.NetworkGame {
     readonly GAME_NAME = 'AirHockey';
@@ -27,7 +28,7 @@ export class AirHockey implements LunnNet.NetworkGame {
 
     private readonly GAME_SIZE: Readonly<LunnNet.Utils.Size> = { width: 1200, height: 600 };
 
-    constructor(player1Socket: SocketIO.Socket, player2Socket: SocketIO.Socket) {
+    constructor(player1Socket: Socket, player2Socket: Socket) {
         this.gameStated = false;
         this.teamLeft = new Team(TeamSide.Left);
         this.teamRight = new Team(TeamSide.Right);
@@ -233,7 +234,7 @@ export class AirHockey implements LunnNet.NetworkGame {
         // }, this);
     }
 
-    private listenToEvents(socket: SocketIO.Socket) {
+    private listenToEvents(socket: Socket) {
         socket.on('UpdateFromClient', (data: LunnNet.AirHockey.UpdateFromClient) => {
             this.handleOnPlayerUpdate(socket.id, data);
         });
