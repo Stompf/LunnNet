@@ -1,5 +1,5 @@
 import { Player } from './player';
-import * as winston from 'winston';
+import { logger } from '../logger';
 import * as p2 from 'p2';
 import { Ball } from './ball';
 import { Team, TeamSide } from './team';
@@ -68,7 +68,7 @@ export class AirHockey implements LunnNet.NetworkGame {
             goals: this.goals.map(this.mapToGoalOptions)
         };
 
-        winston.info(
+        logger.info(
             `${this.GAME_NAME} - starting game with players: ${this.players
                 .map(p => p.socket.id)
                 .join(' : ')}.`
@@ -83,7 +83,7 @@ export class AirHockey implements LunnNet.NetworkGame {
     }
 
     stopGame = (forced?: boolean) => {
-        winston.info(
+        logger.info(
             `${this.GAME_NAME} - stopping game with players: ${this.players
                 .map(p => p.socket.id)
                 .join(' : ')}.${forced === true ? ' forced' : ''}`
@@ -199,7 +199,7 @@ export class AirHockey implements LunnNet.NetworkGame {
                     (evt.bodyA === this.ball.body || evt.bodyB === this.ball.body)
                 ) {
                     this.paused = true;
-                    winston.info(`${team.TeamSide} GOAL!`);
+                    logger.info(`${team.TeamSide} GOAL!`);
                     team.addScore();
 
                     const newGoal: LunnNet.AirHockey.NewGoal = {
@@ -248,7 +248,7 @@ export class AirHockey implements LunnNet.NetworkGame {
 
         const player = this.players.find(p => p.socket.id === id);
         if (!player) {
-            winston.info(
+            logger.info(
                 `${this.GAME_NAME} - handleOnPlayerUpdate - got info about player not in game.`
             );
             return;

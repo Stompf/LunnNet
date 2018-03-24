@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as socketIO from 'socket.io';
 import * as http from 'http';
-import * as winston from 'winston';
+import { logger } from './logger';
 import * as compression from 'compression';
 import * as helmet from 'helmet';
 import { MatchMaking } from './matchmaking';
@@ -12,7 +12,7 @@ const app = express();
 app.use(compression()); // Compress all routes
 app.use(helmet());
 
-winston.info('Starting HTTP server...');
+logger.info('Starting HTTP server...');
 const server = http.createServer(app);
 
 const matchMaking = new MatchMaking();
@@ -22,10 +22,10 @@ io.serveClient(false);
 io.attach(server);
 
 io.on('connection', socket => {
-    winston.info('a user connected: ' + socket.id);
+    logger.info('a user connected: ' + socket.id);
 
     socket.on('QueueMatchMaking', (request: LunnNet.Network.QueueMatchMaking) => {
-        winston.info('user: ' + socket.id + ' - queued: ' + request.game);
+        logger.info('user: ' + socket.id + ' - queued: ' + request.game);
         matchMaking.addToQueue(socket, request.game);
     });
 
@@ -34,11 +34,11 @@ io.on('connection', socket => {
     });
 
     socket.on('disconnect', () => {
-        winston.info('a user disconnected: ' + socket.id);
+        logger.info('a user disconnected: ' + socket.id);
         matchMaking.removeFromQueue(socket);
     });
 });
 
 server.listen(port, () => {
-    winston.info('listening on *:' + port);
+    logger.info('listening on *:' + port);
 });

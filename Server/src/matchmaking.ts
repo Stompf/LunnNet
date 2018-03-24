@@ -1,5 +1,5 @@
 import { MultiDictionary } from 'typescript-collections';
-import * as winston from 'winston';
+import { logger } from './logger';
 import { AirHockey } from './air-hockey/main';
 import { Socket } from 'socket.io';
 
@@ -19,7 +19,7 @@ export class MatchMaking {
     removeFromQueue(socket: Socket) {
         this.currentQueue.keys().forEach(game => {
             if (this.currentQueue.remove(game, socket)) {
-                winston.info('Removed player: ' + socket.id + ' from game: ' + game);
+                logger.info('Removed player: ' + socket.id + ' from game: ' + game);
             }
         });
     }
@@ -41,7 +41,7 @@ export class MatchMaking {
                 }
                 break;
             default:
-                winston.info(`MatchMaking - tried to queue for game: ${game}`);
+                logger.info(`MatchMaking - tried to queue for game: ${game}`);
                 break;
         }
     }
