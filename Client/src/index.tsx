@@ -7,6 +7,8 @@ import Asteroids from './asteroids/asteroids';
 import AirHockey from './air-hockey/air-hockey-main-menu';
 import AirHockeyLocal from './air-hockey/air-hockey-local';
 import AirHockeyNetwork from './air-hockey/air-hockey-network';
+import TopDown from './top-down/top-down';
+
 import { Reboot, AppBar, Button, Grid } from 'material-ui';
 
 (window as any).PIXI = require('phaser-ce/build/custom/pixi');
@@ -37,6 +39,7 @@ const Main = () => (
             <Route path="/physics-network" component={AirHockeyNetwork} />
             <Route path="/air-hockey/local" component={AirHockeyLocal} />
             <Route path="/air-hockey/network" component={AirHockeyNetwork} />
+            <Route path="/top-down" component={TopDown} />
             <Route component={AirHockeyLocal} />
         </Switch>
     </main>
