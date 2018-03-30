@@ -16,6 +16,7 @@ import { Reboot, AppBar, Button, Grid } from 'material-ui';
 (window as any).Phaser = require('phaser-ce/build/custom/phaser-split');
 
 const AsteroidLink = (props: any) => <Link to="/asteroids" {...props} />;
+const IsometricLink = (props: any) => <Link to="/top-down" {...props} />;
 
 const Header = () => (
     <AppBar position="static">
@@ -26,6 +27,11 @@ const Header = () => (
             <Grid item>
                 <Button color="inherit" component={AsteroidLink}>
                     Asteroids
+                </Button>
+            </Grid>
+            <Grid item>
+                <Button color="inherit" component={IsometricLink}>
+                    Isometric
                 </Button>
             </Grid>
         </Grid>
