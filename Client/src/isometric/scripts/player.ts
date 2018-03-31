@@ -4,6 +4,8 @@ import { AssetName } from './asset-loader';
 export class Player {
     private bodySprite: Phaser.Sprite;
     private headSprite: Phaser.Sprite;
+    private weaponSprite: Phaser.Sprite;
+
     private currentDirection = 0;
     private isIdle = true;
     private currentSpeed = 200;
@@ -17,6 +19,7 @@ export class Player {
         game.physics.enable(this.bodySprite, Phaser.Physics.ARCADE);
         this.addAnimations(this.bodySprite);
         this.headSprite = this.addHead(game);
+        this.weaponSprite = this.addWeapon(game);
 
         this.setIdle();
 
@@ -35,6 +38,7 @@ export class Player {
             } else {
                 this.bodySprite.animations.play(`run_${this.currentDirection}`);
                 this.headSprite.animations.play(`run_${this.currentDirection}`);
+                this.weaponSprite.animations.play(`run_${this.currentDirection}`);
 
                 game.physics.arcade.moveToPointer(this.bodySprite, this.currentSpeed);
             }
@@ -46,6 +50,7 @@ export class Player {
     private setIdle() {
         this.bodySprite.animations.play(`idle_${this.currentDirection}`);
         this.headSprite.animations.play(`idle_${this.currentDirection}`);
+        this.weaponSprite.animations.play(`idle_${this.currentDirection}`);
 
         this.bodySprite.body.velocity.setTo(0, 0);
         this.isIdle = true;
@@ -67,5 +72,13 @@ export class Player {
 
         this.bodySprite.addChild(headSprite);
         return headSprite;
+    }
+
+    private addWeapon(game: Phaser.Game) {
+        const weaponSprite = game.add.sprite(0, 0, AssetName.greatsword);
+        this.addAnimations(weaponSprite);
+
+        this.bodySprite.addChild(weaponSprite);
+        return weaponSprite;
     }
 }

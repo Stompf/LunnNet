@@ -8,18 +8,21 @@ export enum AssetName {
 
 export const AssetLoader = {
     load(game: Phaser.Game) {
-        loadSpritesheetAsset(game, AssetName.steel_armor, 'character/male/steel_armor.png');
-        loadSpritesheetAsset(game, AssetName.male_head1, 'character/male/male_head1.png');
-        loadSpritesheetAsset(game, AssetName.greatsword, 'character/male/greatsword.png');
+        // Character
+        loadSpriteSheetAsset(game, AssetName.steel_armor, 'character/male/steel_armor.png');
+        loadSpriteSheetAsset(game, AssetName.male_head1, 'character/male/male_head1.png');
+
+        // Weapons
+        loadSpriteSheetAsset(game, AssetName.greatsword, 'character/male/greatsword.png');
     }
 };
 
-const DEFAULT_SPRITESHEET_SIZE = {
+const DEFAULT_SPRITE_SHEET_SIZE = {
     width: 128,
     height: 128
 };
 
-function loadSpritesheetAsset(
+function loadSpriteSheetAsset(
     game: Phaser.Game,
     name: string,
     pathFromBase: string,
@@ -28,7 +31,7 @@ function loadSpritesheetAsset(
     game.load.spritesheet(
         name,
         `${BASE_ASSET_DIR}/${pathFromBase}`,
-        size ? size.width : DEFAULT_SPRITESHEET_SIZE.width,
-        size ? size.height : DEFAULT_SPRITESHEET_SIZE.height
+        size ? size.width : DEFAULT_SPRITE_SHEET_SIZE.width,
+        size ? size.height : DEFAULT_SPRITE_SHEET_SIZE.height
     );
 }
