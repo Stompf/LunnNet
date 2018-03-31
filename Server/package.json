@@ -12,7 +12,8 @@
         "debug-serve": "nodemon -e ts -w ./src -x npm run watch:debug-serve",
         "watch:debug-serve": "node --inspect -r ts-node/register src/server.ts",
         "lint": "tslint -c tslint.json --fix --project tsconfig.json",
-        "prettier": "prettier --write \"**/*.ts\""
+        "prettier": "prettier --write \"**/*.ts\"",
+        "precommit": "npm run prettier && npm run lint"
     },
     "dependencies": {
         "compression": "^1.7.2",

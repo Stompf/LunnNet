@@ -38,6 +38,7 @@
         "build-watch": "tsc --watch --pretty",
         "lint": "tslint -c tslint.json --fix --project tsconfig.json",
         "eject": "react-scripts-ts eject",
-        "prettier": "prettier --write \"**/*.ts\""
+        "prettier": "prettier --write \"**/*.ts\"",
+        "precommit": "npm run prettier && npm run lint"
     }
 }
