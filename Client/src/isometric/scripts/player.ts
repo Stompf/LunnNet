@@ -2,38 +2,41 @@ import { AnimationManger } from './animation-manager';
 import { AssetName } from './asset-loader';
 
 export class Player {
-    sprite: Phaser.Sprite;
-
+    private bodySprite: Phaser.Sprite;
+    private headSprite: Phaser.Sprite;
     private currentDirection = 0;
     private isIdle = true;
     private currentSpeed = 200;
 
     constructor(game: Phaser.Game) {
-        this.sprite = game.add.sprite(
+        this.bodySprite = game.add.sprite(
             game.world.centerX,
             game.world.centerY,
             AssetName.steel_armor
         );
-        game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
-        this.addAnimations(this.sprite);
+        game.physics.enable(this.bodySprite, Phaser.Physics.ARCADE);
+        this.addAnimations(this.bodySprite);
+        this.headSprite = this.addHead(game);
 
         this.setIdle();
 
-        game.camera.follow(this.sprite);
+        game.camera.follow(this.bodySprite);
     }
 
     update(game: Phaser.Game) {
         if (game.input.activePointer.isDown) {
             this.isIdle = false;
 
-            const degrees = game.input.activePointer.position.angle(this.sprite.position, true);
+            const degrees = game.input.activePointer.position.angle(this.bodySprite.position, true);
             this.currentDirection = AnimationManger.setDirection(degrees);
 
-            if (Phaser.Rectangle.contains(this.sprite.body, game.input.x, game.input.y)) {
+            if (Phaser.Rectangle.contains(this.bodySprite.body, game.input.x, game.input.y)) {
                 this.setIdle();
             } else {
-                this.sprite.animations.play(`run_${this.currentDirection}`);
-                game.physics.arcade.moveToPointer(this.sprite, this.currentSpeed);
+                this.bodySprite.animations.play(`run_${this.currentDirection}`);
+                this.headSprite.animations.play(`run_${this.currentDirection}`);
+
+                game.physics.arcade.moveToPointer(this.bodySprite, this.currentSpeed);
             }
         } else if (!this.isIdle) {
             this.setIdle();
@@ -41,8 +44,10 @@ export class Player {
     }
 
     private setIdle() {
-        this.sprite.animations.play(`idle_${this.currentDirection}`);
-        this.sprite.body.velocity.setTo(0, 0);
+        this.bodySprite.animations.play(`idle_${this.currentDirection}`);
+        this.headSprite.animations.play(`idle_${this.currentDirection}`);
+
+        this.bodySprite.body.velocity.setTo(0, 0);
         this.isIdle = true;
     }
 
@@ -54,5 +59,13 @@ export class Player {
         AnimationManger.addAnimation('hit_and_die_', [18, 19, 20, 21, 22, 23], sprite, 4);
         AnimationManger.addAnimation('cast_spell_', [24, 25, 26, 27], sprite, 4);
         AnimationManger.addAnimation('shoot_bow_', [28, 29, 30, 31], sprite, 4);
+    }
+
+    private addHead(game: Phaser.Game) {
+        const headSprite = game.add.sprite(0, 0, AssetName.male_head1);
+        this.addAnimations(headSprite);
+
+        this.bodySprite.addChild(headSprite);
+        return headSprite;
     }
 }
