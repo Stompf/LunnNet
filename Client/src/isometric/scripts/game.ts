@@ -1,6 +1,6 @@
 import { Player } from './player';
 
-export class TopDownGame {
+export class IsometricGame {
     protected game: Phaser.Game;
 
     player!: Player;

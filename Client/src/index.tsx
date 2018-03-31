@@ -7,7 +7,7 @@ import Asteroids from './asteroids/asteroids';
 import AirHockey from './air-hockey/air-hockey-main-menu';
 import AirHockeyLocal from './air-hockey/air-hockey-local';
 import AirHockeyNetwork from './air-hockey/air-hockey-network';
-import TopDown from './top-down/top-down';
+import Isometric from './isometric/isometric';
 
 import { Reboot, AppBar, Button, Grid } from 'material-ui';
 
@@ -16,7 +16,7 @@ import { Reboot, AppBar, Button, Grid } from 'material-ui';
 (window as any).Phaser = require('phaser-ce/build/custom/phaser-split');
 
 const AsteroidLink = (props: any) => <Link to="/asteroids" {...props} />;
-const IsometricLink = (props: any) => <Link to="/top-down" {...props} />;
+const IsometricLink = (props: any) => <Link to="/isometric" {...props} />;
 
 const Header = () => (
     <AppBar position="static">
@@ -45,7 +45,7 @@ const Main = () => (
             <Route path="/physics-network" component={AirHockeyNetwork} />
             <Route path="/air-hockey/local" component={AirHockeyLocal} />
             <Route path="/air-hockey/network" component={AirHockeyNetwork} />
-            <Route path="/top-down" component={TopDown} />
+            <Route path="/isometric" component={Isometric} />
             <Route component={AirHockeyLocal} />
         </Switch>
     </main>
