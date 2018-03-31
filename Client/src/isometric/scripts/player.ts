@@ -17,10 +17,9 @@ export class Player {
     }
 
     update(game: Phaser.Game) {
-        if (game.input.mousePointer.isDown) {
-            const degrees = game.input.mousePointer.position.angle(this.sprite.position, true);
+        if (game.input.activePointer.isDown) {
+            const degrees = game.input.activePointer.position.angle(this.sprite.position, true);
             this.currentDirection = this.setDirection(degrees);
-            console.log(degrees.toFixed(1) + ' - ' + this.currentDirection);
 
             if (Phaser.Rectangle.contains(this.sprite.body, game.input.x, game.input.y)) {
                 this.setIdle();
