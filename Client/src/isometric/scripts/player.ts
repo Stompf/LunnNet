@@ -1,4 +1,4 @@
-const IMG_SIZE = 32;
+import { AnimationManger } from './animation-manager';
 
 export class Player {
     sprite: Phaser.Sprite;
@@ -19,7 +19,7 @@ export class Player {
     update(game: Phaser.Game) {
         if (game.input.activePointer.isDown) {
             const degrees = game.input.activePointer.position.angle(this.sprite.position, true);
-            this.currentDirection = this.setDirection(degrees);
+            this.currentDirection = AnimationManger.setDirection(degrees);
 
             if (Phaser.Rectangle.contains(this.sprite.body, game.input.x, game.input.y)) {
                 this.setIdle();
@@ -32,128 +32,18 @@ export class Player {
         }
     }
 
-    private setDirection(degrees: number) {
-        if (degrees >= -22.5 && degrees < 22.5) {
-            return 0;
-        } else if (degrees >= 22.5 && degrees < 67.5) {
-            return 1;
-        } else if (degrees >= 67.5 && degrees < 112.5) {
-            return 2;
-        } else if (degrees >= 112.5 && degrees < 157.5) {
-            return 3;
-        } else if (degrees >= 157.5 || degrees < -157.5) {
-            return 4;
-        } else if (degrees >= -157.5 && degrees < -112.5) {
-            return 5;
-        } else if (degrees >= -112.5 && degrees < -67.5) {
-            return 6;
-        } else {
-            return 7;
-        }
-    }
-
     private setIdle() {
         this.sprite.animations.play(`idle_${this.currentDirection}`);
         this.sprite.body.velocity.setTo(0, 0);
     }
 
     private addAnimations(sprite: Phaser.Sprite) {
-        for (let i = 0; i < 8; i++) {
-            sprite.animations.add(
-                `idle_${i}`,
-                [
-                    this.getFrame(0, i),
-                    this.getFrame(1, i),
-                    this.getFrame(2, i),
-                    this.getFrame(3, i)
-                ],
-                3,
-                true
-            );
-        }
-
-        for (let i = 0; i < 8; i++) {
-            sprite.animations.add(
-                `run_${i}`,
-                [
-                    this.getFrame(4, i),
-                    this.getFrame(5, i),
-                    this.getFrame(6, i),
-                    this.getFrame(7, i),
-                    this.getFrame(8, i),
-                    this.getFrame(9, i),
-                    this.getFrame(10, i),
-                    this.getFrame(11, i)
-                ],
-                10,
-                true
-            );
-        }
-
-        for (let i = 0; i < 8; i++) {
-            sprite.animations.add(
-                `melee_swing_${i}`,
-                [
-                    this.getFrame(12, i),
-                    this.getFrame(13, i),
-                    this.getFrame(14, i),
-                    this.getFrame(15, i)
-                ],
-                6,
-                true
-            );
-        }
-
-        for (let i = 0; i < 8; i++) {
-            sprite.animations.add('block', [this.getFrame(16, i), this.getFrame(17, i)], 4, true);
-        }
-
-        for (let i = 0; i < 8; i++) {
-            sprite.animations.add(
-                `hit_and_die_${i}`,
-                [
-                    this.getFrame(18, i),
-                    this.getFrame(19, i),
-                    this.getFrame(20, i),
-                    this.getFrame(21, i),
-                    this.getFrame(22, i),
-                    this.getFrame(23, i)
-                ],
-                4,
-                true
-            );
-        }
-
-        for (let i = 0; i < 8; i++) {
-            sprite.animations.add(
-                `cast_spell_${i}`,
-                [
-                    this.getFrame(24, i),
-                    this.getFrame(25, i),
-                    this.getFrame(26, i),
-                    this.getFrame(27, i)
-                ],
-                4,
-                true
-            );
-        }
-
-        for (let i = 0; i < 8; i++) {
-            sprite.animations.add(
-                `shoot_bow_${i}`,
-                [
-                    this.getFrame(28, i),
-                    this.getFrame(29, i),
-                    this.getFrame(30, i),
-                    this.getFrame(31, i)
-                ],
-                4,
-                true
-            );
-        }
-    }
-
-    private getFrame(frame: number, direction: number) {
-        return frame + IMG_SIZE * direction;
+        AnimationManger.addAnimation('idle', [0, 1, 2, 3], sprite, 3);
+        AnimationManger.addAnimation('run', [4, 5, 6, 7, 8, 9, 10, 11], sprite, 10);
+        AnimationManger.addAnimation('melee_swing_', [12, 13, 14, 15], sprite, 6);
+        AnimationManger.addAnimation('block', [16, 17], sprite, 4);
+        AnimationManger.addAnimation('hit_and_die_', [18, 19, 20, 21, 22, 23], sprite, 4);
+        AnimationManger.addAnimation('cast_spell_', [24, 25, 26, 27], sprite, 4);
+        AnimationManger.addAnimation('shoot_bow_', [28, 29, 30, 31], sprite, 4);
     }
 }
