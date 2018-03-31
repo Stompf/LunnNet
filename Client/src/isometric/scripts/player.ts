@@ -1,23 +1,31 @@
 import { AnimationManger } from './animation-manager';
+import { AssetName } from './asset-loader';
 
 export class Player {
     sprite: Phaser.Sprite;
 
-    currentDirection = 0;
+    private currentDirection = 0;
+    private isIdle = true;
+    private currentSpeed = 200;
 
     constructor(game: Phaser.Game) {
-        this.sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'steel_armor');
-        this.sprite.anchor.set(0.5, 0.5);
+        this.sprite = game.add.sprite(
+            game.world.centerX,
+            game.world.centerY,
+            AssetName.steel_armor
+        );
         game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
         this.addAnimations(this.sprite);
 
-        this.sprite.animations.play('idle');
+        this.setIdle();
 
         game.camera.follow(this.sprite);
     }
 
     update(game: Phaser.Game) {
         if (game.input.activePointer.isDown) {
+            this.isIdle = false;
+
             const degrees = game.input.activePointer.position.angle(this.sprite.position, true);
             this.currentDirection = AnimationManger.setDirection(degrees);
 
@@ -25,9 +33,9 @@ export class Player {
                 this.setIdle();
             } else {
                 this.sprite.animations.play(`run_${this.currentDirection}`);
-                game.physics.arcade.moveToPointer(this.sprite, 200);
+                game.physics.arcade.moveToPointer(this.sprite, this.currentSpeed);
             }
-        } else {
+        } else if (!this.isIdle) {
             this.setIdle();
         }
     }
@@ -35,6 +43,7 @@ export class Player {
     private setIdle() {
         this.sprite.animations.play(`idle_${this.currentDirection}`);
         this.sprite.body.velocity.setTo(0, 0);
+        this.isIdle = true;
     }
 
     private addAnimations(sprite: Phaser.Sprite) {

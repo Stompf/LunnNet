@@ -1,8 +1,8 @@
 const DIRECTIONS_COUNT = 7;
 const TOTAL_FRAMES_PER_ROW = 32;
 
-export class AnimationManger {
-    static setDirection(degrees: number) {
+export const AnimationManger = {
+    setDirection(degrees: number) {
         if (degrees >= -22.5 && degrees < 22.5) {
             return 0;
         } else if (degrees >= 22.5 && degrees < 67.5) {
@@ -20,9 +20,9 @@ export class AnimationManger {
         } else {
             return 7;
         }
-    }
+    },
 
-    static addAnimation(
+    addAnimation(
         name: string,
         frames: number[],
         sprite: Phaser.Sprite,
@@ -37,9 +37,9 @@ export class AnimationManger {
                 !noLoop
             );
         }
-    }
+    },
 
-    static getFrame(frame: number, direction: number) {
+    getFrame(frame: number, direction: number) {
         return frame + TOTAL_FRAMES_PER_ROW * direction;
     }
-}
+};

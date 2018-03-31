@@ -1,4 +1,5 @@
 import { Player } from './player';
+import { AssetLoader } from './asset-loader';
 
 export class IsometricGame {
     protected game: Phaser.Game;
@@ -19,16 +20,16 @@ export class IsometricGame {
     }
 
     private preload = () => {
+        PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
+        this.game.canvas.oncontextmenu = e => {
+            e.preventDefault();
+        };
+
         this.game.stage.backgroundColor = 0xffffff;
         this.game.renderer.view.style.border = '1px solid black';
 
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        this.game.load.spritesheet(
-            'steel_armor',
-            process.env.PUBLIC_URL + '/assets/games/isometric/character/male/steel_armor.png',
-            128,
-            128
-        );
+        AssetLoader.load(this.game);
     };
 
     private create = () => {
