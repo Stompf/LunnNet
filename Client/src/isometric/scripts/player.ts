@@ -44,6 +44,7 @@ export class Player {
 
             if (
                 game.input.keyboard.isDown(Phaser.KeyCode.CONTROL) ||
+                (game.input.activePointer.isMouse && game.input.mousePointer.rightButton.isDown) ||
                 (game.input.pointer1.isDown && game.input.pointer2.isDown)
             ) {
                 this.shoot();
