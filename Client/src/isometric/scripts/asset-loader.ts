@@ -3,7 +3,24 @@ const BASE_ASSET_DIR = process.env.PUBLIC_URL + '/assets/games/isometric';
 export enum AssetName {
     steel_armor = 'steel_armor',
     male_head1 = 'male_head1',
-    greatsword = 'greatsword'
+    male_head2 = 'male_head2',
+    male_head3 = 'male_head3',
+    greatsword = 'greatsword',
+    buckler = 'buckler',
+    clothes = 'clothes',
+    dagger = 'dagger',
+    greatbow = 'greatbow',
+    greatstaff = 'greatstaff',
+    leather_armor = 'leather_armor',
+    longbow = 'longbow',
+    longsword = 'longsword',
+    rod = 'rod',
+    shield = 'shield',
+    shortbow = 'shortbow',
+    shortsword = 'shortsword',
+    slingshot = 'slingshot',
+    staff = 'staff',
+    wand = 'wand'
 }
 
 export const AssetLoader = {

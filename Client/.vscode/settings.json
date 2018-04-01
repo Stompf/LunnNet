@@ -55,11 +55,31 @@
     ],
     "emmet.showExpandedAbbreviation": "never",
     "cSpell.words": [
+        "Lunn",
+        "PIXI",
         "SPACEBAR",
+        "Unmount",
+        "codelyzer",
+        "eofline",
+        "forin",
+        "greatbow",
+        "greatstaff",
+        "greatsword",
         "haspopup",
+        "longsword",
+        "multiline",
+        "ngtools",
+        "nospace",
         "onstatechange",
         "onupdatefound",
         "precached",
-        "renderable"
+        "quotemark",
+        "renderable",
+        "respawn",
+        "shortbow",
+        "shortsword",
+        "spritesheet",
+        "vsicons",
+        "wamd"
     ]
 }
