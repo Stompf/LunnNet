@@ -1,5 +1,15 @@
 import { AnimationManger } from './animation-manager';
-import { AssetName } from './asset-loader';
+import { MaleWeapons, MaleArmor } from './asset-loader';
+
+enum CharacterAnimation {
+    idle = 'idle',
+    run = 'run',
+    melee_swing = 'melee_swing',
+    block = 'block',
+    hit_and_die = 'hit_and_die',
+    cast_spell = 'cast_spell',
+    shoot_bow = 'shoot_bow'
+}
 
 export class Player {
     private bodySprite: Phaser.Sprite;
@@ -14,7 +24,7 @@ export class Player {
         this.bodySprite = game.add.sprite(
             game.world.centerX,
             game.world.centerY,
-            AssetName.steel_armor
+            MaleArmor.steel_armor
         );
         game.physics.enable(this.bodySprite, Phaser.Physics.ARCADE);
         this.addAnimations(this.bodySprite);
@@ -29,45 +39,65 @@ export class Player {
     update(game: Phaser.Game) {
         if (game.input.activePointer.isDown) {
             this.isIdle = false;
-
             const degrees = game.input.activePointer.position.angle(this.bodySprite.position, true);
             this.currentDirection = AnimationManger.setDirection(degrees);
 
-            if (Phaser.Rectangle.contains(this.bodySprite.body, game.input.x, game.input.y)) {
-                this.setIdle();
+            if (
+                game.input.keyboard.isDown(Phaser.KeyCode.CONTROL) ||
+                (game.input.pointer1.isDown && game.input.pointer2.isDown)
+            ) {
+                this.shoot();
             } else {
-                this.bodySprite.animations.play(`run_${this.currentDirection}`);
-                this.headSprite.animations.play(`run_${this.currentDirection}`);
-                this.weaponSprite.animations.play(`run_${this.currentDirection}`);
-
-                game.physics.arcade.moveToPointer(this.bodySprite, this.currentSpeed);
+                this.move(game);
             }
         } else if (!this.isIdle) {
             this.setIdle();
         }
     }
 
+    private shoot() {
+        this.setCharacterAnimation(CharacterAnimation.cast_spell);
+    }
+
+    private move(game: Phaser.Game) {
+        if (Phaser.Rectangle.contains(this.bodySprite.body, game.input.x, game.input.y)) {
+            this.setIdle();
+        } else {
+            this.setCharacterAnimation(CharacterAnimation.run);
+
+            game.physics.arcade.moveToPointer(this.bodySprite, this.currentSpeed);
+        }
+    }
+
     private setIdle() {
-        this.bodySprite.animations.play(`idle_${this.currentDirection}`);
-        this.headSprite.animations.play(`idle_${this.currentDirection}`);
-        this.weaponSprite.animations.play(`idle_${this.currentDirection}`);
+        this.setCharacterAnimation(CharacterAnimation.idle);
 
         this.bodySprite.body.velocity.setTo(0, 0);
         this.isIdle = true;
     }
 
     private addAnimations(sprite: Phaser.Sprite) {
-        AnimationManger.addAnimation('idle', [0, 1, 2, 3], sprite, 3);
-        AnimationManger.addAnimation('run', [4, 5, 6, 7, 8, 9, 10, 11], sprite, 10);
-        AnimationManger.addAnimation('melee_swing_', [12, 13, 14, 15], sprite, 6);
-        AnimationManger.addAnimation('block', [16, 17], sprite, 4);
-        AnimationManger.addAnimation('hit_and_die_', [18, 19, 20, 21, 22, 23], sprite, 4);
-        AnimationManger.addAnimation('cast_spell_', [24, 25, 26, 27], sprite, 4);
-        AnimationManger.addAnimation('shoot_bow_', [28, 29, 30, 31], sprite, 4);
+        AnimationManger.addAnimation(CharacterAnimation.idle, [0, 1, 2, 3], sprite, 3);
+        AnimationManger.addAnimation(
+            CharacterAnimation.run,
+            [4, 5, 6, 7, 8, 9, 10, 11],
+            sprite,
+            10
+        );
+        AnimationManger.addAnimation(CharacterAnimation.melee_swing, [12, 13, 14, 15], sprite, 6);
+        AnimationManger.addAnimation(CharacterAnimation.block, [16, 17], sprite, 4);
+        AnimationManger.addAnimation(
+            CharacterAnimation.hit_and_die,
+            [18, 19, 20, 21, 22, 23],
+            sprite,
+            4
+        );
+        AnimationManger.addAnimation(CharacterAnimation.cast_spell, [24, 25, 26, 27], sprite, 4);
+        AnimationManger.addAnimation(CharacterAnimation.shoot_bow, [28, 29, 30, 31], sprite, 4);
     }
 
     private addHead(game: Phaser.Game) {
-        const headSprite = game.add.sprite(0, 0, AssetName.male_head1);
+        const headSprite = game.add.sprite(0, 0, MaleArmor.head1);
         this.addAnimations(headSprite);
 
         this.bodySprite.addChild(headSprite);
@@ -75,10 +105,16 @@ export class Player {
     }
 
     private addWeapon(game: Phaser.Game) {
-        const weaponSprite = game.add.sprite(0, 0, AssetName.greatsword);
+        const weaponSprite = game.add.sprite(0, 0, MaleWeapons.staff);
         this.addAnimations(weaponSprite);
 
         this.bodySprite.addChild(weaponSprite);
         return weaponSprite;
+    }
+
+    private setCharacterAnimation(animation: string) {
+        this.bodySprite.animations.play(`${animation}_${this.currentDirection}`);
+        this.headSprite.animations.play(`${animation}_${this.currentDirection}`);
+        this.weaponSprite.animations.play(`${animation}_${this.currentDirection}`);
     }
 }
