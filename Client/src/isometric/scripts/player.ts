@@ -58,7 +58,7 @@ export class Player {
 
     private shoot() {
         this.bodySprite.body.velocity.setTo(0, 0);
-        this.setCharacterAnimation(CharacterAnimation.cast_spell);
+        this.setCharacterAnimation(CharacterAnimation.melee_swing);
     }
 
     private move(game: Phaser.Game) {
@@ -111,7 +111,7 @@ export class Player {
     }
 
     private addWeapon(game: Phaser.Game) {
-        const weaponSprite = game.add.sprite(0, 0, MaleWeapons.staff);
+        const weaponSprite = game.add.sprite(0, 0, MaleWeapons.greatsword);
         this.addAnimations(weaponSprite);
 
         this.bodySprite.addChild(weaponSprite);
