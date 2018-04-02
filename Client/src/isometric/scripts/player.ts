@@ -51,7 +51,7 @@ export class Player {
             } else {
                 this.move(game);
             }
-        } else if (!this.isIdle) {
+        } else {
             this.setIdle();
         }
     }
@@ -71,6 +71,10 @@ export class Player {
     }
 
     private setIdle() {
+        if (this.isIdle) {
+            return;
+        }
+
         this.setCharacterAnimation(CharacterAnimation.idle);
 
         this.bodySprite.body.velocity.setTo(0, 0);

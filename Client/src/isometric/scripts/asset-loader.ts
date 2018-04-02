@@ -1,20 +1,20 @@
 const BASE_ASSET_DIR = process.env.PUBLIC_URL + '/assets/games/isometric';
 
 export enum MaleWeapons {
-    greatsword = 'greatsword',
-    buckler = 'buckler',
-    dagger = 'dagger',
-    greatbow = 'greatbow',
-    greatstaff = 'greatstaff',
-    longbow = 'longbow',
-    longsword = 'longsword',
-    rod = 'rod',
-    shield = 'shield',
-    shortbow = 'shortbow',
-    shortsword = 'shortsword',
-    slingshot = 'slingshot',
-    staff = 'staff',
-    wand = 'wand'
+    greatsword = 'male_greatsword',
+    buckler = 'male_buckler',
+    dagger = 'male_dagger',
+    greatbow = 'male_greatbow',
+    greatstaff = 'male_greatstaff',
+    longbow = 'male_longbow',
+    longsword = 'male_longsword',
+    rod = 'male_rod',
+    shield = 'male_shield',
+    shortbow = 'male_shortbow',
+    shortsword = 'male_shortsword',
+    slingshot = 'male_slingshot',
+    staff = 'male_staff',
+    wand = 'male_wand'
 }
 
 export enum MaleArmor {
