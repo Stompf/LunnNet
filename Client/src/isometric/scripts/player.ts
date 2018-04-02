@@ -57,6 +57,7 @@ export class Player {
     }
 
     private shoot() {
+        this.bodySprite.body.velocity.setTo(0, 0);
         this.setCharacterAnimation(CharacterAnimation.cast_spell);
     }
 
