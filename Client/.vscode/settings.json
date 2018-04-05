@@ -73,6 +73,7 @@
         "onstatechange",
         "onupdatefound",
         "precached",
+        "precommit",
         "quotemark",
         "renderable",
         "respawn",

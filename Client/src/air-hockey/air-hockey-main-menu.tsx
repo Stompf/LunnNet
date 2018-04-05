@@ -7,7 +7,8 @@ import {
     Grow,
     Paper,
     MenuList,
-    WithStyles
+    WithStyles,
+    Theme
 } from 'material-ui';
 import { Manager, Target, Popper } from 'react-popper';
 import { withStyles } from 'material-ui/styles';
@@ -19,7 +20,7 @@ interface AirHockeyState {
     open: boolean;
 }
 
-const styles = (theme: any) => ({
+const styles = (theme: Theme) => ({
     root: {
         display: 'flex'
     },
@@ -31,7 +32,10 @@ const styles = (theme: any) => ({
     }
 });
 
-class AirHockeyMainMenu extends React.Component<AirHockeyProps & WithStyles, AirHockeyState> {
+class AirHockeyMainMenu extends React.Component<
+    AirHockeyProps & WithStyles<'root' | 'paper' | 'popperClose'>,
+    AirHockeyState
+> {
     private timeout: number = 0;
 
     state = {
@@ -100,4 +104,4 @@ class AirHockeyMainMenu extends React.Component<AirHockeyProps & WithStyles, Air
     };
 }
 
-export default withStyles(styles)<any>(AirHockeyMainMenu);
+export default withStyles(styles)(AirHockeyMainMenu);

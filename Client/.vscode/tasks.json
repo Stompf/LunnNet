@@ -20,12 +20,5 @@
             "type": "npm",
             "script": "build-watch",
             "problemMatcher": []
-        },
-        {
-            "group": "build",
-            "type": "npm",
-            "script": "precommit",
-            "problemMatcher": []
         }
-    ]
 }
