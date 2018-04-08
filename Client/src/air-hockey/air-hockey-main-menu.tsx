@@ -20,22 +20,20 @@ interface AirHockeyState {
     open: boolean;
 }
 
-const styles = (theme: Theme) => ({
-    root: {
-        display: 'flex'
-    },
-    paper: {
-        marginRight: theme.spacing.unit * 2
-    },
-    popperClose: {
-        pointerEvents: 'none'
-    }
-});
+const styles = (theme: Theme) =>
+    ({
+        root: {
+            display: 'flex'
+        },
+        paper: {
+            marginRight: theme.spacing.unit * 2
+        },
+        popperClose: {
+            pointerEvents: 'none'
+        }
+    } as React.CSSProperties);
 
-class AirHockeyMainMenu extends React.Component<
-    AirHockeyProps & WithStyles<'root' | 'paper' | 'popperClose'>,
-    AirHockeyState
-> {
+class AirHockeyMainMenu extends React.Component<AirHockeyProps & WithStyles, AirHockeyState> {
     private timeout: number = 0;
 
     state = {
