@@ -8,7 +8,7 @@ import { Socket } from 'socket.io';
 export class AirHockey implements LunnNet.NetworkGame {
     readonly GAME_NAME = 'AirHockey';
 
-    private readonly TIME_LIMIT = 10 * 60 * 1000;
+    private readonly TIME_LIMIT = 10 * 60 * 1000;;
     private readonly FIXED_TIME_STEP = 1 / 60;
     private readonly MAX_SUB_STEPS = 5;
     private readonly BALL_INIT_VELOCITY = 10;
