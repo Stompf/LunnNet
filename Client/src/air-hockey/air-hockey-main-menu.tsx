@@ -11,7 +11,7 @@ import {
     Theme
 } from 'material-ui';
 import { Manager, Target, Popper } from 'react-popper';
-import { withStyles } from 'material-ui/styles';
+import { withStyles, StyleRules } from 'material-ui/styles';
 import * as classNames from 'classnames';
 
 interface AirHockeyProps {}
@@ -31,7 +31,7 @@ const styles = (theme: Theme) =>
         popperClose: {
             pointerEvents: 'none'
         }
-    } as React.CSSProperties);
+    } as StyleRules);
 
 class AirHockeyMainMenu extends React.Component<AirHockeyProps & WithStyles, AirHockeyState> {
     private timeout: number = 0;

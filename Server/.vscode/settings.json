@@ -48,7 +48,17 @@
         "liquid"
     ],
     "cSpell.words": [
+        "classpath",
+        "codelyzer",
+        "libpeerconnection",
+        "Lunn",
+        "ngtools",
+        "PIXI",
+        "precommit",
         "prettierrc",
-        "pxmi"
+        "pxmi",
+        "respawn",
+        "testem",
+        "vsicons"
     ]
 }
