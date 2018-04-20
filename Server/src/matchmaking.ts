@@ -41,7 +41,7 @@ export class MatchMaking {
                 }
                 break;
             default:
-                logger.info(`MatchMaking - tried to queue for game: ${game}`);
+                logger.error(`MatchMaking - tried to queue for game: ${game}`);
                 break;
         }
     }

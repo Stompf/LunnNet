@@ -22,9 +22,10 @@
             "problemMatcher": []
         },
         {
+            "label": "npm: precommit",
             "group": "build",
-            "type": "npm",
-            "script": "precommit",
+            "type": "shell",
+            "command": "npm run precommit",
             "problemMatcher": []
         }
     ]

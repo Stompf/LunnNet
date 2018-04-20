@@ -20,5 +20,13 @@
             "type": "npm",
             "script": "build-watch",
             "problemMatcher": []
+        },
+        {
+            "label": "npm: precommit",
+            "group": "build",
+            "type": "shell",
+            "command": "npm run precommit",
+            "problemMatcher": []
         }
+    ]
 }
