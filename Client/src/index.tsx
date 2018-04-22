@@ -8,6 +8,7 @@ import AirHockey from './air-hockey/air-hockey-main-menu';
 import AirHockeyLocal from './air-hockey/air-hockey-local';
 import AirHockeyNetwork from './air-hockey/air-hockey-network';
 import Isometric from './isometric/isometric';
+import AchtungKurve from './achtung-kurve/achtung-kurve';
 
 import { Reboot, AppBar, Button, Grid } from 'material-ui';
 
@@ -17,6 +18,7 @@ import { Reboot, AppBar, Button, Grid } from 'material-ui';
 
 const AsteroidLink = (props: any) => <Link to="/asteroids" {...props} />;
 const IsometricLink = (props: any) => <Link to="/isometric" {...props} />;
+const AchtungKurveLink = (props: any) => <Link to="/kurve" {...props} />;
 
 const Header = () => (
     <AppBar position="static">
@@ -34,6 +36,11 @@ const Header = () => (
                     Isometric
                 </Button>
             </Grid>
+            <Grid item>
+                <Button color="inherit" component={AchtungKurveLink}>
+                    Kurve
+                </Button>
+            </Grid>
         </Grid>
     </AppBar>
 );
@@ -46,6 +53,7 @@ const Main = () => (
             <Route path="/air-hockey/local" component={AirHockeyLocal} />
             <Route path="/air-hockey/network" component={AirHockeyNetwork} />
             <Route path="/isometric" component={Isometric} />
+            <Route path="/kurve" component={AchtungKurve} />
             <Route component={AirHockeyLocal} />
         </Switch>
     </main>
