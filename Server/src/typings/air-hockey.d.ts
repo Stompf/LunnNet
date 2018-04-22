@@ -37,6 +37,7 @@ declare namespace LunnNet {
             diameter: number;
             mass: number;
             color: number;
+            maxVelocity: number;
         }
 
         interface GameFound {

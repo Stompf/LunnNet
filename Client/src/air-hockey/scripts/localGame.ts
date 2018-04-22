@@ -34,13 +34,6 @@ export class LocalAirHockeyGame {
         this.game.destroy();
     }
 
-    protected appendTextareaLine(text: string) {
-        const textarea = document.getElementById('AirHockeyTextarea') as HTMLTextAreaElement;
-        if (textarea != null) {
-            textarea.value = text + '\n' + textarea.value;
-        }
-    }
-
     private totalAreaHeight() {
         return this.game.height - this.TOP_OFFSET;
     }

@@ -63,7 +63,8 @@ export class AirHockey implements LunnNet.NetworkGame {
             ball: {
                 color: Ball.COLOR,
                 diameter: Ball.DIAMETER,
-                mass: Ball.MASS
+                mass: Ball.MASS, 
+                maxVelocity: Ball.MAX_VELOCITY
             },
             goals: this.goals.map(this.mapToGoalOptions)
         };

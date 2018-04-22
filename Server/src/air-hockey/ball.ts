@@ -6,7 +6,7 @@ export class Ball {
     static readonly DIAMETER = 30;
     static readonly MASS = 0.1;
     static readonly COLOR = 0x000000;
-    private readonly MAX_VELOCITY = 70;
+    static readonly MAX_VELOCITY = 70;
 
     constructor(world: p2.World) {
         this.body = new p2.Body({
@@ -19,7 +19,7 @@ export class Ball {
     }
 
     onUpdate() {
-        this.constrainVelocity(this.body, this.MAX_VELOCITY);
+        this.constrainVelocity(this.body, Ball.MAX_VELOCITY);
     }
 
     setPosition(position: WebKitPoint) {

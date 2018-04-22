@@ -4,14 +4,16 @@ import { BaseSprite } from './baseSprite';
 const DEFAULT_BALL_OPTIONS: LunnNet.AirHockey.BallOptions = {
     mass: 0.1,
     diameter: 30,
-    color: 0x000000
+    color: 0x000000,
+    maxVelocity: 50
 };
 
 export class Ball extends BaseSprite {
-    private readonly MAX_VELOCITY = 70;
+    private readonly MAX_VELOCITY: number;
 
     constructor(game: Phaser.Game, options?: LunnNet.AirHockey.BallOptions) {
         super(Ball.createSprite(game, options || DEFAULT_BALL_OPTIONS));
+        this.MAX_VELOCITY = options ? options.maxVelocity : DEFAULT_BALL_OPTIONS.maxVelocity;
     }
 
     onNetworkUpdate(data: LunnNet.AirHockey.BallUpdate) {

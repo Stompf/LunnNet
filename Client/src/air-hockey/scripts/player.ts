@@ -8,14 +8,14 @@ export const DEFAULT_PLAYER_OPTIONS: LunnNet.AirHockey.NewNetworkPlayer = {
     mass: 1,
     id: '',
     position: { x: 0, y: 0 },
-    speed: 700
+    speed: 550
 };
 
 export class Player extends BaseSprite {
     id: string;
     DIAMETER: number;
 
-    private SPEED = 700;
+    private SPEED: number;
     readonly isLocalPlayer: boolean;
     private keyMapping: KeyMapping.Mapping;
     private input: number[] = [0, 0];

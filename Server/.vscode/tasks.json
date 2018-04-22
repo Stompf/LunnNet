@@ -27,6 +27,13 @@
             "type": "shell",
             "command": "npm run precommit",
             "problemMatcher": []
+        },
+        {
+            "label": "npm: install",
+            "group": "build",
+            "type": "shell",
+            "command": "npm run install",
+            "problemMatcher": []
         }
     ]
 }
