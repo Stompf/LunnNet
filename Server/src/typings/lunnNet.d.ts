@@ -1,8 +1,9 @@
 declare namespace LunnNet {
-    type Game = 'AirHockey';
+    type Game = 'AirHockey' | 'AchtungKurve';
 
     interface NetworkGame {
         readonly GAME_NAME: string;
+        initGame(): void;
     }
 
     namespace Network {

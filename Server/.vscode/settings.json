@@ -34,12 +34,14 @@
         "/": "${workspaceRoot}/src"
     },
     "cSpell.words": [
+        "Achtung",
+        "Kurve",
+        "Lunn",
+        "PIXI",
         "classpath",
         "codelyzer",
         "libpeerconnection",
-        "Lunn",
         "ngtools",
-        "PIXI",
         "precommit",
         "prettierrc",
         "pxmi",

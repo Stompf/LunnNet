@@ -6,6 +6,9 @@ import { Team, TeamSide } from './team';
 import { Socket } from 'socket.io';
 
 export class AirHockey implements LunnNet.NetworkGame {
+    static MAX_PLAYERS = 2;
+    static MIN_PLAYERS = 2;
+
     readonly GAME_NAME = 'AirHockey';
 
     private readonly TIME_LIMIT = 10 * 60 * 1000;
@@ -52,7 +55,7 @@ export class AirHockey implements LunnNet.NetworkGame {
         this.onBeginContact(this.world);
     }
 
-    sendStartGame() {
+    initGame() {
         const gameFound: LunnNet.AirHockey.GameFound = {
             physicsOptions: {
                 gravity: this.world.gravity,
