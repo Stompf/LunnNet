@@ -29,7 +29,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
         if (playerSockets.length > AchtungKurve.MAX_PLAYERS) {
             throw new Error(
                 `Too many players! Max players is: ${AchtungKurve.MAX_PLAYERS}. Was: ${
-                playerSockets.length
+                    playerSockets.length
                 }`
             );
         }
