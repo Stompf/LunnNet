@@ -2,6 +2,7 @@ import { Team, TeamSide } from './team';
 import { Player, DEFAULT_PLAYER_OPTIONS } from './player';
 import { Ball } from './ball';
 import { KeyMapping } from './key-mapping';
+import { P2Sprite } from 'src/models';
 
 export class LocalAirHockeyGame {
     protected game: Phaser.Game;
@@ -17,8 +18,8 @@ export class LocalAirHockeyGame {
     protected player2!: Player;
     protected ball!: Ball;
 
-    private goal1!: Phaser.Sprite;
-    private goal2!: Phaser.Sprite;
+    private goal1!: P2Sprite;
+    private goal2!: P2Sprite;
 
     protected scoreText!: Phaser.Text;
 

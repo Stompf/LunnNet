@@ -1,5 +1,6 @@
 import { AnimationManger } from './animation-manager';
 import { MaleWeapons, MaleArmor } from './asset-loader';
+import { ArcadeSprite } from 'src/models';
 
 enum CharacterAnimation {
     idle = 'idle',
@@ -12,9 +13,9 @@ enum CharacterAnimation {
 }
 
 export class Player {
-    private bodySprite: Phaser.Sprite;
-    private headSprite: Phaser.Sprite;
-    private weaponSprite: Phaser.Sprite;
+    private bodySprite: ArcadeSprite;
+    private headSprite: ArcadeSprite;
+    private weaponSprite: ArcadeSprite;
 
     private currentDirection = 0;
     private isIdle = true;
@@ -62,7 +63,7 @@ export class Player {
     }
 
     private move(game: Phaser.Game) {
-        if (Phaser.Rectangle.contains(this.bodySprite.body, game.input.x, game.input.y)) {
+        if (this.bodySprite.body.hitTest(game.input.x, game.input.y)) {
             this.setIdle();
         } else {
             this.setCharacterAnimation(CharacterAnimation.run);
@@ -82,7 +83,7 @@ export class Player {
         this.isIdle = true;
     }
 
-    private addAnimations(sprite: Phaser.Sprite) {
+    private addAnimations(sprite: ArcadeSprite) {
         AnimationManger.addAnimation(CharacterAnimation.idle, [0, 1, 2, 3], sprite, 3);
         AnimationManger.addAnimation(
             CharacterAnimation.run,

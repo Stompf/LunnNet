@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser-ce';
 import { Utils } from './utils';
+import { P2Sprite } from 'src/models';
 
 export class Player {
     allowCollision: boolean = true;
@@ -9,7 +10,7 @@ export class Player {
     lives = 3;
     points = 0;
     lastShootTime = 0;
-    sprite: Phaser.Sprite;
+    sprite: P2Sprite;
 
     constructor(game: Phaser.Game) {
         const sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'player');

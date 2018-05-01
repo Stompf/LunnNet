@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser-ce';
+import { P2Sprite } from 'src/models';
 
 export namespace Utils {
     export const MASKS = {
@@ -8,7 +9,7 @@ export namespace Utils {
         POWER_UP: new Phaser.Physics.P2.CollisionGroup(Math.pow(2, 4))
     };
 
-    export function constrainVelocity(sprite: Phaser.Sprite, maxVelocity: number) {
+    export function constrainVelocity(sprite: P2Sprite, maxVelocity: number) {
         let vx = sprite.body.data.velocity[0];
         let vy = sprite.body.data.velocity[1];
 

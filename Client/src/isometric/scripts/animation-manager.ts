@@ -1,3 +1,5 @@
+import { ArcadeSprite } from 'src/models';
+
 const DIRECTIONS_COUNT = 7;
 const TOTAL_FRAMES_PER_ROW = 32;
 
@@ -25,7 +27,7 @@ export const AnimationManger = {
     addAnimation(
         name: string,
         frames: number[],
-        sprite: Phaser.Sprite,
+        sprite: ArcadeSprite,
         speed: number,
         noLoop?: boolean
     ) {

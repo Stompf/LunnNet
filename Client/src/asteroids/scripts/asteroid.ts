@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser-ce';
 import { Utils } from './utils';
 import { eventEmitter, Events } from './events';
+import { P2Sprite } from 'src/models';
 
 export class Asteroid {
     static MaxAsteroidSpeed = 2;
@@ -12,7 +13,7 @@ export class Asteroid {
     static Splits = 4;
 
     level: number;
-    sprite: Phaser.Sprite;
+    sprite: P2Sprite;
 
     private fillColor = 0xbfbfbf;
     private strokeColor = 0x6d6d6d;

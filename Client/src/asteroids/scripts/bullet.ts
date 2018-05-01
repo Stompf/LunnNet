@@ -1,5 +1,6 @@
 import { Utils } from './utils';
 import * as Phaser from 'phaser-ce';
+import { P2Sprite } from 'src/models';
 
 export class Bullet {
     static BulletRadius = 3;
@@ -7,7 +8,7 @@ export class Bullet {
     static BulletSpeed = 1200;
 
     shape!: p2.Circle;
-    sprite: Phaser.Sprite;
+    sprite: P2Sprite;
 
     constructor(game: Phaser.Game, angle: number, position: WebKitPoint, velocity: WebKitPoint) {
         const graphics = new Phaser.Graphics(game);

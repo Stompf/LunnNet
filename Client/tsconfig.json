@@ -14,8 +14,9 @@
         "noImplicitReturns": true,
         "strict": true,
         "suppressImplicitAnyIndexErrors": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true
+        "paths": {
+            "src/*": ["src/*"]
+        }
     },
     "include": ["../Server/src/typings/**/*.ts", "./src/**/*.ts", "./src/**/*.tsx"],
     "exclude": [

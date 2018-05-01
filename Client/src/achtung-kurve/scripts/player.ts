@@ -1,6 +1,6 @@
 import { BaseSprite } from './baseSprite';
 import { KeyMapping } from './key-mapping';
-import { P2Sprite } from '../models/achtung';
+import { P2Sprite } from 'src/models';
 
 export const DEFAULT_PLAYER_OPTIONS: LunnNet.AchtungKurve.NewNetworkPlayer = {
     color: 0xff0000,

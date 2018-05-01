@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser-ce';
 import { BaseSprite } from './baseSprite';
+import { P2Sprite } from 'src/models';
 
 const DEFAULT_BALL_OPTIONS: LunnNet.AirHockey.BallOptions = {
     mass: 0.1,
@@ -47,7 +48,7 @@ export class Ball extends BaseSprite {
         return sprite;
     }
 
-    private constrainVelocity(sprite: Phaser.Sprite, maxVelocity: number) {
+    private constrainVelocity(sprite: P2Sprite, maxVelocity: number) {
         const body = sprite.body;
         let angle, currVelocitySqr, vx, vy;
 

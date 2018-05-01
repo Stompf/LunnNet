@@ -1,7 +1,9 @@
-export class BaseSprite {
-    sprite: Phaser.Sprite;
+import { P2Sprite } from 'src/models';
 
-    constructor(sprite: Phaser.Sprite) {
+export class BaseSprite {
+    sprite: P2Sprite;
+
+    constructor(sprite: P2Sprite) {
         this.sprite = sprite;
     }
 

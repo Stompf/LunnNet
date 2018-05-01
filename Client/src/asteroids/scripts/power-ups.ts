@@ -2,9 +2,10 @@ import { Utils } from './utils';
 import * as Phaser from 'phaser-ce';
 import { Player } from './player';
 import { Events, eventEmitter } from './events';
+import { P2Sprite } from 'src/models';
 
 export class BasePowerUp {
-    sprite: Phaser.Sprite;
+    sprite: P2Sprite;
     isActive: boolean = false;
 
     constructor(
@@ -73,7 +74,7 @@ export class PowerUpShield extends BasePowerUp {
     private durationMs = 7000;
     private warningMs = 2000;
     private radius = 80;
-    private shieldSprite!: Phaser.Sprite;
+    private shieldSprite!: P2Sprite;
     private timer: Phaser.Timer;
 
     constructor(

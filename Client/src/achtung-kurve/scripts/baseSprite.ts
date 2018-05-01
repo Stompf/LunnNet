@@ -1,4 +1,4 @@
-import { P2Sprite } from '../models/achtung';
+import { P2Sprite } from 'src/models';
 
 export class BaseSprite {
     sprite: P2Sprite;

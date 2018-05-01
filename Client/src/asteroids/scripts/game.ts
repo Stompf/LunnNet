@@ -6,6 +6,7 @@ import { Asteroid } from './asteroid';
 import { Events, resetEmitter, eventEmitter } from './events';
 import { BasePowerUp, PowerUpShield, PowerUpShootSpeed } from './power-ups';
 import { Utils } from './utils';
+import { P2Sprite } from 'src/models';
 
 export class AsteroidsGame {
     protected game: Phaser.Game;
@@ -322,7 +323,7 @@ export class AsteroidsGame {
 
         // Warp all bodies
         this.game.world.children.forEach(child => {
-            const sprite = child as Phaser.Sprite;
+            const sprite = child as P2Sprite;
             if (sprite.body != null && !(sprite.data instanceof Bullet)) {
                 Utils.constrainVelocity(
                     sprite,
@@ -351,7 +352,7 @@ export class AsteroidsGame {
         return bullet;
     }
 
-    private warp(sprite: Phaser.Sprite) {
+    private warp(sprite: P2Sprite) {
         const p = { x: sprite.x, y: sprite.y };
         if (p.x > this.game.width) {
             p.x = 0;
