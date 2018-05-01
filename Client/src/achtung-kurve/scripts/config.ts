@@ -1,0 +1,10 @@
+export const PLAYER_COLORS = [
+    0xff4136,
+    0x0074d9,
+    0x7fdbff,
+    0x01ff70,
+    0xffdc00,
+    0xb10dc9,
+    0xf012be,
+    0x2ecc40
+];

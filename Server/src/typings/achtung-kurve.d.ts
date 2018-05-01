@@ -12,6 +12,7 @@ declare namespace LunnNet {
             diameter: number;
             mass: number;
             speed: number;
+            movement: number;
         }
 
         interface GameFound {
