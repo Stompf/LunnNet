@@ -18,7 +18,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     static MAX_PLAYERS = PLAYER_COLORS.length;
     readonly GAME_NAME = 'AchtungKurve';
 
-    private players: Player[];
+    players: Player[];
 
     constructor(playerSockets: Socket[]) {
         logger.info(`${this.GAME_NAME}: Starting new game`);
