@@ -1,51 +1,22 @@
 import { Player, DEFAULT_PLAYER_OPTIONS } from './player';
 import { KeyMapping } from './key-mapping';
 import { PLAYER_COLORS } from './config';
+import { BaseAchtungGame } from './base-game';
 
-export class AchtungGame {
-    protected game: Phaser.Game;
-
-    private players: Player[] = [];
+export class LocalAchtungGame extends BaseAchtungGame {
+    protected players: Player[] = [];
 
     constructor(canvasId: string) {
-        this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, {
-            preload: this.preload,
-            create: this.create,
-            update: this.update
-        });
+        super(canvasId);
     }
 
-    destroy() {
-        this.game.destroy();
-    }
-
-    private preload = () => {
-        this.game.canvas.oncontextmenu = e => {
-            e.preventDefault();
-        };
-
-        this.game.stage.backgroundColor = 0xffffff;
-        this.game.renderer.view.style.border = '1px solid black';
-
-        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    };
-
-    private create = () => {
-        this.initPixi();
-        this.initP2();
+    protected create() {
+        super.create();
         this.initPlayers();
-    };
-
-    private update = () => {
-        this.updatePlayers();
-    };
-
-    private initPixi() {
-        PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
     }
 
-    private initP2() {
-        this.game.physics.startSystem(Phaser.Physics.P2JS);
+    protected update() {
+        this.updatePlayers();
     }
 
     private initPlayers() {
