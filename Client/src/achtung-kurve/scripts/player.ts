@@ -1,4 +1,4 @@
-import { BaseSprite } from './baseSprite';
+import { BaseSprite } from './base-sprite';
 import { KeyMapping } from './key-mapping';
 import { P2Sprite } from 'src/models';
 import { Game } from 'phaser-ce';
