@@ -11,6 +11,7 @@ import Isometric from './isometric/isometric';
 import { AchtungKurveLocal, AchtungKurveNetwork, AchtungKurveMainMenu } from './achtung-kurve';
 
 import { Reboot, AppBar, Button, Grid } from 'material-ui';
+import { Auth } from './auth/auth';
 
 (window as any).PIXI = require('phaser-ce/build/custom/pixi');
 (window as any).p2 = require('phaser-ce/build/custom/p2');
@@ -37,6 +38,9 @@ const Header = () => (
             </Grid>
             <Grid item>
                 <AchtungKurveMainMenu />
+            </Grid>
+            <Grid item style={{ marginLeft: 'auto' }}>
+                <Auth />
             </Grid>
         </Grid>
     </AppBar>
