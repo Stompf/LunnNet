@@ -1,108 +1,69 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import {
-    Button,
-    MenuItem,
-    ClickAwayListener,
-    Grow,
-    Paper,
-    MenuList,
-    WithStyles,
-    Theme
-} from 'material-ui';
-import { Manager, Target, Popper } from 'react-popper';
-import { withStyles, StyleRules } from 'material-ui/styles';
-import * as classNames from 'classnames';
+import { Button, MenuItem, WithStyles, Menu } from 'material-ui';
+import { StyleRules, withStyles } from 'material-ui/styles';
 
 interface AchtungKurveProps {}
 
 interface AchtungKurveState {
-    open: boolean;
+    anchorEl: HTMLElement | undefined;
 }
 
-const styles = (theme: Theme) =>
-    ({
-        root: {
-            display: 'flex'
-        },
-        paper: {
-            marginRight: theme.spacing.unit * 2
-        },
-        popperClose: {
-            pointerEvents: 'none'
-        }
-    } as StyleRules);
+const styles = () => ({} as StyleRules);
 
 export const AchtungKurveMainMenu = withStyles(styles)(
     class extends React.Component<AchtungKurveProps & WithStyles, AchtungKurveState> {
-        private timeout: number = 0;
-
-        state = {
-            open: false
-        };
-
-        componentWillUnmount() {
-            clearTimeout(this.timeout);
+        constructor(props: AchtungKurveProps & WithStyles) {
+            super(props);
+            this.state = {
+                anchorEl: undefined
+            };
         }
 
         render() {
             const LocalLink = (props: any) => <Link to="/kurve/local" {...props} />;
             const NetworkLink = (props: any) => <Link to="/kurve/network" {...props} />;
-            const { open } = this.state;
-            const { classes } = this.props;
+            const { anchorEl } = this.state;
+            const open = Boolean(anchorEl);
 
             return (
-                <Manager>
-                    <Target>
-                        <Button
-                            color="inherit"
-                            aria-owns={open ? 'menu-list' : undefined}
-                            aria-haspopup="true"
-                            onClick={this.handleClick}
-                        >
-                            Kurve
-                        </Button>
-                    </Target>
-                    <Popper
-                        placement="bottom-start"
-                        eventsEnabled={open}
-                        className={classNames({ [classes.popperClose]: !open })}
+                <div>
+                    <Button
+                        color="inherit"
+                        aria-owns={open ? 'menu-appbar-hockey' : undefined}
+                        aria-haspopup="true"
+                        onClick={this.handleClick}
                     >
-                        <ClickAwayListener onClickAway={this.handleClose}>
-                            <Grow in={open}>
-                                <Paper id="menu-list" style={{ transformOrigin: '0 0 0' }}>
-                                    <MenuList role="menu">
-                                        <MenuItem component={LocalLink} onClick={this.handleClose}>
-                                            Local play
-                                        </MenuItem>
-                                        <MenuItem
-                                            component={NetworkLink}
-                                            onClick={this.handleClose}
-                                        >
-                                            Network play
-                                        </MenuItem>
-                                    </MenuList>
-                                </Paper>
-                            </Grow>
-                        </ClickAwayListener>
-                    </Popper>
-                </Manager>
+                        Kurve
+                    </Button>
+                    <Menu
+                        id="menu-appbar-hockey"
+                        anchorEl={anchorEl}
+                        getContentAnchorEl={undefined}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left'
+                        }}
+                        open={open}
+                        onClose={this.handleClose}
+                    >
+                        <MenuItem component={LocalLink} onClick={this.handleClose}>
+                            Local play
+                        </MenuItem>
+                        <MenuItem component={NetworkLink} onClick={this.handleClose}>
+                            Network play
+                        </MenuItem>
+                    </Menu>
+                </div>
             );
         }
 
-        private handleClick = () => {
-            this.setState({ open: !this.state.open });
+        private handleClick = (event: React.MouseEvent<HTMLElement>) => {
+            this.setState({ anchorEl: event.currentTarget });
         };
 
         private handleClose = () => {
-            if (!this.state.open) {
-                return;
-            }
-
-            // setTimeout to ensure a close event comes after a target click event
-            this.timeout = setTimeout(() => {
-                this.setState({ open: false });
-            });
+            this.setState({ anchorEl: undefined });
         };
     }
 );

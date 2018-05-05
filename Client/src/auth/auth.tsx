@@ -6,7 +6,7 @@ import { AuthConfig } from 'src/auth/auth-config';
 
 interface AuthProps {}
 interface AuthState {
-    anchorEl: any | null;
+    anchorEl: HTMLElement | undefined;
     loggedIn: boolean;
     profileSrc: string;
 }
@@ -32,7 +32,7 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
         this.state = {
             loggedIn: false,
             profileSrc: '',
-            anchorEl: null
+            anchorEl: undefined
         };
 
         this.lock = new Auth0Lock(AuthConfig.clientId, AuthConfig.domain, {
@@ -98,12 +98,12 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
         );
     }
 
-    private handleMenu = (event: any) => {
+    private handleMenu = (event: React.MouseEvent<HTMLElement>) => {
         this.setState({ anchorEl: event.currentTarget });
     };
 
     private handleClose = () => {
-        this.setState({ anchorEl: null });
+        this.setState({ anchorEl: undefined });
     };
 
     private logout = () => {
