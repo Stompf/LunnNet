@@ -76,13 +76,10 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
                 <Menu
                     id="menu-appbar-auth"
                     anchorEl={anchorEl}
+                    getContentAnchorEl={undefined}
                     anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right'
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right'
+                        vertical: 'bottom',
+                        horizontal: 'center'
                     }}
                     open={open}
                     onClose={this.handleClose}

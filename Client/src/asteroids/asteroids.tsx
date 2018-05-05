@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { AsteroidsGame } from './scripts/game';
 
 class Asteroids extends React.Component<RouteComponentProps<any>, {}> {
-    private game!: AsteroidsGame;
+    private game: AsteroidsGame | undefined;
 
     render() {
         return <div id="AsteroidsCanvas" />;

@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { IsometricGame } from './scripts/game';
 
 class Isometric extends React.Component<RouteComponentProps<any>, {}> {
-    private game!: IsometricGame;
+    private game: IsometricGame | undefined;
 
     render() {
         return <div id="IsometricGameCanvas" />;

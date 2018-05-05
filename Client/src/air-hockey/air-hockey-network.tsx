@@ -5,7 +5,7 @@ import { AirHockeyGame } from './scripts/game';
 interface AirHockeyProps extends RouteComponentProps<any> {}
 
 class AirHockeyNetwork extends React.Component<AirHockeyProps> {
-    private game!: AirHockeyGame;
+    private game: AirHockeyGame | undefined;
 
     render() {
         return <div id="AirHockeyCanvas" />;
