@@ -1,23 +1,8 @@
 import * as React from 'react';
 import Auth0Lock from 'auth0-lock';
-import {
-    Button,
-    Avatar,
-    Grid,
-    withStyles,
-    WithStyles,
-    ClickAwayListener,
-    Grow,
-    Paper,
-    MenuList,
-    MenuItem,
-    IconButton,
-    Menu
-} from 'material-ui';
+import { Button, Avatar, withStyles, WithStyles, MenuItem, IconButton, Menu } from 'material-ui';
 import { StyleRules, Theme } from 'material-ui/styles';
 import { AuthConfig } from 'src/auth/auth-config';
-import { Manager, Target, Popper } from 'react-popper';
-import classNames = require('classnames');
 
 interface AuthProps {}
 interface AuthState {
@@ -41,7 +26,6 @@ const styles = (theme: Theme) =>
 
 class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
     private lock: typeof Auth0Lock;
-    private timeout: number = 0;
 
     constructor(props: AuthProps & WithStyles) {
         super(props);

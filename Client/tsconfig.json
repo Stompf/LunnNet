@@ -6,12 +6,14 @@
         "lib": ["es6", "dom"],
         "baseUrl": ".",
         "sourceMap": true,
-        "allowJs": true,
         "jsx": "react",
         "moduleResolution": "node",
         "rootDir": "src",
         "forceConsistentCasingInFileNames": true,
         "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "allowUnreachableCode": false,
         "strict": true,
         "suppressImplicitAnyIndexErrors": true,
         "paths": {
@@ -27,6 +29,5 @@
         "webpack",
         "jest",
         "src/setupTests.ts"
-    ],
-    "types": ["typePatches"]
+    ]
 }

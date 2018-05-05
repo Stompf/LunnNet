@@ -1,7 +1,6 @@
 import { BaseSprite } from './base-sprite';
 import { KeyMapping } from './key-mapping';
 import { P2Sprite } from 'src/models';
-import { Game } from 'phaser-ce';
 import { addMilliseconds, isAfter } from 'date-fns';
 import { PlayerData } from '../models';
 import { PLAYER_COLORS } from './config';

@@ -1,6 +1,4 @@
-import { Player, DEFAULT_PLAYER_OPTIONS } from './player';
-import { KeyMapping } from './key-mapping';
-import { PLAYER_COLORS } from './config';
+import { Player } from './player';
 
 export class BaseAchtungGame {
     protected game: Phaser.Game;
