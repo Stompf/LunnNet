@@ -30,14 +30,14 @@ export const AchtungKurveMainMenu = withStyles(styles)(
                 <div>
                     <Button
                         color="inherit"
-                        aria-owns={open ? 'menu-appbar-hockey' : undefined}
+                        aria-owns={open ? 'menu-appbar-kruve' : undefined}
                         aria-haspopup="true"
                         onClick={this.handleClick}
                     >
                         Kurve
                     </Button>
                     <Menu
-                        id="menu-appbar-hockey"
+                        id="menu-appbar-kruve"
                         anchorEl={anchorEl}
                         getContentAnchorEl={undefined}
                         anchorOrigin={{

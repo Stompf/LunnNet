@@ -3,12 +3,12 @@ import Auth0Lock from 'auth0-lock';
 import { Button, Avatar, withStyles, WithStyles, MenuItem, IconButton, Menu } from 'material-ui';
 import { StyleRules, Theme } from 'material-ui/styles';
 import { AuthConfig } from 'src/auth/auth-config';
+import { Auth0UserProfile } from 'auth0-js';
 
 interface AuthProps {}
 interface AuthState {
     anchorEl: HTMLElement | undefined;
-    loggedIn: boolean;
-    profileSrc: string;
+    profile: Auth0UserProfile | undefined;
 }
 
 const styles = (theme: Theme) =>
@@ -30,8 +30,7 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
     constructor(props: AuthProps & WithStyles) {
         super(props);
         this.state = {
-            loggedIn: false,
-            profileSrc: '',
+            profile: undefined,
             anchorEl: undefined
         };
 
@@ -60,22 +59,22 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
 
     render() {
         const { classes } = this.props;
-        const { anchorEl, loggedIn } = this.state;
+        const { anchorEl, profile } = this.state;
         const open = Boolean(anchorEl);
 
-        return loggedIn ? (
+        return profile ? (
             <div>
                 <IconButton
-                    aria-owns={open ? 'menu-appbar' : undefined}
+                    aria-owns={open ? 'menu-appbar-auth' : undefined}
                     aria-haspopup="true"
                     onClick={this.handleMenu}
                     color="inherit"
                     className={classes.iconButton}
                 >
-                    <Avatar className={classes.avatar} src={this.state.profileSrc} />
+                    <Avatar className={classes.avatar} src={profile.picture} />
                 </IconButton>
                 <Menu
-                    id="menu-appbar"
+                    id="menu-appbar-auth"
                     anchorEl={anchorEl}
                     anchorOrigin={{
                         vertical: 'top',
@@ -125,13 +124,8 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
                 return;
             }
 
-            console.log(profile.nickname);
-
-            console.log(accessToken);
-            console.log(JSON.stringify(profile));
-
             this.lock.hide();
-            this.setState({ loggedIn: true, profileSrc: profile.picture });
+            this.setState({ profile: profile });
         });
     }
 }
