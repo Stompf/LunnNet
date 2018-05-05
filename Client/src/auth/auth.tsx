@@ -1,45 +1,71 @@
 import * as React from 'react';
 import Auth0Lock from 'auth0-lock';
-import { Button, Avatar, Grid, withStyles, WithStyles } from 'material-ui';
-import { StyleRules } from 'material-ui/styles';
+import {
+    Button,
+    Avatar,
+    Grid,
+    withStyles,
+    WithStyles,
+    ClickAwayListener,
+    Grow,
+    Paper,
+    MenuList,
+    MenuItem,
+    IconButton,
+    Menu
+} from 'material-ui';
+import { StyleRules, Theme } from 'material-ui/styles';
+import { AuthConfig } from 'src/auth/auth-config';
+import { Manager, Target, Popper } from 'react-popper';
+import classNames = require('classnames');
 
 interface AuthProps {}
 interface AuthState {
+    anchorEl: any | null;
     loggedIn: boolean;
     profileSrc: string;
 }
 
-const AUTH0_CLIENT_ID = '4jzx2gzFUTgxbTsIKzfQ8k1P3w7RiEU6';
-const AUTH0_SCOPE = 'openid email profile';
-
-const styles: StyleRules = {
-    avatar: {
-        width: 36,
-        height: 36
-    }
-};
+const styles = (theme: Theme) =>
+    ({
+        avatar: {
+            width: 36,
+            height: 36
+        },
+        root: {
+            display: 'flex'
+        },
+        paper: {
+            marginRight: theme.spacing.unit * 2
+        },
+        popperClose: {
+            pointerEvents: 'none'
+        }
+    } as StyleRules);
 
 class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
     private lock: typeof Auth0Lock;
+    private timeout: number = 0;
 
     constructor(props: AuthProps & WithStyles) {
         super(props);
         this.state = {
             loggedIn: false,
-            profileSrc: ''
+            profileSrc: '',
+            anchorEl: null
         };
 
-        this.lock = new Auth0Lock(AUTH0_CLIENT_ID, 'lunne.eu.auth0.com', {
+        this.lock = new Auth0Lock(AuthConfig.clientId, AuthConfig.domain, {
             auth: {
                 redirect: false,
                 responseType: 'token',
                 params: {
-                    scope: AUTH0_SCOPE
+                    scope: AuthConfig.scope
                 }
             }
         });
 
-        this.lock.checkSession({ scope: AUTH0_SCOPE }, (error, authResult) => {
+        this.lock.checkSession({ scope: AuthConfig.scope }, (error, authResult) => {
             if (!error && authResult) {
                 // user has an active session, so we can use the accessToken directly.
                 this.getUserInfo(authResult.accessToken);
@@ -54,18 +80,37 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
 
     render() {
         const { classes } = this.props;
+        const { anchorEl, loggedIn } = this.state;
+        const open = Boolean(anchorEl);
 
-        return this.state.loggedIn ? (
-            <Grid container spacing={0}>
-                <Grid item>
+        return loggedIn ? (
+            <>
+                <IconButton
+                    aria-owns={open ? 'menu-appbar' : undefined}
+                    aria-haspopup="true"
+                    onClick={this.handleMenu}
+                    color="inherit"
+                    className={classes.avatar}
+                >
                     <Avatar className={classes.avatar} src={this.state.profileSrc} />
-                </Grid>
-                <Grid item>
-                    <Button color="inherit" onClick={this.logout}>
-                        Logout
-                    </Button>
-                </Grid>
-            </Grid>
+                </IconButton>
+                <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                    }}
+                    open={open}
+                    onClose={this.handleClose}
+                >
+                    <MenuItem onClick={this.logout}>Logout</MenuItem>
+                </Menu>
+            </>
         ) : (
             <Button color="inherit" onClick={this.login}>
                 Login
@@ -73,10 +118,19 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
         );
     }
 
+    private handleMenu = (event: any) => {
+        this.setState({ anchorEl: event.currentTarget });
+    };
+
+    private handleClose = () => {
+        this.setState({ anchorEl: null });
+    };
+
     private logout = () => {
+        this.handleClose();
         this.lock.logout({
             returnTo: window.location.href,
-            clientID: AUTH0_CLIENT_ID
+            clientID: AuthConfig.clientId
         });
     };
 
