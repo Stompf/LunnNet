@@ -28,8 +28,8 @@
     "tslint.autoFixOnSave": true,
     "tslint.exclude": "**/node_modules/**/*",
     "tslint.alwaysShowRuleFailuresAsWarnings": true,
-    "extensions.autoUpdate": true,
     "typescript.tsdk": "./node_modules/typescript/lib",
+    "terminal.integrated.copyOnSelection": true,
     "path-intellisense.mappings": {
         "/": "${workspaceRoot}/src"
     },
