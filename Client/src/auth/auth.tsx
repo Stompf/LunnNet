@@ -10,6 +10,7 @@ interface AuthState {
 }
 
 const AUTH0_CLIENT_ID = '4jzx2gzFUTgxbTsIKzfQ8k1P3w7RiEU6';
+const AUTH0_SCOPE = 'openid email profile';
 
 const styles: StyleRules = {
     avatar: {
@@ -33,12 +34,12 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
                 redirect: false,
                 responseType: 'token',
                 params: {
-                    scope: 'openid email profile'
+                    scope: AUTH0_SCOPE
                 }
             }
         });
 
-        this.lock.checkSession({ scope: 'openid email profile' }, (error, authResult) => {
+        this.lock.checkSession({ scope: AUTH0_SCOPE }, (error, authResult) => {
             if (!error && authResult) {
                 // user has an active session, so we can use the accessToken directly.
                 this.getUserInfo(authResult.accessToken);
