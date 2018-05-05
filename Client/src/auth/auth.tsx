@@ -28,18 +28,14 @@ interface AuthState {
 
 const styles = (theme: Theme) =>
     ({
-        avatar: {
+        iconButton: {
+            marginRight: theme.spacing.unit * 2,
             width: 36,
             height: 36
         },
-        root: {
-            display: 'flex'
-        },
-        paper: {
-            marginRight: theme.spacing.unit * 2
-        },
-        popperClose: {
-            pointerEvents: 'none'
+        avatar: {
+            width: 36,
+            height: 36
         }
     } as StyleRules);
 
@@ -84,13 +80,13 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
         const open = Boolean(anchorEl);
 
         return loggedIn ? (
-            <>
+            <div>
                 <IconButton
                     aria-owns={open ? 'menu-appbar' : undefined}
                     aria-haspopup="true"
                     onClick={this.handleMenu}
                     color="inherit"
-                    className={classes.avatar}
+                    className={classes.iconButton}
                 >
                     <Avatar className={classes.avatar} src={this.state.profileSrc} />
                 </IconButton>
@@ -110,7 +106,7 @@ class Auth extends React.Component<AuthProps & WithStyles, AuthState> {
                 >
                     <MenuItem onClick={this.logout}>Logout</MenuItem>
                 </Menu>
-            </>
+            </div>
         ) : (
             <Button color="inherit" onClick={this.login}>
                 Login
