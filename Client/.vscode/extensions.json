@@ -10,6 +10,7 @@
         "robertohuertasm.vscode-icons",
         "eamodio.gitlens",
         "rafamel.subtle-brackets",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "azemoh.one-monokai"
     ]
 }
