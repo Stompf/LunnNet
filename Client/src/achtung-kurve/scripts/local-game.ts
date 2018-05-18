@@ -17,6 +17,7 @@ export class LocalAchtungGame extends BaseAchtungGame {
 
     protected update() {
         this.updatePlayers();
+        this.checkCollisions();
     }
 
     private initPlayers() {
@@ -56,5 +57,39 @@ export class LocalAchtungGame extends BaseAchtungGame {
 
     private updatePlayers() {
         this.players.forEach(player => player.onUpdate(this.game));
+    }
+
+    private checkCollisions() {
+        this.players.forEach(player => {
+            if (player.isAlive) {
+                this.players.forEach(player2 => {
+                    if (player2 !== player) {
+                        this.game.physics.arcade.collide(
+                            player.sprite,
+                            player2.getHistoryGroup(),
+                            () => {
+                                player.die();
+                            }
+                        );
+
+                        this.game.physics.arcade.collide(
+                            player.sprite,
+                            player2.getCloseHistoryGroup(),
+                            () => {
+                                player.die();
+                            }
+                        );
+                    } else {
+                        this.game.physics.arcade.collide(
+                            player.sprite,
+                            player.getHistoryGroup(),
+                            () => {
+                                player.die();
+                            }
+                        );
+                    }
+                });
+            }
+        });
     }
 }

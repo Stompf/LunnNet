@@ -1,26 +1,22 @@
-import { P2Sprite } from 'src/models';
+import { ArcadeSprite } from 'src/models';
 
 export class BaseSprite {
-    sprite: P2Sprite;
+    sprite: ArcadeSprite;
 
-    constructor(sprite: P2Sprite) {
+    constructor(sprite: ArcadeSprite) {
         this.sprite = sprite;
     }
 
-    setDebug(debug: boolean) {
-        this.sprite.body.debug = debug;
-    }
-
     setPosition(position: WebKitPoint) {
-        this.sprite.body.x = position.x;
-        this.sprite.body.y = position.y;
+        this.sprite.x = position.x;
+        this.sprite.y = position.y;
     }
 
     getPosition() {
         return this.sprite.position;
     }
 
-    resetVelocity(velocityX?: number) {
-        this.sprite.body.data.velocity = [velocityX ? velocityX : 0, 0];
+    resetVelocity(velocityX?: number, velocityY?: number) {
+        this.sprite.body.velocity.setTo(velocityX ? velocityX : 0, velocityY ? velocityY : 0);
     }
 }
