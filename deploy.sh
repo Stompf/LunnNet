@@ -36,7 +36,7 @@ if [ $changed -eq 1 ] || [ $force -eq 1 ]; then
 		echo "INFO: Installing Client..."
 		cd Client
 		rm -rf build
-		npm install --no-save
+		npm ci
 		npm run build
 		cd ..
 		echo "INFO: Client installed"
@@ -46,7 +46,7 @@ if [ $changed -eq 1 ] || [ $force -eq 1 ]; then
 		echo "INFO: Installing Server..."
 		cd Server
 		rm -rf dist
-		npm install --no-save
+		npm ci
 		npm run build
 		pm2 startOrReload process.yml
 		echo "INFO: Server installed"
