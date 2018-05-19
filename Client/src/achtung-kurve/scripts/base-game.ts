@@ -29,7 +29,7 @@ export class BaseAchtungGame {
 
     protected create() {
         this.initPixi();
-        this.initP2();
+        this.initPhysics();
     }
 
     protected update() {
@@ -40,7 +40,7 @@ export class BaseAchtungGame {
         PIXI.Sprite.defaultAnchor = { x: 0.5, y: 0.5 };
     }
 
-    private initP2() {
-        this.game.physics.startSystem(Phaser.Physics.P2JS);
+    private initPhysics() {
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
     }
 }

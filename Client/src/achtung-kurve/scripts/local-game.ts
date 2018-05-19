@@ -1,6 +1,6 @@
-import { Player, DEFAULT_PLAYER_OPTIONS } from './player';
+import { Player } from './player';
 import { KeyMapping } from './key-mapping';
-import { PLAYER_COLORS } from './config';
+import { PLAYER_COLORS, DEFAULT_PLAYER_OPTIONS } from './config';
 import { BaseAchtungGame } from './base-game';
 
 export class LocalAchtungGame extends BaseAchtungGame {
@@ -17,6 +17,7 @@ export class LocalAchtungGame extends BaseAchtungGame {
 
     protected update() {
         this.updatePlayers();
+        this.checkCollisions();
     }
 
     private initPlayers() {
@@ -56,5 +57,25 @@ export class LocalAchtungGame extends BaseAchtungGame {
 
     private updatePlayers() {
         this.players.forEach(player => player.onUpdate(this.game));
+    }
+
+    private checkCollisions() {
+        this.players.filter(p => p.isAlive).forEach(player => {
+            if (this.checkPlayerCollide(player)) {
+                player.die();
+            }
+        });
+    }
+
+    private checkPlayerCollide(player: Player) {
+        return (
+            player.checkWorldBounds() ||
+            this.players.some(player2 => {
+                return (
+                    (player2 !== player && player.checkCollide(player2.getCloseHistoryGroup())) ||
+                    player.checkCollide(player2.getHistoryGroup())
+                );
+            })
+        );
     }
 }
