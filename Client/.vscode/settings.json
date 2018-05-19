@@ -27,6 +27,7 @@
     "tslint.autoFixOnSave": true,
     "tslint.alwaysShowRuleFailuresAsWarnings": true,
     "extensions.autoUpdate": true,
+    "terminal.integrated.copyOnSelection": true,
     "typescript.tsdk": "./node_modules/typescript/lib",
     "cSpell.ignorePaths": [
         "node_modules", // this will ignore anything the node_modules directory
