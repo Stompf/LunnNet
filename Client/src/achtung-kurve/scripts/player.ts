@@ -3,18 +3,7 @@ import { KeyMapping } from './key-mapping';
 import { ArcadeSprite } from 'src/models';
 import { addMilliseconds, isAfter } from 'date-fns';
 import { PlayerData } from '../models';
-import { PLAYER_COLORS } from './config';
 import { Group } from 'phaser-ce';
-
-export const DEFAULT_PLAYER_OPTIONS: LunnNet.AchtungKurve.NewNetworkPlayer = {
-    color: PLAYER_COLORS[0],
-    diameter: 10,
-    mass: 1,
-    id: '',
-    position: { x: 0, y: 0 },
-    speed: 100,
-    movement: 0
-};
 
 export class Player extends BaseSprite {
     score: number = 0;
@@ -80,10 +69,10 @@ export class Player extends BaseSprite {
         }
 
         if (game.input.keyboard.isDown(this.keyMapping.left)) {
-            this.movement += this.movementSpeed;
+            this.movement -= this.movementSpeed;
         }
         if (game.input.keyboard.isDown(this.keyMapping.right)) {
-            this.movement -= this.movementSpeed;
+            this.movement += this.movementSpeed;
         }
 
         this.sprite.body.velocity.x = Math.cos(this.movement) * this.SPEED;
@@ -133,6 +122,14 @@ export class Player extends BaseSprite {
 
     getCloseHistoryGroup() {
         return this.closeHistoryGroup;
+    }
+
+    checkWorldBounds() {
+        return this.sprite.body.checkWorldBounds();
+    }
+
+    checkCollide(group: Group) {
+        return this.sprite.game.physics.arcade.collide(this.sprite, group);
     }
 
     die() {
