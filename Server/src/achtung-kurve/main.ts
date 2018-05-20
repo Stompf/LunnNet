@@ -1,22 +1,18 @@
 import { Socket } from 'socket.io';
 import { Player } from './player';
 import { logger } from '../logger';
-
-const PLAYER_COLORS = [
-    '#FF4136',
-    '#0074D9',
-    '#7FDBFF',
-    '#01FF70',
-    '#FFDC00',
-    '#B10DC9',
-    '#F012BE',
-    '#2ECC40'
-];
+import { PLAYER_COLORS } from './constants';
 
 export class AchtungKurve implements LunnNet.NetworkGame {
     static MIN_PLAYERS = 2;
     static MAX_PLAYERS = PLAYER_COLORS.length;
     readonly GAME_NAME = 'AchtungKurve';
+    private readonly FIXED_TIME_STEP = 1 / 60;
+
+    private tick = 0;
+    private paused = false;
+
+    private intervalReference: NodeJS.Timer | undefined;
 
     players: Player[];
 
@@ -38,7 +34,32 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     public initGame() {
-        // TODO
+        this.intervalReference = setInterval(this.heartbeat, this.FIXED_TIME_STEP);
+    }
+
+    private heartbeat = () => {
+        this.tick++;
+
+        if (!this.paused) {
+            this.players.forEach(p => p.onUpdate());
+        }
+
+        const serverTick: LunnNet.AchtungKurve.ServerTick = {
+            tick: this.tick,
+            players: this.players.map(p => p.toUpdatePlayer())
+        };
+
+        // winston.info(`heartbeat: ${serverTick.players[0].velocity}`);
+
+        this.emitToPlayers('ServerTick', serverTick);
+    };
+
+    private emitToPlayers(event: string, data?: any) {
+        this.players.forEach(p => {
+            if (p.socket.connected) {
+                p.socket.emit(event, data);
+            }
+        });
     }
 
     private mapSocketToPlayer = (socket: Socket, index: number) => {

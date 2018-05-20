@@ -7,18 +7,23 @@ declare namespace LunnNet {
 
         interface NewNetworkPlayer {
             id: string;
-            position: WebKitPoint;
             color: number;
-            diameter: number;
-            mass: number;
-            speed: number;
-            movement: number;
         }
 
         interface GameFound {
             gameSize: Utils.Size;
             physicsOptions: PhysicOptions;
             players: NewNetworkPlayer[];
+        }
+
+        interface ServerTick {
+            tick: number;
+            players: UpdatePlayer[];
+        }
+
+        interface UpdatePlayer {
+            id: string;
+            positions: WebKitPoint[];
         }
     }
 }
