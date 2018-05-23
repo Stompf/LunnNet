@@ -34,14 +34,24 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     public initGame() {
+        this.players.forEach((p, index) => {
+            p.setStart(1, { x: 50 + 10 * index, y: 50 });
+        });
+
         this.intervalReference = setInterval(this.heartbeat, this.FIXED_TIME_STEP);
+    }
+
+    stopGame() {
+        if (this.intervalReference) {
+            clearInterval(this.intervalReference);
+        }
     }
 
     private heartbeat = () => {
         this.tick++;
 
         if (!this.paused) {
-            this.players.forEach(p => p.onUpdate());
+            this.players.forEach(p => p.onUpdate(this.FIXED_TIME_STEP));
         }
 
         const serverTick: LunnNet.AchtungKurve.ServerTick = {
