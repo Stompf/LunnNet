@@ -1,6 +1,8 @@
 import { Socket } from 'socket.io';
 
 export class Player {
+    static speed = 0.1;
+
     socket: Socket;
 
     private get Id() {
@@ -8,8 +10,7 @@ export class Player {
     }
 
     private color: number;
-    private movement: number = 0;
-    private speed = 100;
+    private movement: number = 1;
     private positions: WebKitPoint[] = [];
 
     constructor(color: number, socket: Socket) {
@@ -23,10 +24,20 @@ export class Player {
     }
 
     onUpdate(deltaTime: number) {
-        const velocityX = Math.cos(this.movement) * this.speed;
-        const velocityY = Math.sin(this.movement) * this.speed;
+        const oldPosition = this.positions[0];
+        const velocityX = Math.cos(this.movement) * Player.speed;
+        const velocityY = Math.sin(this.movement) * Player.speed;
+        const newPosition = {
+            x: oldPosition.x + deltaTime * velocityX,
+            y: oldPosition.y + deltaTime * velocityY
+        };
+        if (newPosition.x !== oldPosition.x || newPosition.y !== oldPosition.y) {
+            this.positions.unshift(newPosition);
+        }
+    }
 
-        this.positions.push({ x: deltaTime * velocityX, y: deltaTime * velocityY });
+    onClientUpdate(data: LunnNet.AchtungKurve.UpdateFromClient) {
+        this.movement = data.movement;
     }
 
     toNewNetworkPlayer(): LunnNet.AchtungKurve.NewNetworkPlayer {
@@ -41,7 +52,7 @@ export class Player {
     toUpdatePlayer(): LunnNet.AchtungKurve.UpdatePlayer {
         return {
             id: this.Id,
-            positions: this.positions
+            positions: this.positions.slice(0, 1)
         };
     }
 }

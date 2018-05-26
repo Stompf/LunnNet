@@ -1,17 +1,21 @@
 import { BaseAchtungGame } from './base-game';
 import * as socketIO from 'socket.io-client';
 import { Group } from 'phaser-ce';
-import { Player } from 'src/achtung-kurve/scripts/player';
 import { PlayerOptions } from 'src/achtung-kurve/models';
 import { KeyMapping } from './key-mapping';
-import { DEFAULT_PLAYER_OPTIONS } from 'src/air-hockey/scripts/player';
+import { NetworkPlayer } from './network-player';
 
 export class NetworkAchtungGame extends BaseAchtungGame {
     private socket: SocketIOClient.Socket | undefined;
     private networkGameStarted: boolean = false;
     private latestNetworkTick: number = 0;
-    private connectStatusText: Phaser.Text;
-    private content: Group;
+    private connectStatusText!: Phaser.Text;
+    private content!: Group;
+    protected players: NetworkPlayer[] = [];
+
+    private get Id() {
+        return this.socket ? this.socket.id : '';
+    }
 
     private serverIP = process.env.NODE_ENV === 'production'
         ? 'https://home.lunne.nu'
@@ -19,13 +23,6 @@ export class NetworkAchtungGame extends BaseAchtungGame {
 
     constructor(canvasId: string) {
         super(canvasId);
-        this.connectStatusText = this.game.add.text(
-            this.game.world.centerX,
-            this.game.world.centerY,
-            'Connecting...'
-        );
-        this.connectStatusText.anchor.set(0.5, 0.5);
-        this.content = new Group(this.game);
     }
 
     destroy() {
@@ -34,14 +31,39 @@ export class NetworkAchtungGame extends BaseAchtungGame {
         }
     }
 
+    protected create() {
+        super.create();
+        setTimeout(() => {
+            this.connect();
+        }, 250);
+    }
+
     protected update() {
         if (!this.socket || !this.networkGameStarted) {
             return;
         }
+
+        this.players.forEach(p => {
+            if (this.socket && p.onUpdate(this.game)) {
+                this.socket.emit('UpdateFromClient', p.toUpdateFromClient());
+            }
+        });
     }
 
     private connect() {
-        this.connectStatusText.visible = true;
+        if (!this.connectStatusText) {
+            this.connectStatusText = this.game.add.text(
+                this.game.world.centerX,
+                this.game.world.centerY,
+                'Connecting...'
+            );
+            this.connectStatusText.anchor.set(0.5, 0.5);
+            this.connectStatusText.visible = true;
+        }
+        if (!this.content) {
+            this.content = new Group(this.game);
+        }
+
         this.initSocket();
     }
 
@@ -67,8 +89,7 @@ export class NetworkAchtungGame extends BaseAchtungGame {
                 return;
             }
 
-            this.game.world.removeChildren();
-            this.game.physics.p2.clear();
+            this.content.removeAll();
 
             this.connectStatusText.visible = true;
             this.connectStatusText.setText('Disconnected');
@@ -105,10 +126,14 @@ export class NetworkAchtungGame extends BaseAchtungGame {
                 diameter: data.options.player.diameter,
                 movement: player.startMovement,
                 position: player.startPosition,
-                speed: data.options.player.speed
+                speed: data.options.player.speed,
+                isLocalPlayer: player.id === this.Id
             };
 
-            this.players.push(new Player(this.game, options, KeyMapping.Player1Mapping));
+            const networkPlayer = new NetworkPlayer(this.game, options, KeyMapping.Player1Mapping);
+            this.players.push(networkPlayer);
+
+            this.content.add(networkPlayer.graphics);
         });
 
         this.networkGameStarted = true;

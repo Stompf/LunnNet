@@ -10,4 +10,5 @@ export interface PlayerOptions {
     position: WebKitPoint;
     id: string;
     color: number;
+    isLocalPlayer: boolean;
 }

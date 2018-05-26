@@ -1,8 +1,5 @@
-import { Player } from './player';
-
 export class BaseAchtungGame {
     protected game: Phaser.Game;
-    protected players: Player[] = [];
 
     constructor(canvasId: string) {
         this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, {

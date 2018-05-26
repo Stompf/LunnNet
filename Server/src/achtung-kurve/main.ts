@@ -4,17 +4,19 @@ import { logger } from '../logger';
 import { PLAYER_COLORS } from './constants';
 
 export class AchtungKurve implements LunnNet.NetworkGame {
+    private readonly TIME_LIMIT = 10 * 60 * 1000;
+    private readonly FIXED_TIME_STEP = 25;
+
     static MIN_PLAYERS = 2;
     static MAX_PLAYERS = PLAYER_COLORS.length;
     readonly GAME_NAME = 'AchtungKurve';
-    private readonly FIXED_TIME_STEP = 1 / 60;
-
-    private tick = 0;
-    private paused = false;
 
     private intervalReference: NodeJS.Timer | undefined;
-
-    players: Player[];
+    private timeLimitReference: NodeJS.Timer | undefined;
+    private tick = 0;
+    private paused = false;
+    private stopped = false;
+    private players: Player[];
 
     constructor(playerSockets: Socket[]) {
         logger.info(`${this.GAME_NAME}: Starting new game`);
@@ -31,20 +33,58 @@ export class AchtungKurve implements LunnNet.NetworkGame {
         }
 
         this.players = playerSockets.map(this.mapSocketToPlayer);
+        playerSockets.forEach(this.listenToEvents);
     }
 
     public initGame() {
         this.players.forEach((p, index) => {
-            p.setStart(1, { x: 50 + 10 * index, y: 50 });
+            p.setStart(1, { x: 50 + 50 * index, y: 50 });
         });
 
+        const gameFound: LunnNet.AchtungKurve.GameFound = {
+            gameSize: { width: 1400, height: 600 },
+            players: this.players.map(p => p.toNewNetworkPlayer()),
+            options: { player: { diameter: 10, speed: Player.speed } }
+        };
+        this.emitToPlayers('GameFound', gameFound);
+
         this.intervalReference = setInterval(this.heartbeat, this.FIXED_TIME_STEP);
+
+        this.setTimeLimit();
     }
 
-    stopGame() {
+    stopGame = (forced?: boolean) => {
+        if (this.stopped) {
+            return;
+        }
+
+        this.stopped = true;
+
+        logger.info(
+            `${this.GAME_NAME} - stopping game with players: ${this.players
+                .map(p => p.socket.id)
+                .join(' : ')}.${forced === true ? ' forced' : ''}`
+        );
+
         if (this.intervalReference) {
             clearInterval(this.intervalReference);
         }
+
+        if (this.timeLimitReference) {
+            clearTimeout(this.timeLimitReference);
+        }
+
+        this.players.forEach(p => {
+            if (p.socket.connected) {
+                p.socket.disconnect(true);
+            }
+        });
+    };
+
+    private setTimeLimit() {
+        this.timeLimitReference = setTimeout(() => {
+            this.stopGame(true);
+        }, this.TIME_LIMIT);
     }
 
     private heartbeat = () => {
@@ -71,6 +111,31 @@ export class AchtungKurve implements LunnNet.NetworkGame {
             }
         });
     }
+
+    private listenToEvents = (socket: Socket) => {
+        socket.on('UpdateFromClient', (data: LunnNet.AchtungKurve.UpdateFromClient) => {
+            this.handleOnPlayerUpdate(socket.id, data);
+        });
+        socket.on('disconnect', this.stopGame);
+    };
+
+    private handleOnPlayerUpdate = (id: string, data: LunnNet.AchtungKurve.UpdateFromClient) => {
+        if (this.stopped) {
+            return;
+        }
+
+        const player = this.players.find(p => p.socket.id === id);
+        if (!player) {
+            logger.info(
+                `${this.GAME_NAME} - handleOnPlayerUpdate - got info about player not in game.`
+            );
+            return;
+        }
+
+        player.onClientUpdate(data);
+
+        // winston.info(`handleOnPlayerUpdate: ${player.socket.id} : ${data.velocityHorizontal}`);
+    };
 
     private mapSocketToPlayer = (socket: Socket, index: number) => {
         return new Player(PLAYER_COLORS[index], socket);

@@ -17,5 +17,6 @@ export const DEFAULT_PLAYER_OPTIONS: PlayerOptions = {
     id: '',
     position: { x: 0, y: 0 },
     speed: 150,
-    movement: 0
+    movement: 0,
+    isLocalPlayer: true
 };

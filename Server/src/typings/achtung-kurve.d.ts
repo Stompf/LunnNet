@@ -7,6 +7,10 @@ declare namespace LunnNet {
             };
         }
 
+        interface UpdateFromClient {
+            movement: number;
+        }
+
         interface NewNetworkPlayer {
             id: string;
             color: number;
