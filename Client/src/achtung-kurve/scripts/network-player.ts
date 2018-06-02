@@ -10,18 +10,22 @@ export class NetworkPlayer {
     private keyMapping: KeyMapping.Mapping | undefined;
     private movement: number = 0;
     private movementSpeed: number;
+    private color: number;
+    private diameter: number;
 
     graphics: Phaser.Graphics;
 
     constructor(game: Phaser.Game, options: PlayerOptions, keyMapping?: KeyMapping.Mapping) {
+        this.keyMapping = keyMapping;
         this.id = options.id;
         this.movement = options.movement;
         this.isLocalPlayer = options.isLocalPlayer;
-        this.keyMapping = keyMapping;
         this.movementSpeed = options.speed;
+        this.color = options.color;
+        this.diameter = options.diameter;
+
         this.graphics = game.add.graphics();
         this.graphics.moveTo(options.position.x, options.position.y);
-        this.graphics.lineStyle(3, 0xff0000);
     }
 
     onUpdate(game: Phaser.Game) {
@@ -41,7 +45,7 @@ export class NetworkPlayer {
     }
 
     onNetworkUpdate(data: LunnNet.AchtungKurve.UpdatePlayer) {
-        this.graphics.lineStyle(3, 0xff0000);
+        this.graphics.lineStyle(this.diameter, this.color);
         this.graphics.lineTo(data.positions[0].x, data.positions[0].y);
     }
 

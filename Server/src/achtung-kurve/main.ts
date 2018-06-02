@@ -1,14 +1,15 @@
 import { Socket } from 'socket.io';
 import { Player } from './player';
 import { logger } from '../logger';
-import { PLAYER_COLORS } from './constants';
+import { constants } from './constants';
+import { segmentIntersection } from './segment-intersection';
 
 export class AchtungKurve implements LunnNet.NetworkGame {
     private readonly TIME_LIMIT = 10 * 60 * 1000;
     private readonly FIXED_TIME_STEP = 25;
 
     static MIN_PLAYERS = 2;
-    static MAX_PLAYERS = PLAYER_COLORS.length;
+    static MAX_PLAYERS = constants.playerColors.length;
     readonly GAME_NAME = 'AchtungKurve';
 
     private intervalReference: NodeJS.Timer | undefined;
@@ -42,9 +43,9 @@ export class AchtungKurve implements LunnNet.NetworkGame {
         });
 
         const gameFound: LunnNet.AchtungKurve.GameFound = {
-            gameSize: { width: 1400, height: 600 },
+            gameSize: constants.gameSize,
             players: this.players.map(p => p.toNewNetworkPlayer()),
-            options: { player: { diameter: 10, speed: Player.speed } }
+            options: { player: { diameter: constants.playerDiameter, speed: Player.speed } }
         };
         this.emitToPlayers('GameFound', gameFound);
 
@@ -88,11 +89,14 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     private heartbeat = () => {
+        if (this.paused) {
+            return;
+        }
+
         this.tick++;
 
-        if (!this.paused) {
-            this.players.forEach(p => p.onUpdate(this.FIXED_TIME_STEP));
-        }
+        this.players.forEach(p => p.onUpdate(this.FIXED_TIME_STEP));
+        this.checkCollisions();
 
         const serverTick: LunnNet.AchtungKurve.ServerTick = {
             tick: this.tick,
@@ -138,6 +142,66 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     };
 
     private mapSocketToPlayer = (socket: Socket, index: number) => {
-        return new Player(PLAYER_COLORS[index], socket);
+        return new Player(constants.playerColors[index], socket);
     };
+
+    private checkCollisions() {
+        this.players.filter(p => p.isAlive).forEach(p => {
+            if (this.isOutsideOfGame(p.currentPosition) || this.checkIntersects(p)) {
+                p.kill();
+            }
+        });
+    }
+
+    private isOutsideOfGame(pos: WebKitPoint) {
+        return (
+            pos.x <= 0 ||
+            pos.x >= constants.gameSize.width ||
+            pos.y <= 0 ||
+            pos.y >= constants.gameSize.height
+        );
+    }
+
+    private checkIntersects(player: Player) {
+        const { posA1, posA2 } = player.currentPositionLine;
+        return this.players.some(p => this.checkPlayerCollision(posA1, posA2, p));
+    }
+
+    private checkPlayerCollision(posA1: WebKitPoint, posA2: WebKitPoint, player: Player) {
+        const positions = player.getPositions();
+        if (positions.length < 2) {
+            return false;
+        }
+
+        for (let i = 2; i < positions.length; i++) {
+            if (i === positions.length - 1) {
+                return false;
+            }
+
+            const posB1 = positions[i];
+            const posB2 = positions[i + 1];
+
+            if (
+                segmentIntersection(
+                    posA1.x,
+                    posA1.y,
+                    posA2.x,
+                    posA2.y,
+                    posB1.x,
+                    posB1.y,
+                    posB2.x,
+                    posB2.y
+                )
+            ) {
+                logger.info(
+                    `intersects: ${JSON.stringify(posA1)} ${JSON.stringify(posA2)} ${JSON.stringify(
+                        positions[i]
+                    )} ${JSON.stringify(positions[i + 1])}`
+                );
+
+                return true;
+            }
+        }
+        return false;
+    }
 }
