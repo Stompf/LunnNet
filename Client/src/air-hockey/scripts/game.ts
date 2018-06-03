@@ -11,9 +11,8 @@ export class AirHockeyGame {
 
     protected game: Phaser.Game;
     private socket!: SocketIOClient.Socket;
-    private serverIP = process.env.NODE_ENV === 'production'
-        ? 'https://home.lunne.nu'
-        : 'http://localhost:4444';
+    private serverIP =
+        process.env.NODE_ENV === 'production' ? 'https://home.lunne.nu' : 'http://localhost:4444';
 
     private players!: Player[];
     private ball!: Ball;

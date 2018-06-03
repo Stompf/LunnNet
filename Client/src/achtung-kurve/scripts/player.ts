@@ -2,7 +2,7 @@ import { BaseSprite } from './base-sprite';
 import { KeyMapping } from './key-mapping';
 import { ArcadeSprite } from 'src/models';
 import { addMilliseconds, isAfter } from 'date-fns';
-import { PlayerData } from '../models';
+import { PlayerData, PlayerOptions } from '../models';
 import { Group } from 'phaser-ce';
 
 export class Player extends BaseSprite {
@@ -11,20 +11,16 @@ export class Player extends BaseSprite {
     private closeHistoryGroup: Group;
 
     readonly isLocalPlayer: boolean;
+    readonly id: string;
 
     private readonly SPEED: number;
     private readonly movementSpeed: number = 0.05;
-    private readonly id: string;
     private readonly diameter: number;
 
     private movement: number;
     isAlive: boolean = true;
 
-    constructor(
-        game: Phaser.Game,
-        options: LunnNet.AchtungKurve.NewNetworkPlayer,
-        private keyMapping: KeyMapping.Mapping
-    ) {
+    constructor(game: Phaser.Game, options: PlayerOptions, private keyMapping: KeyMapping.Mapping) {
         super(Player.createSprite(game, options));
         this.isLocalPlayer = true;
         this.SPEED = options.speed;
@@ -35,7 +31,7 @@ export class Player extends BaseSprite {
         this.closeHistoryGroup = new Phaser.Group(game);
     }
 
-    static createSprite(game: Phaser.Game, options: LunnNet.AchtungKurve.NewNetworkPlayer) {
+    static createSprite(game: Phaser.Game, options: PlayerOptions) {
         Phaser.Component.Core.skipTypeChecks = true;
 
         const graphics = new Phaser.Graphics(game);
@@ -49,7 +45,6 @@ export class Player extends BaseSprite {
         );
         game.physics.arcade.enable(sprite);
         sprite.body.setCircle(options.diameter / 2);
-        sprite.body.mass = options.mass;
         sprite.body.collideWorldBounds = true;
         sprite.body.isCircle = true;
 
@@ -85,7 +80,6 @@ export class Player extends BaseSprite {
         );
         game.physics.arcade.enable(sprite);
         sprite.body.setCircle(this.diameter / 2);
-        sprite.body.mass = this.sprite.body.mass;
         sprite.body.immovable = true;
         sprite.body.isCircle = true;
 

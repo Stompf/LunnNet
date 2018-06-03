@@ -74,9 +74,9 @@ export class Asteroid {
 
     explode = () => {
         if (this.level < Asteroid.MaxLevel) {
-            const angleDisturb = Math.PI / 2 * (Math.random() - 0.5);
+            const angleDisturb = (Math.PI / 2) * (Math.random() - 0.5);
             for (let i = 0; i < this.level + 2; i++) {
-                const angle = Math.PI / 2 * i + angleDisturb;
+                const angle = (Math.PI / 2) * i + angleDisturb;
                 const position = this.getSubAstroidPosition(
                     this.sprite.body.data.interpolatedPosition,
                     this.getRadius(),
@@ -120,8 +120,8 @@ export class Asteroid {
             return bodyPosition.splice(0);
         }
         return [
-            this.sprite.body.x + radius / 1.25 * (index <= totalSplits / 2 ? 1 : -1),
-            this.sprite.body.y + radius / 1.25 * (index % 2 === 0 ? 1 : -1)
+            this.sprite.body.x + (radius / 1.25) * (index <= totalSplits / 2 ? 1 : -1),
+            this.sprite.body.y + (radius / 1.25) * (index % 2 === 0 ? 1 : -1)
         ];
     };
 
@@ -149,7 +149,7 @@ export class Asteroid {
         const verticals = [];
         const radius = this.getRadius();
         for (let j = 0; j < Asteroid.NumAsteroidVerticals; j++) {
-            const angle = j * 2 * Math.PI / Asteroid.NumAsteroidVerticals;
+            const angle = (j * 2 * Math.PI) / Asteroid.NumAsteroidVerticals;
             const xv = Number(
                 (radius * Math.cos(angle) + (Math.random() - 0.5) * radius * 0.4).toFixed(2)
             );
@@ -163,8 +163,7 @@ export class Asteroid {
 
     private getRadius() {
         return (
-            Asteroid.AsteroidRadius *
-            (Asteroid.NumAsteroidLevels - this.level) /
+            (Asteroid.AsteroidRadius * (Asteroid.NumAsteroidLevels - this.level)) /
             Asteroid.NumAsteroidLevels
         );
     }

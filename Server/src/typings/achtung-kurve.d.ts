@@ -1,24 +1,37 @@
 declare namespace LunnNet {
     namespace AchtungKurve {
-        interface PhysicOptions {
-            gravity: number[];
-            restitution: number;
+        interface Options {
+            player: {
+                speed: number;
+                diameter: number;
+            };
+        }
+
+        interface UpdateFromClient {
+            movement: number;
         }
 
         interface NewNetworkPlayer {
             id: string;
-            position: WebKitPoint;
             color: number;
-            diameter: number;
-            mass: number;
-            speed: number;
-            movement: number;
+            startPosition: WebKitPoint;
+            startMovement: number;
         }
 
         interface GameFound {
             gameSize: Utils.Size;
-            physicsOptions: PhysicOptions;
+            options: Options;
             players: NewNetworkPlayer[];
+        }
+
+        interface ServerTick {
+            tick: number;
+            players: UpdatePlayer[];
+        }
+
+        interface UpdatePlayer {
+            id: string;
+            positions: WebKitPoint[];
         }
     }
 }
