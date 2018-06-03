@@ -39,7 +39,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
 
     public initGame() {
         this.players.forEach((p, index) => {
-            p.setStart(1, { x: 5 + 5 * index, y: 5 });
+            p.setStart(1, { x: 50 + 50 * index, y: 50 });
         });
 
         const gameFound: LunnNet.AchtungKurve.GameFound = {
@@ -147,61 +147,75 @@ export class AchtungKurve implements LunnNet.NetworkGame {
 
     private checkCollisions() {
         this.players.filter(p => p.isAlive).forEach(p => {
-            if (this.isOutsideOfGame(p.currentPosition) || this.checkIntersects(p)) {
+            const { offset1, offset2 } = p.currentPositionLine;
+            if (
+                this.isOutsideOfGame(offset1) ||
+                this.isOutsideOfGame(offset2) ||
+                this.checkIntersects(p)
+            ) {
                 p.kill();
             }
         });
     }
 
-    private isOutsideOfGame(pos: WebKitPoint) {
+    private isOutsideOfGame(line: LunnNet.Utils.Line) {
         return (
-            pos.x <= 0 ||
-            pos.x >= constants.gameSize.width ||
-            pos.y <= 0 ||
-            pos.y >= constants.gameSize.height
+            line.x1 <= 0 ||
+            line.x2 <= 0 ||
+            line.x1 >= constants.gameSize.width ||
+            line.x2 >= constants.gameSize.width ||
+            line.y1 <= 0 ||
+            line.y2 <= 0 ||
+            line.y1 >= constants.gameSize.height ||
+            line.y2 >= constants.gameSize.height
         );
     }
 
     private checkIntersects(player: Player) {
-        const { posA1, posA2 } = player.currentPositionLine;
-        return this.players.some(p => this.checkPlayerCollision(posA1, posA2, p, p === player));
+        const { offset1, offset2 } = player.currentPositionLine;
+        return this.players.some(p => this.checkPlayerCollision(offset1, offset2, p, p === player));
     }
 
     private checkPlayerCollision(
-        posA1: WebKitPoint,
-        posA2: WebKitPoint,
+        line1: LunnNet.Utils.Line,
+        line2: LunnNet.Utils.Line,
         player: Player,
-        self: boolean
+        isSelf: boolean
     ) {
-        const positions = player.getPositions();
-        if (positions.length < 2) {
+        const offsetLines1 = player.getOffsetLines1();
+        const offsetLines2 = player.getOffsetLines2();
+        return (
+            this.checkLines(line1, offsetLines1, isSelf) ||
+            this.checkLines(line1, offsetLines2, isSelf) ||
+            this.checkLines(line2, offsetLines1, isSelf) ||
+            this.checkLines(line2, offsetLines2, isSelf)
+        );
+    }
+
+    private checkLines(
+        line: LunnNet.Utils.Line,
+        offsetLines: LunnNet.Utils.Line[],
+        isSelf: boolean
+    ) {
+        if (offsetLines.length < 2) {
             return false;
         }
 
-        for (let i = self ? 2 : 0; i < positions.length; i++) {
-            if (i === positions.length - 1) {
-                return false;
-            }
-
-            const posB1 = positions[i];
-            const posB2 = positions[i + 1];
-
+        for (let i = isSelf ? 2 : 0; i < offsetLines.length; i++) {
             if (
                 segmentIntersection(
-                    posA1.x,
-                    posA1.y,
-                    posA2.x,
-                    posA2.y,
-                    posB1.x,
-                    posB1.y,
-                    posB2.x,
-                    posB2.y
+                    line.x1,
+                    line.y1,
+                    line.x2,
+                    line.y2,
+                    offsetLines[i].x1,
+                    offsetLines[i].y1,
+                    offsetLines[i].x2,
+                    offsetLines[i].y2
                 )
             ) {
                 logger.info(
-                    `intersects: ${JSON.stringify(posA1)} ${JSON.stringify(posA2)} ${JSON.stringify(
-                        positions[i]
-                    )} ${JSON.stringify(positions[i + 1])}`
+                    `intersects: ${JSON.stringify(line)} ${JSON.stringify(offsetLines[i])}}`
                 );
 
                 return true;

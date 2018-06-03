@@ -20,7 +20,7 @@ export class NetworkPlayer {
         this.id = options.id;
         this.movement = options.movement;
         this.isLocalPlayer = options.isLocalPlayer;
-        this.movementSpeed = options.speed * 3;
+        this.movementSpeed = options.speed;
         this.color = options.color;
         this.diameter = options.diameter;
 
