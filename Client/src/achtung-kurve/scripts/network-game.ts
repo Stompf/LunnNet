@@ -31,6 +31,11 @@ export class NetworkAchtungGame extends BaseAchtungGame {
         }
     }
 
+    protected preload() {
+        super.preload();
+        this.game.world.scale.set(10);
+    }
+
     protected create() {
         super.create();
         setTimeout(() => {

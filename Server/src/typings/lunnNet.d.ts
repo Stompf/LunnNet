@@ -25,5 +25,10 @@ declare namespace LunnNet {
             width: number;
             height: number;
         }
+
+        interface Point {
+            x: number;
+            y: number;
+        }
     }
 }

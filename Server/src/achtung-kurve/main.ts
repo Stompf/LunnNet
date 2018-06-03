@@ -39,7 +39,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
 
     public initGame() {
         this.players.forEach((p, index) => {
-            p.setStart(1, { x: 50 + 50 * index, y: 50 });
+            p.setStart(1, { x: 5 + 5 * index, y: 5 });
         });
 
         const gameFound: LunnNet.AchtungKurve.GameFound = {
@@ -164,16 +164,21 @@ export class AchtungKurve implements LunnNet.NetworkGame {
 
     private checkIntersects(player: Player) {
         const { posA1, posA2 } = player.currentPositionLine;
-        return this.players.some(p => this.checkPlayerCollision(posA1, posA2, p));
+        return this.players.some(p => this.checkPlayerCollision(posA1, posA2, p, p === player));
     }
 
-    private checkPlayerCollision(posA1: WebKitPoint, posA2: WebKitPoint, player: Player) {
+    private checkPlayerCollision(
+        posA1: WebKitPoint,
+        posA2: WebKitPoint,
+        player: Player,
+        self: boolean
+    ) {
         const positions = player.getPositions();
         if (positions.length < 2) {
             return false;
         }
 
-        for (let i = 2; i < positions.length; i++) {
+        for (let i = self ? 2 : 0; i < positions.length; i++) {
             if (i === positions.length - 1) {
                 return false;
             }
