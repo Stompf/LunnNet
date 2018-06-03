@@ -18,7 +18,8 @@
         "suppressImplicitAnyIndexErrors": true,
         "paths": {
             "src/*": ["src/*"]
-        }
+        },
+        "keyofStringsOnly": true
     },
     "include": ["../Server/src/typings/**/*.ts", "./src/**/*.ts", "./src/**/*.tsx"],
     "exclude": [

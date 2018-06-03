@@ -17,9 +17,8 @@ export class NetworkAchtungGame extends BaseAchtungGame {
         return this.socket ? this.socket.id : '';
     }
 
-    private serverIP = process.env.NODE_ENV === 'production'
-        ? 'https://home.lunne.nu'
-        : 'http://localhost:4444';
+    private serverIP =
+        process.env.NODE_ENV === 'production' ? 'https://home.lunne.nu' : 'http://localhost:4444';
 
     constructor(canvasId: string) {
         super(canvasId);
@@ -33,7 +32,6 @@ export class NetworkAchtungGame extends BaseAchtungGame {
 
     protected preload() {
         super.preload();
-        this.game.world.scale.set(10);
     }
 
     protected create() {
@@ -121,8 +119,8 @@ export class NetworkAchtungGame extends BaseAchtungGame {
     private initNewNetworkGame(data: LunnNet.AchtungKurve.GameFound) {
         this.clear();
         this.connectStatusText.visible = false;
-        this.game.width = data.gameSize.width;
-        this.game.height = data.gameSize.height;
+        this.game.scale.setGameSize(data.gameSize.width, data.gameSize.height);
+        this.game.scale.refresh();
 
         data.players.forEach(player => {
             const options: PlayerOptions = {
