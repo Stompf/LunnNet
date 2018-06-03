@@ -286,7 +286,7 @@ export class AirHockey implements LunnNet.NetworkGame {
         world.addBody(right);
 
         let left = new p2.Body({
-            angle: 3 * Math.PI / 2,
+            angle: (3 * Math.PI) / 2,
             position: [0, 0]
         });
         left.addShape(new p2.Plane());
