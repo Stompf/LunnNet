@@ -63,10 +63,16 @@ export class Player extends BaseSprite {
             return;
         }
 
-        if (game.input.keyboard.isDown(this.keyMapping.left)) {
+        if (
+            game.input.keyboard.isDown(this.keyMapping.left) ||
+            (game.input.pointer1.isDown && game.input.pointer1.x <= game.width / 2)
+        ) {
             this.movement -= this.movementSpeed;
         }
-        if (game.input.keyboard.isDown(this.keyMapping.right)) {
+        if (
+            game.input.keyboard.isDown(this.keyMapping.right) ||
+            (game.input.pointer1.isDown && game.input.pointer1.x > game.width / 2)
+        ) {
             this.movement += this.movementSpeed;
         }
 

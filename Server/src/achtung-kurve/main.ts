@@ -95,12 +95,14 @@ export class AchtungKurve implements LunnNet.NetworkGame {
 
         this.tick++;
 
-        this.players.forEach(p => p.onUpdate(this.FIXED_TIME_STEP));
+        const alivePlayers = this.players.filter(p => p.isAlive);
+
+        alivePlayers.forEach(p => p.onUpdate(this.FIXED_TIME_STEP));
         this.checkCollisions();
 
         const serverTick: LunnNet.AchtungKurve.ServerTick = {
             tick: this.tick,
-            players: this.players.map(p => p.toUpdatePlayer())
+            players: alivePlayers.map(p => p.toUpdatePlayer())
         };
 
         // winston.info(`heartbeat: ${serverTick.players[0].velocity}`);

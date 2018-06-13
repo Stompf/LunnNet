@@ -12,6 +12,7 @@ export class NetworkPlayer {
     private movementSpeed: number;
     private color: number;
     private diameter: number;
+    private currentPosition: LunnNet.Utils.Point;
 
     graphics: Phaser.Graphics;
 
@@ -26,6 +27,7 @@ export class NetworkPlayer {
 
         this.graphics = game.add.graphics();
         this.graphics.moveTo(options.position.x, options.position.y);
+        this.currentPosition = options.position;
     }
 
     onUpdate(game: Phaser.Game) {
@@ -34,10 +36,16 @@ export class NetworkPlayer {
         }
 
         const oldMovement = this.movement;
-        if (game.input.keyboard.isDown(this.keyMapping.left)) {
+        if (
+            game.input.keyboard.isDown(this.keyMapping.left) ||
+            (game.input.pointer1.isDown && game.input.pointer1.x <= game.width / 2)
+        ) {
             this.movement -= this.movementSpeed;
         }
-        if (game.input.keyboard.isDown(this.keyMapping.right)) {
+        if (
+            game.input.keyboard.isDown(this.keyMapping.right) ||
+            (game.input.pointer1.isDown && game.input.pointer1.x > game.canvas.width / 2)
+        ) {
             this.movement += this.movementSpeed;
         }
 
@@ -45,8 +53,16 @@ export class NetworkPlayer {
     }
 
     onNetworkUpdate(data: LunnNet.AchtungKurve.UpdatePlayer) {
+        if (
+            data.positions[0].x === this.currentPosition.x &&
+            data.positions[0].y === this.currentPosition.y
+        ) {
+            return;
+        }
+
         this.graphics.lineStyle(this.diameter, this.color);
         this.graphics.lineTo(data.positions[0].x, data.positions[0].y);
+        this.currentPosition = data.positions[0];
     }
 
     toUpdateFromClient(): LunnNet.AchtungKurve.UpdateFromClient {

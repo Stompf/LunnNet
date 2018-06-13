@@ -1,23 +1,12 @@
-import { IGameConfig } from 'phaser-ce';
-
 export class BaseAchtungGame {
     protected game: Phaser.Game;
 
     constructor(canvasId: string) {
-        const config = {
-            canvasId,
-            width: 1400,
-            height: 600,
-            renderer: Phaser.AUTO,
-            antialias: true,
-            state: {
-                preload: () => this.preload(),
-                create: () => this.create(),
-                update: () => this.update()
-            }
-        } as IGameConfig;
-
-        this.game = new Phaser.Game(config);
+        this.game = new Phaser.Game(1400, 600, Phaser.AUTO, canvasId, {
+            preload: () => this.preload(),
+            create: () => this.create(),
+            update: () => this.update()
+        });
     }
 
     destroy() {
