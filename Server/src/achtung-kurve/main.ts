@@ -7,6 +7,7 @@ import { segmentIntersection } from './segment-intersection';
 export class AchtungKurve implements LunnNet.NetworkGame {
     private readonly TIME_LIMIT = 10 * 60 * 1000;
     private readonly FIXED_TIME_STEP = 25;
+    private readonly SPAWN_OFFSET = 100;
 
     static MIN_PLAYERS = 2;
     static MAX_PLAYERS = constants.playerColors.length;
@@ -38,8 +39,9 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     public initGame() {
+        const startPositions = this.getRandomStartPositions(this.players.length);
         this.players.forEach((p, index) => {
-            p.setStart(1, { x: 50 + 50 * index, y: 50 });
+            p.setStart(startPositions[index].movement, startPositions[index].position);
         });
 
         const gameFound: LunnNet.AchtungKurve.GameFound = {
@@ -104,8 +106,6 @@ export class AchtungKurve implements LunnNet.NetworkGame {
             tick: this.tick,
             players: alivePlayers.map(p => p.toUpdatePlayer())
         };
-
-        // winston.info(`heartbeat: ${serverTick.players[0].velocity}`);
 
         this.emitToPlayers('ServerTick', serverTick);
     };
@@ -224,5 +224,32 @@ export class AchtungKurve implements LunnNet.NetworkGame {
             }
         }
         return false;
+    }
+
+    private getRandomStartPositions(playerCount: number) {
+        const startPositions: LunnNet.AchtungKurve.StartPosition[] = [];
+        for (let i = 0; i < playerCount; i++) {
+            const x = this.getRandomArbitrary(
+                this.SPAWN_OFFSET,
+                constants.gameSize.width - this.SPAWN_OFFSET
+            );
+            const y = this.getRandomArbitrary(
+                this.SPAWN_OFFSET,
+                constants.gameSize.height - this.SPAWN_OFFSET
+            );
+            startPositions.push({
+                movement: this.getRandomMovement(),
+                position: { x, y }
+            });
+        }
+        return startPositions;
+    }
+
+    private getRandomMovement() {
+        return Math.random() * 2 * Math.PI;
+    }
+
+    private getRandomArbitrary(min: number, max: number) {
+        return Math.random() * (max - min) + min;
     }
 }

@@ -14,7 +14,7 @@ declare namespace LunnNet {
         interface NewNetworkPlayer {
             id: string;
             color: number;
-            startPosition: WebKitPoint;
+            startPosition: Utils.Point;
             startMovement: number;
         }
 
@@ -31,7 +31,12 @@ declare namespace LunnNet {
 
         interface UpdatePlayer {
             id: string;
-            positions: WebKitPoint[];
+            positions: Utils.Point[];
+        }
+
+        interface StartPosition {
+            movement: number;
+            position: Utils.Point;
         }
     }
 }
