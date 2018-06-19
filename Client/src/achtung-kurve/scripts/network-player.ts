@@ -12,7 +12,8 @@ export class NetworkPlayer {
     private movementSpeed: number;
     private color: number;
     private diameter: number;
-    private currentPosition: LunnNet.Utils.Point;
+
+    private queuedUpdates: LunnNet.AchtungKurve.UpdatePlayer[];
 
     graphics: Phaser.Graphics;
 
@@ -27,10 +28,12 @@ export class NetworkPlayer {
 
         this.graphics = game.add.graphics();
         this.graphics.moveTo(options.position.x, options.position.y);
-        this.currentPosition = options.position;
+        this.queuedUpdates = [];
     }
 
     onUpdate(game: Phaser.Game) {
+        this.readQueuedUpdates();
+
         if (!this.isLocalPlayer || !this.isAlive || !this.keyMapping) {
             return;
         }
@@ -53,21 +56,20 @@ export class NetworkPlayer {
     }
 
     onNetworkUpdate(data: LunnNet.AchtungKurve.UpdatePlayer) {
-        if (
-            data.positions[0].x === this.currentPosition.x &&
-            data.positions[0].y === this.currentPosition.y
-        ) {
-            return;
-        }
-
-        this.graphics.lineStyle(this.diameter, this.color);
-        this.graphics.lineTo(data.positions[0].x, data.positions[0].y);
-        this.currentPosition = data.positions[0];
+        this.queuedUpdates.push(data);
     }
 
     toUpdateFromClient(): LunnNet.AchtungKurve.UpdateFromClient {
         return {
             movement: this.movement
         };
+    }
+
+    private readQueuedUpdates() {
+        this.queuedUpdates.forEach(update => {
+            this.graphics.lineStyle(this.diameter, this.color);
+            this.graphics.lineTo(update.positions[0].x, update.positions[0].y);
+        });
+        this.queuedUpdates = [];
     }
 }
