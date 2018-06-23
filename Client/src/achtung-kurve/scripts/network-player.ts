@@ -47,7 +47,7 @@ export class NetworkPlayer {
         }
         if (
             game.input.keyboard.isDown(this.keyMapping.right) ||
-            (game.input.pointer1.isDown && game.input.pointer1.x > game.canvas.width / 2)
+            (game.input.pointer1.isDown && game.input.pointer1.x > game.width / 2)
         ) {
             this.movement += this.movementSpeed;
         }
@@ -65,10 +65,15 @@ export class NetworkPlayer {
         };
     }
 
+    reset() {
+        this.queuedUpdates = [];
+        this.graphics.clear();
+    }
+
     private readQueuedUpdates() {
         this.queuedUpdates.forEach(update => {
             this.graphics.lineStyle(this.diameter, this.color);
-            this.graphics.lineTo(update.positions[0].x, update.positions[0].y);
+            this.graphics.lineTo(update.position.x, update.position.y);
         });
         this.queuedUpdates = [];
     }

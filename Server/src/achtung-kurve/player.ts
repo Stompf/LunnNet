@@ -6,12 +6,13 @@ export class Player {
     static speed = 0.1;
 
     socket: Socket;
+    ready: boolean = false;
+    color: number;
 
-    private get Id() {
+    get Id() {
         return this.socket.id;
     }
 
-    private color: number;
     private movement: number = 1;
     private positions: WebKitPoint[] = [];
     private offsetLines1: LunnNet.Utils.Line[] = [];
@@ -79,7 +80,7 @@ export class Player {
     toUpdatePlayer(): LunnNet.AchtungKurve.UpdatePlayer {
         return {
             id: this.Id,
-            positions: this.positions.slice(0, 1)
+            position: this.positions[0]
         };
     }
 

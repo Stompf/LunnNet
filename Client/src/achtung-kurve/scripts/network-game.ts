@@ -18,7 +18,9 @@ export class NetworkAchtungGame extends BaseAchtungGame {
     }
 
     private serverIP =
-        process.env.NODE_ENV === 'production' ? 'https://home.lunne.nu' : 'http://localhost:4444';
+        process.env.NODE_ENV === 'production'
+            ? 'https://home.lunne.nu'
+            : `http://${window.location.hostname}:4444`;
 
     constructor(canvasId: string) {
         super(canvasId);
@@ -100,6 +102,17 @@ export class NetworkAchtungGame extends BaseAchtungGame {
             this.connect();
         });
 
+        this.socket.on('RoundOver', (data: LunnNet.AchtungKurve.RoundOver) => {
+            this.connectStatusText.visible = true;
+            this.connectStatusText.addColor(String(data.color ? data.color : '#000000'), 0);
+            this.connectStatusText.setText(`player: ${data.winnerId} won this round!`);
+
+            setTimeout(() => {
+                this.connectStatusText.visible = false;
+                this.players.forEach(p => p.reset());
+            }, data.roundTimeout);
+        });
+
         this.socket.on('ServerTick', (data: LunnNet.AchtungKurve.ServerTick) => {
             if (this.latestNetworkTick > data.tick) {
                 return;
@@ -117,6 +130,10 @@ export class NetworkAchtungGame extends BaseAchtungGame {
     };
 
     private initNewNetworkGame(data: LunnNet.AchtungKurve.GameFound) {
+        if (!this.socket) {
+            return;
+        }
+
         this.clear();
         this.connectStatusText.visible = false;
         this.game.scale.setGameSize(data.gameSize.width, data.gameSize.height);
@@ -138,6 +155,8 @@ export class NetworkAchtungGame extends BaseAchtungGame {
 
             this.content.add(networkPlayer.graphics);
         });
+
+        this.socket.emit('PlayerReady');
 
         this.networkGameStarted = true;
     }

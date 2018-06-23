@@ -31,7 +31,15 @@ declare namespace LunnNet {
 
         interface UpdatePlayer {
             id: string;
-            positions: Utils.Point[];
+            position: Utils.Point;
+        }
+
+        interface PlayerReady {}
+
+        interface RoundOver {
+            winnerId?: string;
+            color?: number;
+            roundTimeout: number;
         }
 
         interface StartPosition {

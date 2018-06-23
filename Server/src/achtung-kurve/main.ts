@@ -8,6 +8,8 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     private readonly TIME_LIMIT = 10 * 60 * 1000;
     private readonly FIXED_TIME_STEP = 25;
     private readonly SPAWN_OFFSET = 100;
+    private readonly START_TIMEOUT = 1000;
+    private readonly ROUND_TIMEOUT = 3000;
 
     static MIN_PLAYERS = 2;
     static MAX_PLAYERS = constants.playerColors.length;
@@ -51,6 +53,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
         };
         this.emitToPlayers('GameFound', gameFound);
 
+        this.paused = true;
         this.intervalReference = setInterval(this.heartbeat, this.FIXED_TIME_STEP);
 
         this.setTimeLimit();
@@ -66,7 +69,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
         logger.info(
             `${this.GAME_NAME} - stopping game with players: ${this.players
                 .map(p => p.socket.id)
-                .join(' : ')}.${forced === true ? ' forced' : ''}`
+                .join(' : ')}.${forced ? ' forced' : ''}`
         );
 
         if (this.intervalReference) {
@@ -119,11 +122,35 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     private listenToEvents = (socket: Socket) => {
+        socket.on('PlayerReady', (_data: LunnNet.AchtungKurve.PlayerReady) => {
+            this.handleOnPlayerReady(socket.id);
+        });
         socket.on('UpdateFromClient', (data: LunnNet.AchtungKurve.UpdateFromClient) => {
             this.handleOnPlayerUpdate(socket.id, data);
         });
         socket.on('disconnect', this.stopGame);
     };
+
+    private handleOnPlayerReady = (id: string) => {
+        const player = this.players.find(p => p.Id === id);
+        if (!player) {
+            logger.info(
+                `handleOnPlayerReady - Tried to ready player that does not exist in game. Id: ${id}`
+            );
+            return;
+        }
+
+        player.ready = true;
+        if (this.players.every(p => p.ready) && this.paused) {
+            this.startRound(this.START_TIMEOUT);
+        }
+    };
+
+    private startRound(timeoutMs: number) {
+        setTimeout(() => {
+            this.paused = false;
+        }, timeoutMs);
+    }
 
     private handleOnPlayerUpdate = (id: string, data: LunnNet.AchtungKurve.UpdateFromClient) => {
         if (this.stopped) {
@@ -156,8 +183,37 @@ export class AchtungKurve implements LunnNet.NetworkGame {
                 this.checkIntersects(p)
             ) {
                 p.kill();
+                this.checkGameOver();
             }
         });
+    }
+
+    private checkGameOver() {
+        let gameOver = false;
+        const alivePlayers = this.players.filter(p => p.isAlive);
+        if (alivePlayers.length === 1) {
+            this.emitToPlayers('RoundOver', {
+                color: alivePlayers[0].color,
+                winnerId: alivePlayers[0].Id,
+                roundTimeout: this.ROUND_TIMEOUT
+            } as LunnNet.AchtungKurve.RoundOver);
+            gameOver = true;
+        } else if (alivePlayers.length === 0) {
+            this.emitToPlayers('RoundOver', {
+                roundTimeout: this.ROUND_TIMEOUT
+            } as LunnNet.AchtungKurve.RoundOver);
+            gameOver = true;
+        }
+
+        if (gameOver) {
+            this.paused = true;
+            const startPositions = this.getRandomStartPositions(this.players.length);
+            this.players.forEach((p, index) => {
+                p.setStart(startPositions[index].movement, startPositions[index].position);
+            });
+
+            this.startRound(this.ROUND_TIMEOUT);
+        }
     }
 
     private isOutsideOfGame(line: LunnNet.Utils.Line) {
@@ -199,11 +255,11 @@ export class AchtungKurve implements LunnNet.NetworkGame {
         offsetLines: LunnNet.Utils.Line[],
         isSelf: boolean
     ) {
-        if (offsetLines.length < 2) {
+        if (offsetLines.length < 4) {
             return false;
         }
 
-        for (let i = isSelf ? 2 : 0; i < offsetLines.length; i++) {
+        for (let i = isSelf ? 4 : 0; i < offsetLines.length; i++) {
             if (
                 segmentIntersection(
                     line.x1,
