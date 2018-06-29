@@ -273,10 +273,6 @@ export class AchtungKurve implements LunnNet.NetworkGame {
                     offsetLines[i].y2
                 )
             ) {
-                logger.info(
-                    `intersects: ${JSON.stringify(line)} ${JSON.stringify(offsetLines[i])}}`
-                );
-
                 return true;
             }
         }

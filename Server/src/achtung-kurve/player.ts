@@ -1,5 +1,4 @@
 import { Socket } from 'socket.io';
-import { logger } from '../logger';
 import { constants } from './constants';
 
 export class Player {
@@ -108,7 +107,6 @@ export class Player {
 
     kill() {
         this._isAlive = false;
-        logger.info(`player killed`);
     }
 
     private getOffsetLine(
