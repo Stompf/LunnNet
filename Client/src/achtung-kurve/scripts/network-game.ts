@@ -109,7 +109,13 @@ export class NetworkAchtungGame extends BaseAchtungGame {
 
             setTimeout(() => {
                 this.connectStatusText.visible = false;
-                this.players.forEach(p => p.reset());
+                this.players.forEach(p => {
+                    const foundNetworkPlayer = data.players.find(pp => pp.id === p.id);
+                    if (!foundNetworkPlayer) {
+                        return;
+                    }
+                    p.reset(foundNetworkPlayer.position, foundNetworkPlayer.movement);
+                });
             }, data.roundTimeout);
         });
 

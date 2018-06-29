@@ -28,6 +28,10 @@ export class Player {
     }
 
     get currentPositionLine() {
+        if (this.offsetLines1.length === 0 || this.offsetLines2.length === 0) {
+            return { offset1: null, offset2: null };
+        }
+
         return { offset1: this.offsetLines1[0], offset2: this.offsetLines2[0] };
     }
 
@@ -37,8 +41,11 @@ export class Player {
     }
 
     setStart(movement: number, position: WebKitPoint) {
+        this._isAlive = true;
         this.movement = movement;
         this.positions = [position];
+        this.offsetLines1 = [];
+        this.offsetLines2 = [];
     }
 
     onUpdate(deltaTime: number) {
@@ -81,6 +88,13 @@ export class Player {
         return {
             id: this.Id,
             position: this.positions[0]
+        };
+    }
+
+    toNewRoundPlayer(): LunnNet.AchtungKurve.NewRoundPlayer {
+        return {
+            ...this.toUpdatePlayer(),
+            movement: this.movement
         };
     }
 

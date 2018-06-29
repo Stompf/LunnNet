@@ -34,12 +34,17 @@ declare namespace LunnNet {
             position: Utils.Point;
         }
 
+        interface NewRoundPlayer extends UpdatePlayer {
+            movement: number;
+        }
+
         interface PlayerReady {}
 
         interface RoundOver {
             winnerId?: string;
             color?: number;
             roundTimeout: number;
+            players: NewRoundPlayer[];
         }
 
         interface StartPosition {

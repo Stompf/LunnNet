@@ -65,9 +65,11 @@ export class NetworkPlayer {
         };
     }
 
-    reset() {
+    reset(position: LunnNet.Utils.Point, movement: number) {
         this.queuedUpdates = [];
         this.graphics.clear();
+        this.graphics.moveTo(position.x, position.y);
+        this.movement = movement;
     }
 
     private readQueuedUpdates() {

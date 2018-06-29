@@ -110,7 +110,9 @@ export class AchtungKurve implements LunnNet.NetworkGame {
             players: alivePlayers.map(p => p.toUpdatePlayer())
         };
 
-        this.emitToPlayers('ServerTick', serverTick);
+        if (!this.paused) {
+            this.emitToPlayers('ServerTick', serverTick);
+        }
     };
 
     private emitToPlayers(event: string, data?: any) {
@@ -149,6 +151,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     private startRound(timeoutMs: number) {
         setTimeout(() => {
             this.paused = false;
+            this.tick = 0;
         }, timeoutMs);
     }
 
@@ -189,43 +192,41 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     private checkGameOver() {
-        let gameOver = false;
         const alivePlayers = this.players.filter(p => p.isAlive);
-        if (alivePlayers.length === 1) {
-            this.emitToPlayers('RoundOver', {
-                color: alivePlayers[0].color,
-                winnerId: alivePlayers[0].Id,
-                roundTimeout: this.ROUND_TIMEOUT
-            } as LunnNet.AchtungKurve.RoundOver);
-            gameOver = true;
-        } else if (alivePlayers.length === 0) {
-            this.emitToPlayers('RoundOver', {
-                roundTimeout: this.ROUND_TIMEOUT
-            } as LunnNet.AchtungKurve.RoundOver);
-            gameOver = true;
-        }
-
-        if (gameOver) {
-            this.paused = true;
-            const startPositions = this.getRandomStartPositions(this.players.length);
-            this.players.forEach((p, index) => {
-                p.setStart(startPositions[index].movement, startPositions[index].position);
-            });
-
-            this.startRound(this.ROUND_TIMEOUT);
+        if (alivePlayers.length === 1 || alivePlayers.length === 0) {
+            this.sendNewRound(alivePlayers.length ? alivePlayers[0] : undefined);
         }
     }
 
-    private isOutsideOfGame(line: LunnNet.Utils.Line) {
+    private sendNewRound(winner?: Player) {
+        this.paused = true;
+        const startPositions = this.getRandomStartPositions(this.players.length);
+        this.players.forEach((p, index) => {
+            p.setStart(startPositions[index].movement, startPositions[index].position);
+        });
+
+        const roundOver: LunnNet.AchtungKurve.RoundOver = {
+            color: winner ? winner.color : undefined,
+            roundTimeout: this.ROUND_TIMEOUT,
+            winnerId: winner ? winner.Id : undefined,
+            players: this.players.map(p => p.toNewRoundPlayer())
+        };
+        this.emitToPlayers('RoundOver', roundOver);
+
+        this.startRound(this.ROUND_TIMEOUT);
+    }
+
+    private isOutsideOfGame(line: LunnNet.Utils.Line | null) {
         return (
-            line.x1 <= 0 ||
-            line.x2 <= 0 ||
-            line.x1 >= constants.gameSize.width ||
-            line.x2 >= constants.gameSize.width ||
-            line.y1 <= 0 ||
-            line.y2 <= 0 ||
-            line.y1 >= constants.gameSize.height ||
-            line.y2 >= constants.gameSize.height
+            line != null &&
+            (line.x1 <= 0 ||
+                line.x2 <= 0 ||
+                line.x1 >= constants.gameSize.width ||
+                line.x2 >= constants.gameSize.width ||
+                line.y1 <= 0 ||
+                line.y2 <= 0 ||
+                line.y1 >= constants.gameSize.height ||
+                line.y2 >= constants.gameSize.height)
         );
     }
 
@@ -235,8 +236,8 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     private checkPlayerCollision(
-        line1: LunnNet.Utils.Line,
-        line2: LunnNet.Utils.Line,
+        line1: LunnNet.Utils.Line | null,
+        line2: LunnNet.Utils.Line | null,
         player: Player,
         isSelf: boolean
     ) {
@@ -251,11 +252,11 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     private checkLines(
-        line: LunnNet.Utils.Line,
+        line: LunnNet.Utils.Line | null,
         offsetLines: LunnNet.Utils.Line[],
         isSelf: boolean
     ) {
-        if (offsetLines.length < 4) {
+        if (offsetLines.length < 4 || line == null) {
             return false;
         }
 
