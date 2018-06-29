@@ -27,6 +27,7 @@ export class NetworkAchtungGame extends BaseAchtungGame {
     }
 
     destroy() {
+        super.destroy();
         if (this.socket) {
             this.socket.close();
         }
@@ -103,11 +104,13 @@ export class NetworkAchtungGame extends BaseAchtungGame {
         });
 
         this.socket.on('RoundOver', (data: LunnNet.AchtungKurve.RoundOver) => {
+            this.connectStatusText.bringToTop();
             this.connectStatusText.visible = true;
-            this.connectStatusText.addColor(String(data.color ? data.color : '#000000'), 0);
+
             this.connectStatusText.setText(`player: ${data.winnerId} won this round!`);
 
             setTimeout(() => {
+                this.latestNetworkTick = 0;
                 this.connectStatusText.visible = false;
                 this.players.forEach(p => {
                     const foundNetworkPlayer = data.players.find(pp => pp.id === p.id);

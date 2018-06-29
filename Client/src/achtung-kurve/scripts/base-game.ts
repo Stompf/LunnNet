@@ -22,6 +22,7 @@ export class BaseAchtungGame {
         this.game.renderer.view.style.border = '1px solid black';
 
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.game.stage.disableVisibilityChange = true;
     }
 
     protected create() {
