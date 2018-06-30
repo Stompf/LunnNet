@@ -95,7 +95,7 @@ export class NetworkAchtungGame extends BaseAchtungGame {
                 return;
             }
 
-            this.content.removeAll();
+            this.clear();
 
             this.connectStatusText.visible = true;
             this.connectStatusText.setText('Disconnected');
@@ -107,6 +107,11 @@ export class NetworkAchtungGame extends BaseAchtungGame {
             this.connectStatusText.bringToTop();
             this.connectStatusText.visible = true;
 
+            let color = Phaser.Color.componentToHex(data.color || 0);
+            if (color.length !== 6) {
+                color = '00' + color;
+            }
+            this.connectStatusText.addColor('#' + color, 0);
             this.connectStatusText.setText(`player: ${data.winnerId} won this round!`);
 
             setTimeout(() => {
@@ -171,6 +176,7 @@ export class NetworkAchtungGame extends BaseAchtungGame {
     }
 
     private clear() {
+        this.connectStatusText.clearColors();
         this.latestNetworkTick = 0;
         this.players = [];
         this.content.removeAll();
