@@ -1,10 +1,11 @@
 import { Socket } from 'socket.io';
 import { Player } from './player';
-import { logger } from '../logger';
+import { logger } from '../../logger';
 import { constants } from './constants';
 import { segmentIntersection } from './segment-intersection';
+import { LunnNet, AchtungKurve } from '../../typings';
 
-export class AchtungKurve implements LunnNet.NetworkGame {
+export class AchtungKurveGame implements LunnNet.NetworkGame {
     private readonly TIME_LIMIT = 10 * 60 * 1000;
     private readonly FIXED_TIME_STEP = 25;
     private readonly SPAWN_OFFSET = 100;
@@ -25,12 +26,12 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     constructor(playerSockets: Socket[]) {
         logger.info(`${this.GAME_NAME}: Starting new game`);
 
-        if (playerSockets.length < AchtungKurve.MIN_PLAYERS) {
+        if (playerSockets.length < AchtungKurveGame.MIN_PLAYERS) {
             throw new Error(`No players! Was: ${playerSockets.length}`);
         }
-        if (playerSockets.length > AchtungKurve.MAX_PLAYERS) {
+        if (playerSockets.length > AchtungKurveGame.MAX_PLAYERS) {
             throw new Error(
-                `Too many players! Max players is: ${AchtungKurve.MAX_PLAYERS}. Was: ${
+                `Too many players! Max players is: ${AchtungKurveGame.MAX_PLAYERS}. Was: ${
                     playerSockets.length
                 }`
             );
@@ -46,7 +47,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
             p.setStart(startPositions[index].movement, startPositions[index].position);
         });
 
-        const gameFound: LunnNet.AchtungKurve.GameFound = {
+        const gameFound: AchtungKurve.GameFound = {
             gameSize: constants.gameSize,
             players: this.players.map(p => p.toNewNetworkPlayer()),
             options: { player: { diameter: constants.playerDiameter, speed: Player.speed } }
@@ -105,7 +106,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
         alivePlayers.forEach(p => p.onUpdate(this.FIXED_TIME_STEP));
         this.checkCollisions();
 
-        const serverTick: LunnNet.AchtungKurve.ServerTick = {
+        const serverTick: AchtungKurve.ServerTick = {
             tick: this.tick,
             players: alivePlayers.map(p => p.toUpdatePlayer())
         };
@@ -124,10 +125,10 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     private listenToEvents = (socket: Socket) => {
-        socket.on('PlayerReady', (_data: LunnNet.AchtungKurve.PlayerReady) => {
+        socket.on('PlayerReady', (_data: AchtungKurve.PlayerReady) => {
             this.handleOnPlayerReady(socket.id);
         });
-        socket.on('UpdateFromClient', (data: LunnNet.AchtungKurve.UpdateFromClient) => {
+        socket.on('UpdateFromClient', (data: AchtungKurve.UpdateFromClient) => {
             this.handleOnPlayerUpdate(socket.id, data);
         });
         socket.on('disconnect', this.stopGame);
@@ -155,7 +156,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
         }, timeoutMs);
     }
 
-    private handleOnPlayerUpdate = (id: string, data: LunnNet.AchtungKurve.UpdateFromClient) => {
+    private handleOnPlayerUpdate = (id: string, data: AchtungKurve.UpdateFromClient) => {
         if (this.stopped) {
             return;
         }
@@ -205,7 +206,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
             p.setStart(startPositions[index].movement, startPositions[index].position);
         });
 
-        const roundOver: LunnNet.AchtungKurve.RoundOver = {
+        const roundOver: AchtungKurve.RoundOver = {
             color: winner ? winner.color : undefined,
             roundTimeout: this.ROUND_TIMEOUT,
             winnerId: winner ? winner.Id : undefined,
@@ -280,7 +281,7 @@ export class AchtungKurve implements LunnNet.NetworkGame {
     }
 
     private getRandomStartPositions(playerCount: number) {
-        const startPositions: LunnNet.AchtungKurve.StartPosition[] = [];
+        const startPositions: AchtungKurve.StartPosition[] = [];
         for (let i = 0; i < playerCount; i++) {
             const x = this.getRandomArbitrary(
                 this.SPAWN_OFFSET,

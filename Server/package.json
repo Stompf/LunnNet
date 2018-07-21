@@ -10,7 +10,7 @@
         "watch-ts": "tsc -w --pretty",
         "serve": "cross-env NODE_ENV=production ts-node src/server.ts",
         "debug-serve": "nodemon --delay 0.5 -e ts -w ./src -x npm run watch:debug-serve",
-        "watch:debug-serve": "kill-port --port 9229 && TS_NODE_FILES=true node --inspect=0.0.0.0:9229 -r ts-node/register src/server.ts",
+        "watch:debug-serve": "kill-port --port 9229 && node --inspect=0.0.0.0:9229 -r ts-node/register src/server.ts",
         "lint": "tslint -c tslint.json --fix --project tsconfig.json",
         "prettier": "prettier --write \"**/*.ts\"",
         "precommit": "npm run prettier && npm run lint"

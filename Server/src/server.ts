@@ -5,6 +5,7 @@ import { logger } from './logger';
 import * as compression from 'compression';
 import * as helmet from 'helmet';
 import { MatchMaking } from './matchmaking';
+import { LunnNet } from './typings';
 
 const port = process.env.PORT || 4444;
 const app = express();

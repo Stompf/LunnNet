@@ -4,6 +4,7 @@ import { Group } from 'phaser-ce';
 import { PlayerOptions } from 'src/achtung-kurve/models';
 import { KeyMapping } from './key-mapping';
 import { NetworkPlayer } from './network-player';
+import { AchtungKurve, LunnNet } from 'lunnNet';
 
 export class NetworkAchtungGame extends BaseAchtungGame {
     private socket: SocketIOClient.Socket | undefined;
@@ -85,7 +86,7 @@ export class NetworkAchtungGame extends BaseAchtungGame {
             this.queue();
         });
 
-        this.socket.on('GameFound', (data: LunnNet.AchtungKurve.GameFound) => {
+        this.socket.on('GameFound', (data: AchtungKurve.GameFound) => {
             this.connectStatusText.setText('Game found');
             this.initNewNetworkGame(data);
         });
@@ -103,7 +104,7 @@ export class NetworkAchtungGame extends BaseAchtungGame {
             this.connect();
         });
 
-        this.socket.on('RoundOver', (data: LunnNet.AchtungKurve.RoundOver) => {
+        this.socket.on('RoundOver', (data: AchtungKurve.RoundOver) => {
             this.connectStatusText.bringToTop();
             this.connectStatusText.visible = true;
 
@@ -127,7 +128,7 @@ export class NetworkAchtungGame extends BaseAchtungGame {
             }, data.roundTimeout);
         });
 
-        this.socket.on('ServerTick', (data: LunnNet.AchtungKurve.ServerTick) => {
+        this.socket.on('ServerTick', (data: AchtungKurve.ServerTick) => {
             if (this.latestNetworkTick > data.tick) {
                 return;
             }
@@ -143,7 +144,7 @@ export class NetworkAchtungGame extends BaseAchtungGame {
         });
     };
 
-    private initNewNetworkGame(data: LunnNet.AchtungKurve.GameFound) {
+    private initNewNetworkGame(data: AchtungKurve.GameFound) {
         if (!this.socket) {
             return;
         }

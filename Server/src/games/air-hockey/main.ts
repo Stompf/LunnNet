@@ -1,11 +1,12 @@
 import { Player } from './player';
-import { logger } from '../logger';
+import { logger } from '../../logger';
 import * as p2 from 'p2';
 import { Ball } from './ball';
 import { Team, TeamSide } from './team';
 import { Socket } from 'socket.io';
+import { LunnNet, AirHockey } from '../../typings';
 
-export class AirHockey implements LunnNet.NetworkGame {
+export class AirHockeyGame implements LunnNet.NetworkGame {
     static MAX_PLAYERS = 2;
     static MIN_PLAYERS = 2;
 
@@ -56,7 +57,7 @@ export class AirHockey implements LunnNet.NetworkGame {
     }
 
     initGame() {
-        const gameFound: LunnNet.AirHockey.GameFound = {
+        const gameFound: AirHockey.GameFound = {
             physicsOptions: {
                 gravity: this.world.gravity,
                 restitution: this.world.defaultContactMaterial.restitution
@@ -141,7 +142,7 @@ export class AirHockey implements LunnNet.NetworkGame {
         }
     }
 
-    private mapToGoalOptions = (goal: Goal): LunnNet.AirHockey.GoalOptions => {
+    private mapToGoalOptions = (goal: Goal): AirHockey.GoalOptions => {
         return {
             back: this.mapToPositionWithBox(goal.back),
             bottom: this.mapToPositionWithBox(goal.bottom),
@@ -150,7 +151,7 @@ export class AirHockey implements LunnNet.NetworkGame {
         };
     };
 
-    private mapToPositionWithBox(body: p2.Body): LunnNet.AirHockey.PositionWithBox {
+    private mapToPositionWithBox(body: p2.Body): AirHockey.PositionWithBox {
         const box = body.shapes[0] as p2.Box;
         return {
             height: box.height,
@@ -176,7 +177,7 @@ export class AirHockey implements LunnNet.NetworkGame {
             this.world.step(this.FIXED_TIME_STEP, this.FIXED_TIME_STEP, this.MAX_SUB_STEPS);
         }
 
-        const serverTick: LunnNet.AirHockey.ServerTick = {
+        const serverTick: AirHockey.ServerTick = {
             tick: this.tick,
             players: this.players.map(p => p.toUpdateNetworkPlayerPlayer()),
             ballUpdate: this.ball.toBallUpdate()
@@ -206,7 +207,7 @@ export class AirHockey implements LunnNet.NetworkGame {
                     logger.info(`${team.TeamSide} GOAL!`);
                     team.addScore();
 
-                    const newGoal: LunnNet.AirHockey.NewGoal = {
+                    const newGoal: AirHockey.NewGoal = {
                         teamThatScored: team.TeamSide === TeamSide.Left ? 'left' : 'right',
                         teamLeftScore: this.teamLeft.Score,
                         teamRightScore: this.teamRight.Score,
@@ -239,13 +240,13 @@ export class AirHockey implements LunnNet.NetworkGame {
     }
 
     private listenToEvents(socket: Socket) {
-        socket.on('UpdateFromClient', (data: LunnNet.AirHockey.UpdateFromClient) => {
+        socket.on('UpdateFromClient', (data: AirHockey.UpdateFromClient) => {
             this.handleOnPlayerUpdate(socket.id, data);
         });
         socket.on('disconnect', this.stopGame);
     }
 
-    private handleOnPlayerUpdate = (id: string, data: LunnNet.AirHockey.UpdateFromClient) => {
+    private handleOnPlayerUpdate = (id: string, data: AirHockey.UpdateFromClient) => {
         if (!this.gameStated) {
             return;
         }

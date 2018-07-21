@@ -1,8 +1,9 @@
 import * as Phaser from 'phaser-ce';
 import { KeyMapping } from './key-mapping';
 import { BaseSprite } from './baseSprite';
+import { AirHockey } from 'lunnNet';
 
-export const DEFAULT_PLAYER_OPTIONS: LunnNet.AirHockey.NewNetworkPlayer = {
+export const DEFAULT_PLAYER_OPTIONS: AirHockey.NewNetworkPlayer = {
     color: 0xff0000,
     diameter: 60,
     mass: 1,
@@ -24,7 +25,7 @@ export class Player extends BaseSprite {
         game: Phaser.Game,
         isLocalPlayer: boolean,
         keyMapping: KeyMapping.Mapping,
-        options: LunnNet.AirHockey.NewNetworkPlayer
+        options: AirHockey.NewNetworkPlayer
     ) {
         super(Player.createSprite(game, options));
 
@@ -35,7 +36,7 @@ export class Player extends BaseSprite {
         this.isLocalPlayer = isLocalPlayer;
     }
 
-    onNetworkUpdate(data: LunnNet.AirHockey.UpdateNetworkPlayer) {
+    onNetworkUpdate(data: AirHockey.UpdateNetworkPlayer) {
         // if (this.isLocalPlayer) {
         //     return;
         // }
@@ -88,7 +89,7 @@ export class Player extends BaseSprite {
         }
     }
 
-    toUpdateNetworkPlayer(): LunnNet.AirHockey.UpdateFromClient {
+    toUpdateNetworkPlayer(): AirHockey.UpdateFromClient {
         // console.log(`Update: ${this.sprite.body.angularForce} : ${this.sprite.body.angularVelocity} :
         // ${this.sprite.body.force.x} : ${this.sprite.body.force.y} : ${this.sprite.body.velocity.x} : ${this.sprite.body.velocity.y}`);
 
@@ -98,7 +99,7 @@ export class Player extends BaseSprite {
         };
     }
 
-    static createSprite(game: Phaser.Game, options: LunnNet.AirHockey.NewNetworkPlayer) {
+    static createSprite(game: Phaser.Game, options: AirHockey.NewNetworkPlayer) {
         Phaser.Component.Core.skipTypeChecks = true;
 
         const graphics = new Phaser.Graphics(game);

@@ -4,6 +4,7 @@ import { Player } from './player';
 import { Ball } from './ball';
 import { Team, TeamSide } from './team';
 import { KeyMapping } from './key-mapping';
+import { AirHockey, LunnNet } from 'lunnNet';
 // import { KeyMapping } from './key-mapping';
 
 export class AirHockeyGame {
@@ -128,7 +129,7 @@ export class AirHockeyGame {
             this.queue();
         });
 
-        this.socket.on('GameFound', (data: LunnNet.AirHockey.GameFound) => {
+        this.socket.on('GameFound', (data: AirHockey.GameFound) => {
             this.connectStatusText.setText('Game found');
             this.initNewNetworkGame(data);
         });
@@ -148,7 +149,7 @@ export class AirHockeyGame {
             this.connect();
         });
 
-        this.socket.on('ServerTick', (data: LunnNet.AirHockey.ServerTick) => {
+        this.socket.on('ServerTick', (data: AirHockey.ServerTick) => {
             if (this.latestNetworkTick > data.tick) {
                 return;
             }
@@ -167,7 +168,7 @@ export class AirHockeyGame {
             this.latestNetworkTick = data.tick;
         });
 
-        this.socket.on('NewGoal', (data: LunnNet.AirHockey.NewGoal) => {
+        this.socket.on('NewGoal', (data: AirHockey.NewGoal) => {
             this.teamLeft.score = data.teamLeftScore;
             this.teamRight.score = data.teamRightScore;
             this.scoreText.setText(this.teamLeft.score + ' - ' + this.teamRight.score, true);
@@ -187,7 +188,7 @@ export class AirHockeyGame {
         // });
     };
 
-    private initNewNetworkGame(data: LunnNet.AirHockey.GameFound) {
+    private initNewNetworkGame(data: AirHockey.GameFound) {
         this.clear();
         this.connectStatusText.visible = false;
         this.game.physics.p2.world.gravity = data.physicsOptions.gravity;
@@ -224,14 +225,14 @@ export class AirHockeyGame {
         this.teamRight.resetScore();
     }
 
-    private drawGoals(goalOptions: LunnNet.AirHockey.GoalOptions) {
+    private drawGoals(goalOptions: AirHockey.GoalOptions) {
         this.drawPositionWithBox(goalOptions.top, 0xd7d7d7);
         this.drawPositionWithBox(goalOptions.back, 0xd7d7d7);
         this.drawPositionWithBox(goalOptions.bottom, 0xd7d7d7);
         this.drawPositionWithBox(goalOptions.goal, 0x000000);
     }
 
-    private drawPositionWithBox(pBox: LunnNet.AirHockey.PositionWithBox, color: number) {
+    private drawPositionWithBox(pBox: AirHockey.PositionWithBox, color: number) {
         const texture = new Phaser.Graphics(this.game);
         texture.beginFill(color);
         texture.drawRect(0, 0, pBox.width, pBox.height);

@@ -1,4 +1,5 @@
 import * as p2 from 'p2';
+import { AirHockey } from '../../typings';
 
 export class Ball {
     body: p2.Body;
@@ -27,7 +28,7 @@ export class Ball {
         this.body.previousPosition = this.body.position;
     }
 
-    toBallUpdate(): LunnNet.AirHockey.BallUpdate {
+    toBallUpdate(): AirHockey.BallUpdate {
         return {
             angularVelocity: this.body.angularVelocity,
             position: {

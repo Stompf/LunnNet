@@ -1,5 +1,6 @@
 import { PlayerOptions } from '../models';
 import { KeyMapping } from './key-mapping';
+import { AchtungKurve, LunnNet } from 'lunnNet';
 
 export class NetworkPlayer {
     readonly id: string;
@@ -13,7 +14,7 @@ export class NetworkPlayer {
     private color: number;
     private diameter: number;
 
-    private queuedUpdates: LunnNet.AchtungKurve.UpdatePlayer[];
+    private queuedUpdates: AchtungKurve.UpdatePlayer[];
 
     graphics: Phaser.Graphics;
 
@@ -55,11 +56,11 @@ export class NetworkPlayer {
         return oldMovement !== this.movement;
     }
 
-    onNetworkUpdate(data: LunnNet.AchtungKurve.UpdatePlayer) {
+    onNetworkUpdate(data: AchtungKurve.UpdatePlayer) {
         this.queuedUpdates.push(data);
     }
 
-    toUpdateFromClient(): LunnNet.AchtungKurve.UpdateFromClient {
+    toUpdateFromClient(): AchtungKurve.UpdateFromClient {
         return {
             movement: this.movement
         };

@@ -1,8 +1,9 @@
 import { MultiDictionary } from 'typescript-collections';
 import { logger } from './logger';
-import { AirHockey } from './air-hockey/main';
+import { AirHockeyGame } from './games/air-hockey/main';
 import { Socket } from 'socket.io';
-import { AchtungKurve } from './achtung-kurve/main';
+import { AchtungKurveGame } from './games/achtung-kurve/main';
+import { LunnNet } from './typings';
 
 export class MatchMaking {
     private currentQueue: MultiDictionary<LunnNet.Game, Socket>;
@@ -30,26 +31,26 @@ export class MatchMaking {
 
         switch (game) {
             case 'AirHockey':
-                while (array.length >= AirHockey.MIN_PLAYERS) {
+                while (array.length >= AirHockeyGame.MIN_PLAYERS) {
                     const playerOne = array.shift() as Socket;
                     const playerTwo = array.shift() as Socket;
 
                     this.currentQueue.remove(game, playerOne);
                     this.currentQueue.remove(game, playerTwo);
 
-                    const airHockey = new AirHockey(playerOne, playerTwo);
+                    const airHockey = new AirHockeyGame(playerOne, playerTwo);
                     airHockey.initGame();
                 }
                 break;
             case 'AchtungKurve':
-                while (array.length >= AchtungKurve.MIN_PLAYERS) {
+                while (array.length >= AchtungKurveGame.MIN_PLAYERS) {
                     const playerOne = array.shift() as Socket;
                     const playerTwo = array.shift() as Socket;
 
                     this.currentQueue.remove(game, playerOne);
                     this.currentQueue.remove(game, playerTwo);
 
-                    const achtungKurve = new AchtungKurve([playerOne, playerTwo]);
+                    const achtungKurve = new AchtungKurveGame([playerOne, playerTwo]);
                     achtungKurve.initGame();
                 }
                 break;

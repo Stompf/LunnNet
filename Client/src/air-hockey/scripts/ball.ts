@@ -1,8 +1,9 @@
 import * as Phaser from 'phaser-ce';
 import { BaseSprite } from './baseSprite';
 import { P2Sprite } from 'src/models';
+import { AirHockey } from 'lunnNet';
 
-const DEFAULT_BALL_OPTIONS: LunnNet.AirHockey.BallOptions = {
+const DEFAULT_BALL_OPTIONS: AirHockey.BallOptions = {
     mass: 0.1,
     diameter: 30,
     color: 0x000000,
@@ -12,12 +13,12 @@ const DEFAULT_BALL_OPTIONS: LunnNet.AirHockey.BallOptions = {
 export class Ball extends BaseSprite {
     private readonly MAX_VELOCITY: number;
 
-    constructor(game: Phaser.Game, options?: LunnNet.AirHockey.BallOptions) {
+    constructor(game: Phaser.Game, options?: AirHockey.BallOptions) {
         super(Ball.createSprite(game, options || DEFAULT_BALL_OPTIONS));
         this.MAX_VELOCITY = options ? options.maxVelocity : DEFAULT_BALL_OPTIONS.maxVelocity;
     }
 
-    onNetworkUpdate(data: LunnNet.AirHockey.BallUpdate) {
+    onNetworkUpdate(data: AirHockey.BallUpdate) {
         this.sprite.body.setZeroVelocity();
 
         this.sprite.body.angularVelocity = data.angularVelocity;
@@ -30,7 +31,7 @@ export class Ball extends BaseSprite {
         this.constrainVelocity(this.sprite, this.MAX_VELOCITY);
     }
 
-    static createSprite(game: Phaser.Game, options: LunnNet.AirHockey.BallOptions) {
+    static createSprite(game: Phaser.Game, options: AirHockey.BallOptions) {
         Phaser.Component.Core.skipTypeChecks = true;
 
         const graphics = new Phaser.Graphics(game);

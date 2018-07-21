@@ -1,9 +1,20 @@
-declare namespace LunnNet {
+import { Socket } from 'socket.io';
+
+export namespace LunnNet {
     type Game = 'AirHockey' | 'AchtungKurve';
 
     interface NetworkGame {
         readonly GAME_NAME: string;
         initGame(): void;
+    }
+
+    interface Lobby {
+        name: string;
+        players: Socket[];
+        maxPlayers: number;
+        host: Socket;
+        status: 'waiting' | 'inGame';
+        game: Game;
     }
 
     namespace Network {

@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io';
 import { constants } from './constants';
+import { LunnNet, AchtungKurve } from '../../typings';
 
 export class Player {
     static speed = 0.1;
@@ -67,14 +68,14 @@ export class Player {
         }
     }
 
-    onClientUpdate(data: LunnNet.AchtungKurve.UpdateFromClient) {
+    onClientUpdate(data: AchtungKurve.UpdateFromClient) {
         if (!this.isAlive) {
             return;
         }
         this.movement = data.movement;
     }
 
-    toNewNetworkPlayer(): LunnNet.AchtungKurve.NewNetworkPlayer {
+    toNewNetworkPlayer(): AchtungKurve.NewNetworkPlayer {
         return {
             color: this.color,
             id: this.Id,
@@ -83,14 +84,14 @@ export class Player {
         };
     }
 
-    toUpdatePlayer(): LunnNet.AchtungKurve.UpdatePlayer {
+    toUpdatePlayer(): AchtungKurve.UpdatePlayer {
         return {
             id: this.Id,
             position: this.positions[0]
         };
     }
 
-    toNewRoundPlayer(): LunnNet.AchtungKurve.NewRoundPlayer {
+    toNewRoundPlayer(): AchtungKurve.NewRoundPlayer {
         return {
             ...this.toUpdatePlayer(),
             movement: this.movement

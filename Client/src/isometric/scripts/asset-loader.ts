@@ -1,3 +1,5 @@
+import { LunnNet } from 'lunnNet';
+
 const BASE_ASSET_DIR = process.env.PUBLIC_URL + '/assets/games/isometric';
 
 export enum MaleWeapons {

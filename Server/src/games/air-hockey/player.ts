@@ -1,6 +1,7 @@
 import * as p2 from 'p2';
 import { Team } from './team';
 import { Socket } from 'socket.io';
+import { AirHockey } from '../../typings';
 
 export class Player {
     socket: Socket;
@@ -30,7 +31,7 @@ export class Player {
         this.body.previousPosition = this.body.position;
     }
 
-    toNewNetworkPlayer(): LunnNet.AirHockey.NewNetworkPlayer {
+    toNewNetworkPlayer(): AirHockey.NewNetworkPlayer {
         return {
             color: this.COLOR,
             id: this.socket.id,
@@ -41,7 +42,7 @@ export class Player {
         };
     }
 
-    toUpdateNetworkPlayerPlayer(): LunnNet.AirHockey.UpdateNetworkPlayer {
+    toUpdateNetworkPlayerPlayer(): AirHockey.UpdateNetworkPlayer {
         return {
             id: this.socket.id,
             position: { x: this.body.interpolatedPosition[0], y: this.body.interpolatedPosition[1] }

@@ -1,55 +1,55 @@
-declare namespace LunnNet {
-    namespace AchtungKurve {
-        interface Options {
-            player: {
-                speed: number;
-                diameter: number;
-            };
-        }
+import { LunnNet } from './lunnNet';
 
-        interface UpdateFromClient {
-            movement: number;
-        }
+export namespace AchtungKurve {
+    interface Options {
+        player: {
+            speed: number;
+            diameter: number;
+        };
+    }
 
-        interface NewNetworkPlayer {
-            id: string;
-            color: number;
-            startPosition: Utils.Point;
-            startMovement: number;
-        }
+    interface UpdateFromClient {
+        movement: number;
+    }
 
-        interface GameFound {
-            gameSize: Utils.Size;
-            options: Options;
-            players: NewNetworkPlayer[];
-        }
+    interface NewNetworkPlayer {
+        id: string;
+        color: number;
+        startPosition: LunnNet.Utils.Point;
+        startMovement: number;
+    }
 
-        interface ServerTick {
-            tick: number;
-            players: UpdatePlayer[];
-        }
+    interface GameFound {
+        gameSize: LunnNet.Utils.Size;
+        options: Options;
+        players: NewNetworkPlayer[];
+    }
 
-        interface UpdatePlayer {
-            id: string;
-            position: Utils.Point;
-        }
+    interface ServerTick {
+        tick: number;
+        players: UpdatePlayer[];
+    }
 
-        interface NewRoundPlayer extends UpdatePlayer {
-            movement: number;
-        }
+    interface UpdatePlayer {
+        id: string;
+        position: LunnNet.Utils.Point;
+    }
 
-        interface PlayerReady {}
+    interface NewRoundPlayer extends UpdatePlayer {
+        movement: number;
+    }
 
-        interface RoundOver {
-            winnerId?: string;
-            color?: number;
-            roundTimeout: number;
-            players: NewRoundPlayer[];
-        }
+    interface PlayerReady {}
 
-        interface StartPosition {
-            movement: number;
-            position: Utils.Point;
-        }
+    interface RoundOver {
+        winnerId?: string;
+        color?: number;
+        roundTimeout: number;
+        players: NewRoundPlayer[];
+    }
+
+    interface StartPosition {
+        movement: number;
+        position: LunnNet.Utils.Point;
     }
 }
