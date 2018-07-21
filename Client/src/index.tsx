@@ -9,7 +9,6 @@ import AirHockeyLocal from './air-hockey/air-hockey-local';
 import AirHockeyNetwork from './air-hockey/air-hockey-network';
 import Isometric from './isometric/isometric';
 import { AchtungKurveLocal, AchtungKurveNetwork, AchtungKurveMainMenu } from './achtung-kurve';
-
 import { Reboot, AppBar, Button, Grid } from 'material-ui';
 import Auth from './auth/auth';
 

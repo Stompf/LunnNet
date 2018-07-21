@@ -26,7 +26,7 @@
     "vsicons.presets.angular": true,
     "tslint.autoFixOnSave": true,
     "tslint.alwaysShowRuleFailuresAsWarnings": true,
-    "extensions.autoUpdate": true,
+    "debug.toolBarLocation": "docked",
     "terminal.integrated.copyOnSelection": true,
     "typescript.tsdk": "./node_modules/typescript/lib",
     "cSpell.ignorePaths": [
