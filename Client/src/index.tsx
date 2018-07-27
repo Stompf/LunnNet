@@ -1,4 +1,3 @@
-import 'typeface-roboto';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { unregister } from './registerServiceWorker';
@@ -9,7 +8,8 @@ import AirHockeyLocal from './air-hockey/air-hockey-local';
 import AirHockeyNetwork from './air-hockey/air-hockey-network';
 import Isometric from './isometric/isometric';
 import { AchtungKurveLocal, AchtungKurveNetwork, AchtungKurveMainMenu } from './achtung-kurve';
-import { Reboot, AppBar, Button, Grid } from 'material-ui';
+
+import { AppBar, Button, Grid } from '@material-ui/core';
 import Auth from './auth/auth';
 
 (window as any).PIXI = require('phaser-ce/build/custom/pixi');
@@ -61,12 +61,12 @@ const Main = () => (
 );
 
 const App = () => (
-    <div>
-        <Reboot />
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <Grid>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
         <Header />
         <Main />
-    </div>
+    </Grid>
 );
 
 ReactDOM.render(

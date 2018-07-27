@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, MenuItem, WithStyles, Menu } from 'material-ui';
-import { StyleRules, withStyles } from 'material-ui/styles';
+import { Button, MenuItem, WithStyles, Menu } from '@material-ui/core';
+import { StyleRules, withStyles } from '@material-ui/core/styles';
 
 interface AchtungKurveProps {}
 

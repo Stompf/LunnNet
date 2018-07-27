@@ -1,9 +1,18 @@
 import * as React from 'react';
 import Auth0Lock from 'auth0-lock';
-import { Button, Avatar, withStyles, WithStyles, MenuItem, IconButton, Menu } from 'material-ui';
-import { StyleRules, Theme } from 'material-ui/styles';
+import {
+    Button,
+    Avatar,
+    withStyles,
+    WithStyles,
+    MenuItem,
+    IconButton,
+    Menu,
+    Theme
+} from '@material-ui/core';
 import { AuthConfig } from 'src/auth/auth-config';
 import { Auth0UserProfile } from 'auth0-js';
+import { StyleRules } from '../../node_modules/@material-ui/core/styles';
 
 interface AuthProps {}
 interface AuthState {
