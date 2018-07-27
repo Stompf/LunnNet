@@ -44,9 +44,11 @@
         "ngtools",
         "precommit",
         "prettierrc",
+        "printf",
         "pxmi",
         "respawn",
         "testem",
         "vsicons"
-    ]
+    ],
+    "debug.toolBarLocation": "docked"
 }

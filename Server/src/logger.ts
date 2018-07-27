@@ -1,15 +1,11 @@
-import * as winston from 'winston';
+import { createLogger, format, transports } from 'winston';
+const { combine, timestamp, printf, colorize } = format;
 
-export const logger = new winston.Logger({
-    exitOnError: false,
-    level: 'info',
-    transports: [
-        new winston.transports.Console({
-            handleExceptions: true,
-            timestamp: () => {
-                return new Date().toLocaleString('sv-SE');
-            },
-            colorize: true
-        })
-    ]
+const myFormat = printf(info => {
+    return `${new Date(info.timestamp).toLocaleString()} ${info.level}: ${info.message}`;
+});
+
+export const logger = createLogger({
+    format: combine(colorize(), timestamp(), myFormat),
+    transports: [new transports.Console()]
 });
