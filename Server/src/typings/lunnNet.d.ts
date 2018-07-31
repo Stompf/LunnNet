@@ -9,6 +9,7 @@ export namespace LunnNet {
     }
 
     interface Lobby {
+        id: string;
         name: string;
         players: Socket[];
         maxPlayers: number;
