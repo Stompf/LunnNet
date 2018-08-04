@@ -1,23 +1,47 @@
 import { LunnNet } from '../typings';
 import { Socket } from 'socket.io';
 import { v4 } from 'uuid';
+import { Dictionary } from 'typescript-collections';
+import { Lobby } from './lobby';
 
 export class LobbyHandler {
-    activeLobbies: LunnNet.Lobby[];
+    activeLobbies: Dictionary<string, Lobby>;
 
     constructor() {
-        this.activeLobbies = [];
+        this.activeLobbies = new Dictionary();
     }
 
     addLobby(name: string, game: LunnNet.Game, host: Socket) {
-        this.activeLobbies.push({
-            id: v4(),
-            game,
-            host,
-            name,
-            status: 'waiting',
-            players: [host],
-            maxPlayers: 8
-        });
+        const id = this.generateId();
+
+        this.activeLobbies.setValue(
+            id,
+            new Lobby({
+                id,
+                game,
+                host,
+                name,
+                status: 'waiting',
+                players: [host],
+                maxPlayers: 8
+            })
+        );
+    }
+
+    removeLobby(id: string) {
+        const lobby = this.activeLobbies.getValue(id);
+        if (lobby) {
+            lobby.destroy();
+            this.activeLobbies.remove(id);
+        }
+    }
+
+    private generateId() {
+        while (true) {
+            const id = v4();
+            if (!this.activeLobbies.containsKey(id)) {
+                return id;
+            }
+        }
     }
 }
